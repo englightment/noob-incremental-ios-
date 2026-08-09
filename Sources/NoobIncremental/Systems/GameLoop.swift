@@ -4,9 +4,6 @@ import Foundation
 /// same function drives both the live foreground tick and the offline fast-forward step.
 enum GameLoop {
 
-    /// Registry of generator definitions is intentionally absent for now — no generators
-    /// exist yet (feature priority #2). Passive income is 0 until generators are added,
-    /// at which point this switches to summing `Formulas.generatorOutput` per definition.
     static func tick(_ state: GameState, elapsed: TimeInterval) -> GameState {
         guard elapsed > 0 else { return state }
 
@@ -21,19 +18,18 @@ enum GameLoop {
     }
 
     static func passiveIncomePerSecond(_ state: GameState) -> Decimal {
-        // No generators defined yet; placeholder for when GeneratorDefinition catalog lands.
-        0
-    }
+        let outputMultiplier = UpgradeStore.outputMultiplier(state: state) * UpgradeStore.tickSpeedMultiplier(state: state)
 
-    static func applyTap(_ state: GameState) -> GameState {
-        var next = state
-        let gain = Formulas.tapValue(
-            baseValue: state.tapBaseValue,
-            tapMultiplier: state.tapMultiplier,
-            prestigeMultiplier: state.prestigeMultiplier
-        )
-        next.currency += gain
-        next.lifetimeEarned += gain
-        return next
+        return GeneratorCatalog.all.reduce(Decimal(0)) { total, definition in
+            let level = state.generators[definition.id]?.level ?? 0
+            guard level > 0 else { return total }
+            let output = Formulas.generatorOutput(
+                baseOutput: definition.baseOutput,
+                owned: level,
+                outputMultiplier: outputMultiplier,
+                prestigeMultiplier: state.prestigeMultiplier
+            )
+            return total + output
+        }
     }
 }

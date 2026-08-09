@@ -7,31 +7,27 @@ import Foundation
 /// real Roblox formulas once known.
 enum Formulas {
 
-    // MARK: - Tap
+    // MARK: - Leveled cost (used by both generators and global upgrades)
 
-    static func tapValue(baseValue: Decimal, tapMultiplier: Decimal, prestigeMultiplier: Decimal) -> Decimal {
-        baseValue * tapMultiplier * prestigeMultiplier
-    }
-
-    // MARK: - Generators
-
-    /// Cost of the next generator purchase, given how many are already owned.
+    /// Cost of the next level's purchase, given how many levels are already owned.
     /// cost = base * growthRate^owned
-    static func generatorCost(base: Decimal, owned: Int, growthRate: Double = 1.15) -> Decimal {
+    static func levelCost(base: Decimal, owned: Int, growthRate: Double = 1.15) -> Decimal {
         guard owned > 0 else { return base }
         let multiplier = pow(growthRate, Double(owned))
         return base * Decimal(multiplier)
     }
 
-    /// Total cost to buy `quantity` generators starting from `owned`.
-    static func generatorBulkCost(base: Decimal, owned: Int, quantity: Int, growthRate: Double = 1.15) -> Decimal {
+    /// Total cost to buy `quantity` more levels starting from `owned`.
+    static func bulkLevelCost(base: Decimal, owned: Int, quantity: Int, growthRate: Double = 1.15) -> Decimal {
         guard quantity > 0 else { return 0 }
         var total: Decimal = 0
         for i in 0..<quantity {
-            total += generatorCost(base: base, owned: owned + i, growthRate: growthRate)
+            total += levelCost(base: base, owned: owned + i, growthRate: growthRate)
         }
         return total
     }
+
+    // MARK: - Generators
 
     /// Passive output per tick for one generator type.
     static func generatorOutput(baseOutput: Decimal, owned: Int, outputMultiplier: Decimal, prestigeMultiplier: Decimal) -> Decimal {

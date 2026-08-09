@@ -3,48 +3,41 @@ import XCTest
 
 final class FormulasTests: XCTestCase {
 
-    // MARK: - Tap
+    // MARK: - Leveled cost scaling
 
-    func testTapValueAppliesAllMultipliers() {
-        let value = Formulas.tapValue(baseValue: 2, tapMultiplier: 3, prestigeMultiplier: 2)
-        XCTAssertEqual(value, 12)
-    }
-
-    // MARK: - Generator cost scaling
-
-    func testGeneratorCostAtZeroOwnedEqualsBase() {
-        let cost = Formulas.generatorCost(base: 10, owned: 0, growthRate: 1.15)
+    func testLevelCostAtZeroOwnedEqualsBase() {
+        let cost = Formulas.levelCost(base: 10, owned: 0, growthRate: 1.15)
         XCTAssertEqual(cost, 10)
     }
 
-    func testGeneratorCostIncreasesMonotonicallyWithOwned() {
-        var previous = Formulas.generatorCost(base: 10, owned: 0, growthRate: 1.15)
+    func testLevelCostIncreasesMonotonicallyWithOwned() {
+        var previous = Formulas.levelCost(base: 10, owned: 0, growthRate: 1.15)
         for owned in 1...20 {
-            let current = Formulas.generatorCost(base: 10, owned: owned, growthRate: 1.15)
+            let current = Formulas.levelCost(base: 10, owned: owned, growthRate: 1.15)
             XCTAssertGreaterThan(current, previous, "cost should strictly increase at owned=\(owned)")
             previous = current
         }
     }
 
-    func testGeneratorCostMatchesExpectedGrowthFormula() {
+    func testLevelCostMatchesExpectedGrowthFormula() {
         // cost = base * growthRate^owned
-        let cost = Formulas.generatorCost(base: 100, owned: 5, growthRate: 1.15)
+        let cost = Formulas.levelCost(base: 100, owned: 5, growthRate: 1.15)
         let expected = 100.0 * pow(1.15, 5.0)
         let actual = NSDecimalNumber(decimal: cost).doubleValue
         XCTAssertEqual(actual, expected, accuracy: 0.01)
     }
 
-    func testGeneratorBulkCostEqualsSumOfIndividualCosts() {
-        let bulk = Formulas.generatorBulkCost(base: 10, owned: 3, quantity: 4, growthRate: 1.15)
+    func testBulkLevelCostEqualsSumOfIndividualCosts() {
+        let bulk = Formulas.bulkLevelCost(base: 10, owned: 3, quantity: 4, growthRate: 1.15)
         var manualSum: Decimal = 0
         for i in 0..<4 {
-            manualSum += Formulas.generatorCost(base: 10, owned: 3 + i, growthRate: 1.15)
+            manualSum += Formulas.levelCost(base: 10, owned: 3 + i, growthRate: 1.15)
         }
         XCTAssertEqual(bulk, manualSum)
     }
 
-    func testGeneratorBulkCostZeroQuantityIsZero() {
-        XCTAssertEqual(Formulas.generatorBulkCost(base: 10, owned: 0, quantity: 0), 0)
+    func testBulkLevelCostZeroQuantityIsZero() {
+        XCTAssertEqual(Formulas.bulkLevelCost(base: 10, owned: 0, quantity: 0), 0)
     }
 
     // MARK: - Generator output

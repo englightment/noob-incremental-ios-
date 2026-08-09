@@ -3,19 +3,15 @@ import Foundation
 /// The single source of truth for a save. Kept as one flat, Codable value type
 /// so the whole game can be saved/loaded/offline-fast-forwarded as one blob.
 struct GameState: Codable, Equatable {
-    // Currency
-    var currency: Decimal = 0
+    // Currency ("Oof")
+    var currency: Decimal = GameBalance.startingCurrency
     var lifetimeEarned: Decimal = 0
 
-    // Tap
-    var tapBaseValue: Decimal = 1
-    var tapMultiplier: Decimal = 1
-
-    // Generators, keyed by GeneratorDefinition.id
+    // Noobs, keyed by GeneratorDefinition.id
     var generators: [String: GeneratorState] = [:]
 
-    // Upgrades, storing purchased upgrade ids
-    var purchasedUpgrades: Set<String> = []
+    // Global upgrades ("More Oof", "Faster Noobs", ...), keyed by UpgradeDefinition.id -> level purchased
+    var upgradeLevels: [String: Int] = [:]
 
     // Prestige
     var prestigeCurrency: Decimal = 0
@@ -40,7 +36,7 @@ struct GameState: Codable, Equatable {
     var lastSaveTimestamp: Date = Date()
     var totalPlayTime: TimeInterval = 0
 
-    /// Effective multiplier applied to all currency gains (tap + generators).
+    /// Effective multiplier applied to all Noob production.
     var prestigeMultiplier: Decimal {
         Formulas.prestigeMultiplier(prestigeCurrency: prestigeCurrency)
     }
