@@ -97,12 +97,16 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE=""
 
+      # Uses `ditto`, not `zip` — plain zip doesn't reliably preserve the executable bit
+      # on the app's binary inside the bundle, which makes installers reject the .ipa
+      # as invalid. `ditto` is what `xcodebuild -exportArchive` itself uses internally.
       - name: Package as .ipa
         run: |
           APP_PATH="build/Build/Products/Release-iphoneos/NoobIncremental.app"
           mkdir -p Payload
           cp -r "$APP_PATH" Payload/
-          zip -r NoobIncremental-unsigned.ipa Payload
+          chmod +x "Payload/NoobIncremental.app/NoobIncremental"
+          ditto -c -k --keepParent Payload NoobIncremental-unsigned.ipa
 
       - name: Upload .ipa artifact
         uses: actions/upload-artifact@v4
