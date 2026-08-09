@@ -12,17 +12,24 @@
 		183790EAA80841FFDF999C9B /* NumberFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */; };
 		2388156E9505C27FB3956782 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A10F64BBF3AE4F3B20A3C4B /* ContentView.swift */; };
 		26FBCA8D7E4B1289001AF6C1 /* GameBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58064FEE4A7B0E3FD96D834 /* GameBalance.swift */; };
+		283E0ABD92263388403A364B /* UpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18A0896ECC21EC4833B7340 /* UpgradeStoreTests.swift */; };
 		3B0F4D3F6CF32BEAF4CAB058 /* NoobIncrementalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A176DC510D4E504705C05D6E /* NoobIncrementalApp.swift */; };
 		519C10902BE7A8E5951697BD /* PetState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55E2434ADBF982BC8169D6C3 /* PetState.swift */; };
 		5662F0BF7E9998E7746F8CC8 /* FormulasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9102C53B66EE95A238CE1C0D /* FormulasTests.swift */; };
 		5EA32FE7047CE1A8F4BA55AD /* OfflineProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */; };
 		6FC7BF5BDF1502E276274D14 /* OfflineProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A6DF5E50215E9B2048DADC /* OfflineProgressTests.swift */; };
 		70C504122BF04C983B888DB5 /* GameLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF13B3804E62DA65AE06A1F4 /* GameLoop.swift */; };
+		780C15320F83BD4132C3BDE5 /* GeneratorStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFCA9BD2719FCF5AA254E72 /* GeneratorStoreTests.swift */; };
 		8EF54F390B50CC2CC427862A /* Formulas.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */; };
 		A65D3A7E310E9FDE9C920EE4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4B7BB345AAB314803A868CE /* Assets.xcassets */; };
 		B8AC0B69FB413DD03CAAAE74 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C14AD1238FC37E53805ECF /* GameState.swift */; };
+		BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13E6847D2D71E92B21BF9C2 /* UpgradeDefinition.swift */; };
 		BE90EC6D4AB8EFF30652BEFD /* NumberFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1616AA4F5E49D1A089625AC1 /* NumberFormatting.swift */; };
+		CDFA142A60E72F35B51D6303 /* GeneratorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0428B2EB50771DBE1BA4CC4A /* GeneratorStore.swift */; };
+		CE54B7F076646DD58CDE2503 /* GameLoopPassiveIncomeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1131683B10CC5CB75CA716 /* GameLoopPassiveIncomeTests.swift */; };
+		E126A5AB62EE4CA58CAA5427 /* GeneratorDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E303E868D2D07673027F91 /* GeneratorDefinition.swift */; };
 		E7F3F6218BC45A35902F2903 /* GeneratorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D29D4C7990FC411B26A687 /* GeneratorState.swift */; };
+		F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC12A83B89E0907154AB583 /* UpgradeStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0428B2EB50771DBE1BA4CC4A /* GeneratorStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorStore.swift; sourceTree = "<group>"; };
+		0E1131683B10CC5CB75CA716 /* GameLoopPassiveIncomeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLoopPassiveIncomeTests.swift; sourceTree = "<group>"; };
 		10107EDEDD2B1D4A7634B40A /* NoobIncremental.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NoobIncremental.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10C14AD1238FC37E53805ECF /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		11D29D4C7990FC411B26A687 /* GeneratorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorState.swift; sourceTree = "<group>"; };
@@ -45,16 +54,21 @@
 		38C0BC7ED008689C0B4E76EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		55E2434ADBF982BC8169D6C3 /* PetState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetState.swift; sourceTree = "<group>"; };
 		9102C53B66EE95A238CE1C0D /* FormulasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulasTests.swift; sourceTree = "<group>"; };
+		98E303E868D2D07673027F91 /* GeneratorDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorDefinition.swift; sourceTree = "<group>"; };
 		9A10F64BBF3AE4F3B20A3C4B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A176DC510D4E504705C05D6E /* NoobIncrementalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoobIncrementalApp.swift; sourceTree = "<group>"; };
 		A799D55A49241D21CCEA52F3 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		AF13B3804E62DA65AE06A1F4 /* GameLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLoop.swift; sourceTree = "<group>"; };
 		B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormattingTests.swift; sourceTree = "<group>"; };
 		BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formulas.swift; sourceTree = "<group>"; };
+		BFC12A83B89E0907154AB583 /* UpgradeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeStore.swift; sourceTree = "<group>"; };
 		C58064FEE4A7B0E3FD96D834 /* GameBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBalance.swift; sourceTree = "<group>"; };
 		C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineProgress.swift; sourceTree = "<group>"; };
 		E164BB617C986177AA688455 /* NoobIncrementalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoobIncrementalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E18A0896ECC21EC4833B7340 /* UpgradeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeStoreTests.swift; sourceTree = "<group>"; };
 		E4B7BB345AAB314803A868CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EDFCA9BD2719FCF5AA254E72 /* GeneratorStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorStoreTests.swift; sourceTree = "<group>"; };
+		F13E6847D2D71E92B21BF9C2 /* UpgradeDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeDefinition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -104,8 +118,10 @@
 			children = (
 				C58064FEE4A7B0E3FD96D834 /* GameBalance.swift */,
 				10C14AD1238FC37E53805ECF /* GameState.swift */,
+				98E303E868D2D07673027F91 /* GeneratorDefinition.swift */,
 				11D29D4C7990FC411B26A687 /* GeneratorState.swift */,
 				55E2434ADBF982BC8169D6C3 /* PetState.swift */,
+				F13E6847D2D71E92B21BF9C2 /* UpgradeDefinition.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -146,8 +162,11 @@
 			isa = PBXGroup;
 			children = (
 				9102C53B66EE95A238CE1C0D /* FormulasTests.swift */,
+				0E1131683B10CC5CB75CA716 /* GameLoopPassiveIncomeTests.swift */,
+				EDFCA9BD2719FCF5AA254E72 /* GeneratorStoreTests.swift */,
 				B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */,
 				17A6DF5E50215E9B2048DADC /* OfflineProgressTests.swift */,
+				E18A0896ECC21EC4833B7340 /* UpgradeStoreTests.swift */,
 			);
 			path = NoobIncrementalTests;
 			sourceTree = "<group>";
@@ -157,8 +176,10 @@
 			children = (
 				BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */,
 				AF13B3804E62DA65AE06A1F4 /* GameLoop.swift */,
+				0428B2EB50771DBE1BA4CC4A /* GeneratorStore.swift */,
 				1616AA4F5E49D1A089625AC1 /* NumberFormatting.swift */,
 				C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */,
+				BFC12A83B89E0907154AB583 /* UpgradeStore.swift */,
 			);
 			path = Systems;
 			sourceTree = "<group>";
@@ -271,12 +292,16 @@
 				70C504122BF04C983B888DB5 /* GameLoop.swift in Sources */,
 				B8AC0B69FB413DD03CAAAE74 /* GameState.swift in Sources */,
 				0EF915C8504FB351EBC648EE /* GameViewModel.swift in Sources */,
+				E126A5AB62EE4CA58CAA5427 /* GeneratorDefinition.swift in Sources */,
 				E7F3F6218BC45A35902F2903 /* GeneratorState.swift in Sources */,
+				CDFA142A60E72F35B51D6303 /* GeneratorStore.swift in Sources */,
 				3B0F4D3F6CF32BEAF4CAB058 /* NoobIncrementalApp.swift in Sources */,
 				BE90EC6D4AB8EFF30652BEFD /* NumberFormatting.swift in Sources */,
 				5EA32FE7047CE1A8F4BA55AD /* OfflineProgress.swift in Sources */,
 				519C10902BE7A8E5951697BD /* PetState.swift in Sources */,
 				00E29878A6480C69338B2CB4 /* SaveManager.swift in Sources */,
+				BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */,
+				F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,8 +310,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				5662F0BF7E9998E7746F8CC8 /* FormulasTests.swift in Sources */,
+				CE54B7F076646DD58CDE2503 /* GameLoopPassiveIncomeTests.swift in Sources */,
+				780C15320F83BD4132C3BDE5 /* GeneratorStoreTests.swift in Sources */,
 				183790EAA80841FFDF999C9B /* NumberFormattingTests.swift in Sources */,
 				6FC7BF5BDF1502E276274D14 /* OfflineProgressTests.swift in Sources */,
+				283E0ABD92263388403A364B /* UpgradeStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
