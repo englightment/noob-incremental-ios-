@@ -5,8 +5,42 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
+  sync-xcodeproj:
+    runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      # Xcode Cloud (configured from App Store Connect, not Xcode itself, so it works
+      # without a local Mac) needs a real .xcodeproj sitting in the repo to detect a
+      # scheme when you set up a workflow — it can't run our generation step first the
+      # way build-and-test does. So CI regenerates the project and commits it back
+      # whenever project.yml or the source tree changes.
+      - name: Commit regenerated project if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add NoobIncremental.xcodeproj
+          if git diff --cached --quiet; then
+            echo "No changes to NoobIncremental.xcodeproj"
+          else
+            git commit -m "chore: sync generated Xcode project [skip ci]"
+            git push
+          fi
+
   build-and-test:
+    needs: sync-xcodeproj
     runs-on: macos-latest
 
     steps:
