@@ -7,7 +7,7 @@ import Foundation
 /// real Roblox formulas once known.
 enum Formulas {
 
-    // MARK: - Leveled cost (used by both generators and global upgrades)
+    // MARK: - Leveled cost (used by generators and both upgrade shops)
 
     /// Cost of the next level's purchase, given how many levels are already owned.
     /// cost = base * growthRate^owned
@@ -29,29 +29,20 @@ enum Formulas {
 
     // MARK: - Generators
 
-    /// Passive output per tick for one generator type.
-    static func generatorOutput(baseOutput: Decimal, owned: Int, outputMultiplier: Decimal, prestigeMultiplier: Decimal) -> Decimal {
+    /// Passive output per second for one generator type, before summing across types.
+    static func generatorOutput(baseOutput: Decimal, owned: Int, outputMultiplier: Decimal) -> Decimal {
         guard owned > 0 else { return 0 }
-        return baseOutput * Decimal(owned) * outputMultiplier * prestigeMultiplier
+        return baseOutput * Decimal(owned) * outputMultiplier
     }
 
-    // MARK: - Prestige
+    // MARK: - Rebirth
 
-    /// Prestige currency granted for resetting at the given lifetime-earned total.
-    /// gain = sqrt(lifetimeEarned / threshold), floored at 0.
-    static func prestigeGain(lifetimeEarned: Decimal, threshold: Decimal = 1_000_000) -> Decimal {
-        guard lifetimeEarned > 0, threshold > 0 else { return 0 }
-        let ratio = NSDecimalNumber(decimal: lifetimeEarned / threshold).doubleValue
+    /// Rebirth currency granted for resetting at the given current-Oof total.
+    /// gain = sqrt(currency / divisor), floored at 0.
+    static func rebirthGain(currency: Decimal, divisor: Decimal = 10_000) -> Decimal {
+        guard currency > 0, divisor > 0 else { return 0 }
+        let ratio = NSDecimalNumber(decimal: currency / divisor).doubleValue
         guard ratio > 0 else { return 0 }
         return Decimal(sqrt(ratio))
-    }
-
-    /// Permanent multiplier applied to all currency gains, derived from banked prestige currency.
-    /// multiplier = 1 + log10(prestigeCurrency + 1) * 0.1
-    static func prestigeMultiplier(prestigeCurrency: Decimal) -> Decimal {
-        guard prestigeCurrency > 0 else { return 1 }
-        let value = NSDecimalNumber(decimal: prestigeCurrency).doubleValue
-        let bonus = log10(value + 1) * 0.1
-        return 1 + Decimal(bonus)
     }
 }

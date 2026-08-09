@@ -13,9 +13,11 @@ struct GameState: Codable, Equatable {
     // Global upgrades ("More Oof", "Faster Noobs", ...), keyed by UpgradeDefinition.id -> level purchased
     var upgradeLevels: [String: Int] = [:]
 
-    // Prestige
-    var prestigeCurrency: Decimal = 0
-    var prestigeCount: Int = 0
+    // Rebirth: a separate currency earned by resetting. Survives resets, along with the
+    // levels bought in the Rebirth Upgrades shop below — everything else resets to zero.
+    var rebirthCurrency: Decimal = 0
+    var rebirthCount: Int = 0
+    var rebirthUpgradeLevels: [String: Int] = [:]
 
     // Zones
     var unlockedZones: Set<String> = [GameBalance.defaultZoneID]
@@ -35,11 +37,6 @@ struct GameState: Codable, Equatable {
     // Meta
     var lastSaveTimestamp: Date = Date()
     var totalPlayTime: TimeInterval = 0
-
-    /// Effective multiplier applied to all Noob production.
-    var prestigeMultiplier: Decimal {
-        Formulas.prestigeMultiplier(prestigeCurrency: prestigeCurrency)
-    }
 
     static var newGame: GameState { GameState() }
 }

@@ -18,7 +18,9 @@ enum GameLoop {
     }
 
     static func passiveIncomePerSecond(_ state: GameState) -> Decimal {
-        let outputMultiplier = UpgradeStore.outputMultiplier(state: state) * UpgradeStore.tickSpeedMultiplier(state: state)
+        let outputMultiplier = UpgradeStore.outputMultiplier(state: state)
+            * UpgradeStore.tickSpeedMultiplier(state: state)
+            * RebirthUpgradeStore.outputMultiplier(state: state)
 
         return GeneratorCatalog.all.reduce(Decimal(0)) { total, definition in
             let level = state.generators[definition.id]?.level ?? 0
@@ -26,8 +28,7 @@ enum GameLoop {
             let output = Formulas.generatorOutput(
                 baseOutput: definition.baseOutput,
                 owned: level,
-                outputMultiplier: outputMultiplier,
-                prestigeMultiplier: state.prestigeMultiplier
+                outputMultiplier: outputMultiplier
             )
             return total + output
         }

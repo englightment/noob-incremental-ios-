@@ -9,8 +9,15 @@ enum GameBalance {
     /// since there's no tap-to-earn to bootstrap with.
     static let startingCurrency: Decimal = 10
 
-    /// Lifetime Oof earned required to reach the next prestige.
-    static let prestigeThreshold: Decimal = 5_000_000_000_000 // 5T, matches "0/5T Oofs"
+    /// Current Oof required before a Rebirth can be performed.
+    static let rebirthRequirement: Decimal = 10_000 // matches "Requirement: 10k Oof"
+
+    /// Scale factor in the rebirth-gain formula — bigger overshoot past the requirement = more gain.
+    static let rebirthGainDivisor: Decimal = 10_000
+
+    /// Cost growth rate for rebirth-currency upgrades — steeper than the Oof-currency shop
+    /// since each level here is far more powerful (doubling Oof output, etc).
+    static let rebirthUpgradeCostGrowthRate: Double = 2.2
 
     /// Baseline seconds-per-Noob-tick before any "Faster Noobs" upgrade is applied.
     static let baseNoobTickSeconds: TimeInterval = 1.0

@@ -43,44 +43,34 @@ final class FormulasTests: XCTestCase {
     // MARK: - Generator output
 
     func testGeneratorOutputScalesWithOwnedCount() {
-        let output = Formulas.generatorOutput(baseOutput: 1, owned: 5, outputMultiplier: 2, prestigeMultiplier: 1)
+        let output = Formulas.generatorOutput(baseOutput: 1, owned: 5, outputMultiplier: 2)
         XCTAssertEqual(output, 10)
     }
 
     func testGeneratorOutputIsZeroWhenNoneOwned() {
-        let output = Formulas.generatorOutput(baseOutput: 1, owned: 0, outputMultiplier: 2, prestigeMultiplier: 1)
+        let output = Formulas.generatorOutput(baseOutput: 1, owned: 0, outputMultiplier: 2)
         XCTAssertEqual(output, 0)
     }
 
-    // MARK: - Prestige
+    // MARK: - Rebirth
 
-    func testPrestigeGainIsZeroBelowThreshold() {
-        let gain = Formulas.prestigeGain(lifetimeEarned: 0, threshold: 1_000_000)
+    func testRebirthGainIsZeroBelowThreshold() {
+        let gain = Formulas.rebirthGain(currency: 0, divisor: 10_000)
         XCTAssertEqual(gain, 0)
     }
 
-    func testPrestigeGainAtExactlyThresholdIsOne() {
-        let gain = Formulas.prestigeGain(lifetimeEarned: 1_000_000, threshold: 1_000_000)
+    func testRebirthGainAtExactlyDivisorIsOne() {
+        let gain = Formulas.rebirthGain(currency: 10_000, divisor: 10_000)
         let actual = NSDecimalNumber(decimal: gain).doubleValue
         XCTAssertEqual(actual, 1.0, accuracy: 0.0001)
     }
 
-    func testPrestigeGainQuadruplesWhenLifetimeEarnedQuadruples() {
-        // gain = sqrt(lifetimeEarned / threshold), so 4x earned -> 2x gain
-        let base = Formulas.prestigeGain(lifetimeEarned: 1_000_000, threshold: 1_000_000)
-        let quadrupled = Formulas.prestigeGain(lifetimeEarned: 4_000_000, threshold: 1_000_000)
+    func testRebirthGainQuadruplesWhenCurrencyQuadruples() {
+        // gain = sqrt(currency / divisor), so 4x currency -> 2x gain
+        let base = Formulas.rebirthGain(currency: 10_000, divisor: 10_000)
+        let quadrupled = Formulas.rebirthGain(currency: 40_000, divisor: 10_000)
         let baseD = NSDecimalNumber(decimal: base).doubleValue
         let quadD = NSDecimalNumber(decimal: quadrupled).doubleValue
         XCTAssertEqual(quadD, baseD * 2, accuracy: 0.0001)
-    }
-
-    func testPrestigeMultiplierIsOneWithNoPrestigeCurrency() {
-        XCTAssertEqual(Formulas.prestigeMultiplier(prestigeCurrency: 0), 1)
-    }
-
-    func testPrestigeMultiplierIncreasesWithPrestigeCurrency() {
-        let low = Formulas.prestigeMultiplier(prestigeCurrency: 10)
-        let high = Formulas.prestigeMultiplier(prestigeCurrency: 1000)
-        XCTAssertGreaterThan(high, low)
     }
 }
