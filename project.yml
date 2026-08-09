@@ -35,9 +35,6 @@ targets:
     scheme:
       testTargets:
         - NoobIncrementalTests
-      configVariants:
-        - Debug
-        - Release
       gatherCoverageData: true
 
   NoobIncrementalTests:
