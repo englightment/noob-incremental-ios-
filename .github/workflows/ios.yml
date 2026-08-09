@@ -1,0 +1,87 @@
+name: iOS Build & Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Pick an available iPhone simulator
+        id: destination
+        run: |
+          NAME=$(xcrun simctl list devices available iOS -j \
+            | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for runtime, devices in data['devices'].items():
+    if 'iOS' not in runtime:
+        continue
+    for d in devices:
+        if d['name'].startswith('iPhone'):
+            print(d['name'])
+            sys.exit(0)
+")
+          echo "Using simulator: $NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build and test
+        run: |
+          xcodebuild test \
+            -project NoobIncremental.xcodeproj \
+            -scheme NoobIncremental \
+            -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}"
+
+  build-unsigned-ipa:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      # No Apple Developer account/signing certs exist in CI, so this builds a plain
+      # unsigned .app for a real device and hand-packages it into an .ipa. Sideloadly
+      # strips/re-signs it locally with your free Apple ID — it doesn't need CI to sign it.
+      - name: Build unsigned .app for iOS device
+        run: |
+          xcodebuild build \
+            -project NoobIncremental.xcodeproj \
+            -scheme NoobIncremental \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE=""
+
+      - name: Package as .ipa
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/NoobIncremental.app"
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r NoobIncremental-unsigned.ipa Payload
+
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NoobIncremental-unsigned-ipa
+          path: NoobIncremental-unsigned.ipa
+          retention-days: 30
