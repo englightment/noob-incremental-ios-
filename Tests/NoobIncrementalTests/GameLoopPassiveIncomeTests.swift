@@ -72,16 +72,17 @@ final class GameLoopPassiveIncomeTests: XCTestCase {
     }
 
     func testTickSpeedReductionIncreasesOutputMultiplier() {
-        // Drives UpgradeStore directly against a synthetic definition so the tick-speed
-        // math can be tested independently of the real catalog's maxLevel cap.
-        let fastTicks = UpgradeDefinition(id: "test_fast", name: "Test Fast", baseCost: 1, maxLevel: 100, effect: .tickSpeedReduction(secondsPerLevel: 0.09))
+        // "faster_noobs" caps at maxLevel 5, so this also verifies the multiplier reflects
+        // being maxed out: 5 levels * 0.1s = 0.5s reduction -> effective tick 0.5s -> multiplier 2.0.
+        guard let fasterNoobs = UpgradeCatalog.definition(for: "faster_noobs") else {
+            return XCTFail("faster_noobs missing from catalog")
+        }
         var state = GameState.newGame
         state.currency = 1_000_000
-        for _ in 0..<5 {
-            state = UpgradeStore.buyOne(fastTicks, state: state)
-        }
-        // 5 levels * 0.09s = 0.45s reduction -> effective tick 0.55s -> multiplier 1/0.55
+        state = UpgradeStore.buyMax(fasterNoobs, state: state)
+
+        XCTAssertTrue(UpgradeStore.isMaxed(fasterNoobs, state: state))
         let multiplier = UpgradeStore.tickSpeedMultiplier(state: state)
-        XCTAssertEqual(NSDecimalNumber(decimal: multiplier).doubleValue, 1.0 / 0.55, accuracy: 0.001)
+        XCTAssertEqual(NSDecimalNumber(decimal: multiplier).doubleValue, 2.0, accuracy: 0.001)
     }
 }
