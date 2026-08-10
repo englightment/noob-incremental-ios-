@@ -46,6 +46,16 @@ struct AchievementRowViewData: Identifiable {
     let isUnlocked: Bool
 }
 
+struct MinionRowViewData: Identifiable {
+    let id: String
+    let name: String
+    let icon: String
+    let isOwned: Bool
+    let isEquipped: Bool
+    let unlockHint: String
+    let bonusText: String
+}
+
 struct FloatingText: Identifiable, Equatable {
     let id = UUID()
     let text: String
@@ -197,6 +207,31 @@ final class GameViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Minions
+
+    var equippedMinionCount: Int { MinionSystem.equippedCount(state: state) }
+    var maxEquippedMinions: Int { MinionSystem.maxEquipped }
+
+    var minionRows: [MinionRowViewData] {
+        MinionCatalog.all.map { definition in
+            MinionRowViewData(
+                id: definition.id,
+                name: definition.name,
+                icon: definition.icon,
+                isOwned: MinionSystem.isOwned(definition, state: state),
+                isEquipped: MinionSystem.isEquipped(definition, state: state),
+                unlockHint: definition.unlockHint,
+                bonusText: "+\(NumberFormatting.format(definition.outputBonus * 100, fractionDigits: 0))% Oof"
+            )
+        }
+    }
+
+    func toggleMinionEquip(id: String) {
+        guard let definition = MinionCatalog.definition(for: id) else { return }
+        state = MinionSystem.toggleEquip(definition, state: state)
+        fireHapticNotification(.success)
+    }
+
     // MARK: - Worlds
 
     var worldRows: [WorldRowViewData] {
@@ -268,7 +303,7 @@ final class GameViewModel: ObservableObject {
         self.saveManager = saveManager
         let loaded = saveManager.load()
         let offline = OfflineProgress.apply(to: loaded)
-        self.state = offline.state
+        self.state = MinionSystem.syncOwnership(state: offline.state)
         self.lastOfflineEarnings = offline.currencyEarned > 0 ? offline.currencyEarned : nil
     }
 
@@ -468,7 +503,7 @@ final class GameViewModel: ObservableObject {
     private func checkForAchievements() {
         let (newState, unlocked) = AchievementStore.unlockNewlyMet(state: state)
         guard !unlocked.isEmpty else { return }
-        state = newState
+        state = MinionSystem.syncOwnership(state: newState)
         achievementToastQueue.append(contentsOf: unlocked)
         SoundManager.play(.achievement, enabled: state.soundEnabled)
         advanceAchievementToastIfNeeded()

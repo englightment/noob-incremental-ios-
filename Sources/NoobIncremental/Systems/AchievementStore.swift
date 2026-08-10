@@ -33,6 +33,8 @@ enum AchievementStore {
             return totalNoobLevels(state: state, zoneID: WorldCatalog.zone2ID) >= total
         case .allRunesOwned:
             return RuneCatalog.all.allSatisfy { RuneStore.level($0, state: state) > 0 }
+        case .allMinionsOwned:
+            return MinionCatalog.all.allSatisfy { MinionSystem.isOwned($0, state: state) }
         }
     }
 

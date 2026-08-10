@@ -840,6 +840,7 @@ private struct MoreSheet: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         statsSection
+                        minionsSection
                         adBoostsSection
                         codesSection
                         achievementsSection
@@ -879,6 +880,64 @@ private struct MoreSheet: View {
             Text(label).font(.caption).foregroundStyle(.white.opacity(0.6))
             Spacer()
             Text(value).font(.caption.weight(.bold)).foregroundStyle(.white)
+        }
+    }
+
+    private var minionsSection: some View {
+        GlowCard(borderColor: .mint) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Minions").font(.headline).foregroundStyle(.white)
+                    Spacer()
+                    Text("\(viewModel.equippedMinionCount)/\(viewModel.maxEquippedMinions) equipped")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+                ForEach(viewModel.minionRows) { minion in
+                    minionRow(minion)
+                }
+            }
+        }
+    }
+
+    private func minionRow(_ minion: MinionRowViewData) -> some View {
+        let atCap = !minion.isEquipped && viewModel.equippedMinionCount >= viewModel.maxEquippedMinions
+
+        return HStack(spacing: 10) {
+            Image(systemName: minion.icon)
+                .font(.title3)
+                .frame(width: 30)
+                .foregroundStyle(minion.isOwned ? AnyShapeStyle(Theme.runeGradient) : AnyShapeStyle(Color.white.opacity(0.25)))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(minion.name)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(minion.isOwned ? .white : .white.opacity(0.4))
+                Text(minion.isOwned ? minion.bonusText : "Locked \u{2014} \(minion.unlockHint)")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.45))
+            }
+
+            Spacer()
+
+            if minion.isOwned {
+                Button(minion.isEquipped ? "Unequip" : "Equip") {
+                    viewModel.toggleMinionEquip(id: minion.id)
+                }
+                .buttonStyle(PressableButtonStyle())
+                .font(.caption.weight(.bold))
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(
+                    minion.isEquipped ? Color.mint.opacity(0.85) : Color.mint.opacity(atCap ? 0.1 : 0.5),
+                    in: Capsule()
+                )
+                .overlay(Capsule().strokeBorder(Color.mint.opacity(minion.isEquipped ? 0 : (atCap ? 0.15 : 0.7)), lineWidth: 1))
+                .foregroundStyle(.white)
+                .disabled(atCap)
+            } else {
+                Image(systemName: "lock.fill")
+                    .foregroundStyle(.white.opacity(0.3))
+            }
         }
     }
 

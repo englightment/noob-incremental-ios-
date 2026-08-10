@@ -24,9 +24,9 @@ struct GameState: Codable, Equatable {
     var runeShards: Decimal = 0
     var runeLevels: [String: Int] = [:]
 
-    // Pets
-    var ownedPets: [String: PetState] = [:]
-    var equippedPetIDs: [String] = []
+    // Minions
+    var ownedMinions: [String: MinionState] = [:]
+    var equippedMinionIDs: [String] = []
 
     // Codes
     var redeemedCodes: Set<String> = []

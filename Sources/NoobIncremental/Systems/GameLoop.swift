@@ -27,6 +27,7 @@ enum GameLoop {
             * AdBoostSystem.combinedMultiplier(state: state, now: now)
             * RuneStore.outputMultiplier(state: state)
             * RuneStore.tickSpeedMultiplier(state: state)
+            * MinionSystem.outputMultiplier(state: state)
 
         let generatorTotal = GeneratorCatalog.all.reduce(Decimal(0)) { total, definition in
             let level = state.generators[definition.id]?.level ?? 0

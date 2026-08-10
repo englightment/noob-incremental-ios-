@@ -10,6 +10,7 @@ enum AchievementCondition: Equatable {
     case streakDays(Int)
     case zone2NoobLevels(Int)
     case allRunesOwned
+    case allMinionsOwned
 }
 
 struct AchievementDefinition: Identifiable, Equatable {
@@ -44,7 +45,8 @@ enum AchievementCatalog {
         AchievementDefinition(id: "explorer", name: "Explorer", description: "Reach Zone 2, The Overworks", condition: .zone2NoobLevels(1)),
         AchievementDefinition(id: "overworks_master", name: "Overworks Master", description: "Reach 20 total Zone 2 Noob levels", condition: .zone2NoobLevels(20)),
         AchievementDefinition(id: "rune_collector", name: "Rune Collector", description: "Own every Rune", condition: .allRunesOwned),
-        AchievementDefinition(id: "max_rune_oof", name: "Runed Up", description: "Max the Rune of Oof", condition: .upgradeMaxed("rune_oof"))
+        AchievementDefinition(id: "max_rune_oof", name: "Runed Up", description: "Max the Rune of Oof", condition: .upgradeMaxed("rune_oof")),
+        AchievementDefinition(id: "menagerie", name: "Menagerie", description: "Unlock every Minion", condition: .allMinionsOwned)
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {
