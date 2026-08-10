@@ -23,8 +23,10 @@ enum GameLoop {
             * RebirthUpgradeStore.outputMultiplier(state: state)
             * AchievementStore.outputMultiplier(state: state)
             * BoostSystem.activeMultiplier(state: state, now: now)
+            * RuneStore.outputMultiplier(state: state)
+            * RuneStore.tickSpeedMultiplier(state: state)
 
-        return GeneratorCatalog.all.reduce(Decimal(0)) { total, definition in
+        let generatorTotal = GeneratorCatalog.all.reduce(Decimal(0)) { total, definition in
             let level = state.generators[definition.id]?.level ?? 0
             guard level > 0 else { return total }
             let output = Formulas.generatorOutput(
@@ -34,5 +36,8 @@ enum GameLoop {
             )
             return total + output
         }
+
+        // Flat bonus is intentionally unmultiplied — a distinct, simple upgrade flavor.
+        return generatorTotal + UpgradeStore.flatOutputBonus(state: state)
     }
 }

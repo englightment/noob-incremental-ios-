@@ -7,8 +7,15 @@ enum GeneratorStore {
         state.generators[definition.id]?.level ?? 0
     }
 
+    /// Noob base cost after the "Bulk Discount" upgrade (if any) is applied. Threading the
+    /// discount through the *base* rather than the final price keeps maxAffordableLevels'
+    /// closed-form math correct — it needs the real per-level cost, not a post-hoc discount.
+    private static func discountedBaseCost(_ definition: GeneratorDefinition, state: GameState) -> Decimal {
+        definition.baseCost * UpgradeStore.costDiscountMultiplier(state: state)
+    }
+
     static func cost(for definition: GeneratorDefinition, state: GameState) -> Decimal {
-        Formulas.levelCost(base: definition.baseCost, owned: level(definition, state: state))
+        Formulas.levelCost(base: discountedBaseCost(definition, state: state), owned: level(definition, state: state))
     }
 
     static func canAfford(_ definition: GeneratorDefinition, state: GameState) -> Bool {
@@ -25,7 +32,7 @@ enum GeneratorStore {
     static func buyQuantity(_ definition: GeneratorDefinition, quantity: Int, state: GameState) -> GameState {
         guard quantity > 0 else { return state }
         let owned = level(definition, state: state)
-        let price = Formulas.bulkLevelCost(base: definition.baseCost, owned: owned, quantity: quantity)
+        let price = Formulas.bulkLevelCost(base: discountedBaseCost(definition, state: state), owned: owned, quantity: quantity)
         guard state.currency >= price else { return state }
 
         var next = state
@@ -40,18 +47,22 @@ enum GeneratorStore {
     }
 
     static func costForQuantity(_ definition: GeneratorDefinition, quantity: Int, state: GameState) -> Decimal {
-        Formulas.bulkLevelCost(base: definition.baseCost, owned: level(definition, state: state), quantity: quantity)
+        Formulas.bulkLevelCost(base: discountedBaseCost(definition, state: state), owned: level(definition, state: state), quantity: quantity)
     }
 
     static func canAffordQuantity(_ definition: GeneratorDefinition, quantity: Int, state: GameState) -> Bool {
         state.currency >= costForQuantity(definition, quantity: quantity, state: state)
     }
 
+    /// How many more levels are affordable right now — accounts for the Bulk Discount
+    /// upgrade, unlike calling Formulas.maxAffordableLevels directly with the raw base cost.
+    static func maxAffordableCount(_ definition: GeneratorDefinition, state: GameState) -> Int {
+        Formulas.maxAffordableLevels(base: discountedBaseCost(definition, state: state), owned: level(definition, state: state), availableCurrency: state.currency)
+    }
+
     /// Buys as many levels as currently affordable — the one case where "best effort" is the
     /// intent, not a bug: that's what "Max" means.
     static func buyMax(_ definition: GeneratorDefinition, state: GameState) -> GameState {
-        let owned = level(definition, state: state)
-        let affordable = Formulas.maxAffordableLevels(base: definition.baseCost, owned: owned, availableCurrency: state.currency)
-        return buyQuantity(definition, quantity: affordable, state: state)
+        buyQuantity(definition, quantity: maxAffordableCount(definition, state: state), state: state)
     }
 }

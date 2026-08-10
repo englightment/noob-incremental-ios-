@@ -13,6 +13,10 @@ private enum Theme {
         colors: [Color(red: 1.0, green: 0.4, blue: 0.85), Color(red: 0.6, green: 0.3, blue: 1.0)],
         startPoint: .leading, endPoint: .trailing
     )
+    static let runeGradient = LinearGradient(
+        colors: [Color(red: 0.3, green: 0.95, blue: 0.8), Color(red: 0.15, green: 0.6, blue: 0.55)],
+        startPoint: .leading, endPoint: .trailing
+    )
     static let cardBackground = Color(red: 0.1, green: 0.08, blue: 0.19)
 }
 
@@ -83,6 +87,7 @@ struct ContentView: View {
 
                 TabView {
                     NoobsTab(
+                        worlds: viewModel.worldRows,
                         generators: viewModel.generatorRows,
                         onUpgrade: viewModel.buyGenerator,
                         onUpgradeMax: viewModel.buyGeneratorMax
@@ -105,6 +110,14 @@ struct ContentView: View {
                         onBuyMax: viewModel.buyRebirthUpgradeMax
                     )
                     .tabItem { Label("Rebirth", systemImage: "arrow.triangle.2.circlepath") }
+
+                    RunesTab(
+                        runeShardsText: viewModel.formattedRuneShards,
+                        runes: viewModel.runeRows,
+                        onBuy: viewModel.buyRune,
+                        onBuyMax: viewModel.buyRuneMax
+                    )
+                    .tabItem { Label("Runes", systemImage: "seal.fill") }
                 }
             }
             .padding()
@@ -310,13 +323,32 @@ private struct GlowCard<Content: View>: View {
 // MARK: - Noobs tab
 
 private struct NoobsTab: View {
+    let worlds: [WorldRowViewData]
     let generators: [GeneratorRowViewData]
     let onUpgrade: (String, Int) -> Void
     let onUpgradeMax: (String) -> Void
     @State private var quantity: BuyQuantity = .one
+    @State private var selectedZoneID: String = WorldCatalog.zone1ID
+
+    private var selectedWorld: WorldRowViewData? {
+        worlds.first { $0.id == selectedZoneID }
+    }
+
+    private var rowsForSelectedZone: [GeneratorRowViewData] {
+        generators.filter { $0.zoneID == selectedZoneID }
+    }
 
     var body: some View {
         VStack(spacing: 8) {
+            if worlds.count > 1 {
+                Picker("World", selection: $selectedZoneID) {
+                    ForEach(worlds) { world in
+                        Text(world.isUnlocked ? world.name : "\u{1F512} \(world.name)").tag(world.id)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
             Picker("Quantity", selection: $quantity) {
                 ForEach(BuyQuantity.allCases) { q in
                     Text(q.rawValue).tag(q)
@@ -324,22 +356,40 @@ private struct NoobsTab: View {
             }
             .pickerStyle(.segmented)
 
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    ForEach(generators) { generator in
-                        GeneratorRowView(data: generator, quantity: quantity) {
-                            switch quantity {
-                            case .one: onUpgrade(generator.id, 1)
-                            case .ten: onUpgrade(generator.id, 10)
-                            case .hundred: onUpgrade(generator.id, 100)
-                            case .max: onUpgradeMax(generator.id)
+            if let world = selectedWorld, !world.isUnlocked {
+                GlowCard(borderColor: .gray) {
+                    VStack(spacing: 6) {
+                        Image(systemName: "lock.fill")
+                            .font(.largeTitle)
+                            .foregroundStyle(.white.opacity(0.4))
+                        Text(world.name)
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.6))
+                        Text(world.lockedDescription)
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.4))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+                }
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        ForEach(rowsForSelectedZone) { generator in
+                            GeneratorRowView(data: generator, quantity: quantity) {
+                                switch quantity {
+                                case .one: onUpgrade(generator.id, 1)
+                                case .ten: onUpgrade(generator.id, 10)
+                                case .hundred: onUpgrade(generator.id, 100)
+                                case .max: onUpgradeMax(generator.id)
+                                }
                             }
                         }
                     }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
         }
     }
 }
@@ -557,6 +607,42 @@ private struct RebirthTab: View {
     }
 }
 
+// MARK: - Runes tab
+
+private struct RunesTab: View {
+    let runeShardsText: String
+    let runes: [UpgradeRowViewData]
+    let onBuy: (String) -> Void
+    let onBuyMax: (String) -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 14) {
+                VStack(spacing: 4) {
+                    Text(runeShardsText)
+                        .font(.system(size: 40, weight: .heavy, design: .rounded))
+                        .foregroundStyle(Theme.runeGradient)
+                    Text("Rune Shards")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+                .padding(.top, 4)
+
+                Text("Earned from Lucky Surges and net-worth milestones \u{2014} spend them on permanent Runes.")
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.white.opacity(0.6))
+
+                ForEach(runes) { rune in
+                    UpgradeRowView(data: rune, borderColor: .mint, onBuy: { onBuy(rune.id) }, onBuyMax: { onBuyMax(rune.id) })
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .scrollIndicators(.hidden)
+    }
+}
+
 // MARK: - Offline earnings banner
 
 private struct OfflineEarningsBanner: View {
@@ -618,6 +704,7 @@ private struct MoreSheet: View {
                 statRow("Lifetime Oof", viewModel.lifetimeEarnedText)
                 statRow("Total Noob Levels", "\(viewModel.totalNoobLevels)")
                 statRow("Rebirths", "\(viewModel.rebirthCount)")
+                statRow("Rune Shards", viewModel.formattedRuneShards)
                 statRow("Login Streak", "\(viewModel.currentStreak) days")
                 statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
                 statRow("Time Played", viewModel.totalPlayTimeText)

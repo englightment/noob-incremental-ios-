@@ -11,14 +11,14 @@ enum Formulas {
 
     /// Cost of the next level's purchase, given how many levels are already owned.
     /// cost = base * growthRate^owned
-    static func levelCost(base: Decimal, owned: Int, growthRate: Double = 1.15) -> Decimal {
+    static func levelCost(base: Decimal, owned: Int, growthRate: Double = 1.12) -> Decimal {
         guard owned > 0 else { return base }
         let multiplier = pow(growthRate, Double(owned))
         return base * Decimal(multiplier)
     }
 
     /// Total cost to buy `quantity` more levels starting from `owned`.
-    static func bulkLevelCost(base: Decimal, owned: Int, quantity: Int, growthRate: Double = 1.15) -> Decimal {
+    static func bulkLevelCost(base: Decimal, owned: Int, quantity: Int, growthRate: Double = 1.12) -> Decimal {
         guard quantity > 0 else { return 0 }
         var total: Decimal = 0
         for i in 0..<quantity {
@@ -31,7 +31,7 @@ enum Formulas {
     /// geometric-series sum in closed form (cheap even for huge quantities), then nudges the
     /// estimate by a couple of steps to correct for floating-point drift against the exact
     /// Decimal cost — avoids looping level-by-level for uncapped purchases (e.g. Noobs).
-    static func maxAffordableLevels(base: Decimal, owned: Int, growthRate: Double = 1.15, availableCurrency: Decimal) -> Int {
+    static func maxAffordableLevels(base: Decimal, owned: Int, growthRate: Double = 1.12, availableCurrency: Decimal) -> Int {
         guard availableCurrency > 0, base > 0, growthRate > 1 else { return 0 }
         let firstCost = levelCost(base: base, owned: owned, growthRate: growthRate)
         guard availableCurrency >= firstCost else { return 0 }

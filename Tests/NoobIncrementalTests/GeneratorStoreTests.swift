@@ -141,4 +141,50 @@ final class GeneratorStoreTests: XCTestCase {
 
         XCTAssertFalse(GeneratorStore.canAfford(hut, state: state), "should have bought until the next level is unaffordable")
     }
+
+    // MARK: - Bulk Discount upgrade wiring
+
+    func testBulkDiscountUpgradeReducesNoobCost() {
+        guard let bulkDiscount = UpgradeCatalog.definition(for: "bulk_discount") else {
+            return XCTFail("bulk_discount missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        let costBeforeDiscount = GeneratorStore.cost(for: hut, state: state)
+
+        state = UpgradeStore.buyOne(bulkDiscount, state: state)
+
+        XCTAssertLessThan(GeneratorStore.cost(for: hut, state: state), costBeforeDiscount)
+    }
+
+    func testMaxAffordableCountAccountsForDiscount() {
+        // This is the exact bug being guarded against: the ViewModel's displayed "Max" count
+        // must come from GeneratorStore.maxAffordableCount, not Formulas.maxAffordableLevels
+        // called with the raw baseCost — otherwise the UI understates what buyMax() actually buys.
+        guard let bulkDiscount = UpgradeCatalog.definition(for: "bulk_discount") else {
+            return XCTFail("bulk_discount missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 100
+
+        let beforeDiscount = GeneratorStore.maxAffordableCount(hut, state: state)
+        state = UpgradeStore.buyOne(bulkDiscount, state: state)
+        let afterDiscount = GeneratorStore.maxAffordableCount(hut, state: state)
+
+        XCTAssertGreaterThanOrEqual(afterDiscount, beforeDiscount, "a cost discount should never make fewer levels affordable")
+    }
+
+    func testMaxAffordableCountMatchesWhatBuyMaxActuallyBuys() {
+        guard let bulkDiscount = UpgradeCatalog.definition(for: "bulk_discount") else {
+            return XCTFail("bulk_discount missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = UpgradeStore.buyOne(bulkDiscount, state: state)
+
+        let predicted = GeneratorStore.maxAffordableCount(hut, state: state)
+        let result = GeneratorStore.buyMax(hut, state: state)
+
+        XCTAssertEqual(GeneratorStore.level(hut, state: result), predicted)
+    }
 }

@@ -123,4 +123,50 @@ final class UpgradeStoreTests: XCTestCase {
 
         XCTAssertGreaterThan(UpgradeStore.tickSpeedMultiplier(state: state), 1)
     }
+
+    func testCostDiscountMultiplierIsOneWithNoUpgrades() {
+        let state = GameState.newGame
+        XCTAssertEqual(UpgradeStore.costDiscountMultiplier(state: state), 1)
+    }
+
+    func testCostDiscountMultiplierDecreasesWithLevels() {
+        guard let bulkDiscount = UpgradeCatalog.definition(for: "bulk_discount") else {
+            return XCTFail("bulk_discount missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = UpgradeStore.buyOne(bulkDiscount, state: state)
+
+        XCTAssertLessThan(UpgradeStore.costDiscountMultiplier(state: state), 1)
+    }
+
+    func testCostDiscountMultiplierNeverGoesBelowFloor() {
+        guard let bulkDiscount = UpgradeCatalog.definition(for: "bulk_discount") else {
+            return XCTFail("bulk_discount missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000_000
+        state = UpgradeStore.buyMax(bulkDiscount, state: state) // maxLevel 20 * 2%/level = 40% off
+
+        let multiplier = NSDecimalNumber(decimal: UpgradeStore.costDiscountMultiplier(state: state)).doubleValue
+        XCTAssertGreaterThanOrEqual(multiplier, 0.5, "discount should never exceed the 50% floor")
+    }
+
+    func testFlatOutputBonusIsZeroWithNoUpgrades() {
+        let state = GameState.newGame
+        XCTAssertEqual(UpgradeStore.flatOutputBonus(state: state), 0)
+    }
+
+    func testFlatOutputBonusScalesWithLevel() {
+        guard let noobValue = UpgradeCatalog.definition(for: "noob_value") else {
+            return XCTFail("noob_value missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        for _ in 0..<3 {
+            state = UpgradeStore.buyOne(noobValue, state: state)
+        }
+
+        XCTAssertEqual(UpgradeStore.flatOutputBonus(state: state), 5 * 3)
+    }
 }

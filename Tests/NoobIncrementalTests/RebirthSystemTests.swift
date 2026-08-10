@@ -127,4 +127,19 @@ final class RebirthSystemTests: XCTestCase {
 
         XCTAssertGreaterThan(gainWayOver, gainAtRequirement * 5, "pushing 100x past the requirement should be worth meaningfully more than the minimum")
     }
+
+    func testRuneOfRebirthIncreasesAvailableGain() {
+        guard let runeRebirth = RuneCatalog.definition(for: "rune_rebirth") else {
+            return XCTFail("rune_rebirth missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = GameBalance.rebirthRequirement
+        let gainWithoutRune = RebirthSystem.availableGain(state: state)
+
+        state.runeShards = 1_000_000
+        state = RuneStore.buyOne(runeRebirth, state: state)
+        let gainWithRune = RebirthSystem.availableGain(state: state)
+
+        XCTAssertGreaterThan(gainWithRune, gainWithoutRune)
+    }
 }

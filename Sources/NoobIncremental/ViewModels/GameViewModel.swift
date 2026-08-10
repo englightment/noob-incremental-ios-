@@ -7,6 +7,7 @@ import Combine
 struct GeneratorRowViewData: Identifiable {
     let id: String
     let name: String
+    let zoneID: String
     let level: Int
     let isLocked: Bool
     let unlockText: String
@@ -18,6 +19,13 @@ struct GeneratorRowViewData: Identifiable {
     let costX100: String
     let canAffordX100: Bool
     let maxAffordableCount: Int
+}
+
+struct WorldRowViewData: Identifiable {
+    let id: String
+    let name: String
+    let isUnlocked: Bool
+    let lockedDescription: String
 }
 
 struct UpgradeRowViewData: Identifiable {
@@ -123,6 +131,14 @@ final class GameViewModel: ObservableObject {
         return NSDecimalNumber(decimal: capped).doubleValue
     }
 
+    // MARK: - Runes
+
+    var formattedRuneShards: String { NumberFormatting.format(state.runeShards) }
+
+    var runeRows: [UpgradeRowViewData] {
+        rowData(for: RuneCatalog.all, level: { RuneStore.level($0, state: self.state) }, isMaxed: { RuneStore.isMaxed($0, state: self.state) }, cost: { RuneStore.cost(for: $0, state: self.state) }, canAfford: { RuneStore.canAfford($0, state: self.state) })
+    }
+
     // MARK: - Settings
 
     var soundEnabled: Bool { state.soundEnabled }
@@ -154,6 +170,19 @@ final class GameViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Worlds
+
+    var worldRows: [WorldRowViewData] {
+        WorldCatalog.all.map { world in
+            WorldRowViewData(
+                id: world.id,
+                name: world.name,
+                isUnlocked: WorldSystem.isUnlocked(world, state: state),
+                lockedDescription: world.lockedDescription
+            )
+        }
+    }
+
     // MARK: - Shop rows
 
     var generatorRows: [GeneratorRowViewData] {
@@ -161,9 +190,10 @@ final class GameViewModel: ObservableObject {
             GeneratorRowViewData(
                 id: definition.id,
                 name: definition.name,
+                zoneID: definition.zoneID,
                 level: GeneratorStore.level(definition, state: state),
                 isLocked: !definition.isVisible(for: state),
-                unlockText: "Unlocks at \(NumberFormatting.format(definition.unlockThreshold)) lifetime Oof",
+                unlockText: "Unlocks at \(NumberFormatting.format(definition.unlockThreshold)) Oof",
                 outputPerLevelText: "\(NumberFormatting.format(definition.baseOutput))/sec per level",
                 costX1: NumberFormatting.format(GeneratorStore.costForQuantity(definition, quantity: 1, state: state)),
                 canAffordX1: GeneratorStore.canAffordQuantity(definition, quantity: 1, state: state),
@@ -171,7 +201,7 @@ final class GameViewModel: ObservableObject {
                 canAffordX10: GeneratorStore.canAffordQuantity(definition, quantity: 10, state: state),
                 costX100: NumberFormatting.format(GeneratorStore.costForQuantity(definition, quantity: 100, state: state)),
                 canAffordX100: GeneratorStore.canAffordQuantity(definition, quantity: 100, state: state),
-                maxAffordableCount: Formulas.maxAffordableLevels(base: definition.baseCost, owned: GeneratorStore.level(definition, state: state), availableCurrency: state.currency)
+                maxAffordableCount: GeneratorStore.maxAffordableCount(definition, state: state)
             )
         }
     }
@@ -297,6 +327,24 @@ final class GameViewModel: ObservableObject {
         checkForAchievements()
     }
 
+    func buyRune(id: String) {
+        guard let definition = RuneCatalog.definition(for: id),
+              RuneStore.canAfford(definition, state: state) else { return }
+        state = RuneStore.buyOne(definition, state: state)
+        fireBuyFeedback()
+        checkForAchievements()
+    }
+
+    func buyRuneMax(id: String) {
+        guard let definition = RuneCatalog.definition(for: id) else { return }
+        let before = RuneStore.level(definition, state: state)
+        state = RuneStore.buyMax(definition, state: state)
+        if RuneStore.level(definition, state: state) > before {
+            fireBuyFeedback()
+        }
+        checkForAchievements()
+    }
+
     func claimDailyReward() {
         guard let (newState, _) = DailyStreakSystem.claim(state: state) else { return }
         state = newState
@@ -372,6 +420,7 @@ final class GameViewModel: ObservableObject {
         lastBoostRoll = now
         guard Double.random(in: 0..<1) < boostChance else { return }
         state = BoostSystem.start(state: state, multiplier: boostMultiplier, duration: boostDuration, now: now)
+        state.runeShards += Decimal(Int.random(in: GameBalance.runeShardsPerLuckySurge))
         fireHapticNotification(.success)
         SoundManager.play(.luckySurge, enabled: state.soundEnabled)
     }
@@ -379,6 +428,7 @@ final class GameViewModel: ObservableObject {
     private func checkForMilestone() {
         guard MilestoneSystem.hasNewMilestone(state: state) else { return }
         state = MilestoneSystem.celebrate(state: state)
+        state.runeShards += GameBalance.runeShardsPerMilestone
         showMilestoneCelebration = true
         SoundManager.play(.milestone, enabled: state.soundEnabled)
         fireHapticNotification(.success)

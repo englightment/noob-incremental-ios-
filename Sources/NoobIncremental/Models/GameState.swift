@@ -19,9 +19,10 @@ struct GameState: Codable, Equatable {
     var rebirthCount: Int = 0
     var rebirthUpgradeLevels: [String: Int] = [:]
 
-    // Zones
-    var unlockedZones: Set<String> = [GameBalance.defaultZoneID]
-    var currentZone: String = GameBalance.defaultZoneID
+    // Rune Shards: a scarce currency earned from Lucky Surges and milestones, spent on
+    // permanent Runes. Survives rebirths, same as Rebirth currency.
+    var runeShards: Decimal = 0
+    var runeLevels: [String: Int] = [:]
 
     // Pets
     var ownedPets: [String: PetState] = [:]

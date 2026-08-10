@@ -14,7 +14,7 @@ enum SoundEffect {
         switch self {
         case .buy: return 1104
         case .rebirth: return 1025
-        case .achievement: return 1016
+        case .achievement: return 1025 // was 1016 ("horn") — swapped for the chime used on streak/milestone
         case .milestone: return 1025
         case .luckySurge: return 1013
         }

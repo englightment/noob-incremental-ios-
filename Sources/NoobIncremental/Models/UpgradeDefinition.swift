@@ -9,6 +9,10 @@ enum UpgradeEffect: Equatable {
     case tickSpeedReduction(secondsPerLevel: TimeInterval)
     /// Total multiplier on rebirth-currency gain follows multiplier(level) = growthRate^level.
     case rebirthGainMultiplier(perLevelGrowthRate: Double)
+    /// Reduces every Noob's cost by perLevelPercent per level (floored at 50% off).
+    case costDiscount(perLevelPercent: Double)
+    /// Adds a flat, unmultiplied amount straight to total Oof/sec per level.
+    case flatOutputBonus(perLevel: Decimal)
 
     static func outputMultiplierValue(level: Int, doublingInterval: Int) -> Decimal {
         guard doublingInterval > 0 else { return 1 }
@@ -18,6 +22,14 @@ enum UpgradeEffect: Equatable {
 
     static func rebirthGainMultiplierValue(level: Int, perLevelGrowthRate: Double) -> Decimal {
         Decimal(pow(perLevelGrowthRate, Double(level)))
+    }
+
+    static func costDiscountMultiplierValue(level: Int, perLevelPercent: Double, floor: Double = 0.5) -> Decimal {
+        Decimal(max(floor, 1.0 - perLevelPercent * Double(level)))
+    }
+
+    static func flatOutputBonusValue(level: Int, perLevel: Decimal) -> Decimal {
+        perLevel * Decimal(level)
     }
 
     /// "current -> next level" text matching the source game's upgrade cards.
@@ -35,6 +47,14 @@ enum UpgradeEffect: Equatable {
             let current = Self.rebirthGainMultiplierValue(level: level, perLevelGrowthRate: growthRate)
             let next = Self.rebirthGainMultiplierValue(level: level + 1, perLevelGrowthRate: growthRate)
             return "x\(NumberFormatting.format(current)) \u{2192} x\(NumberFormatting.format(next))"
+        case .costDiscount(let perLevelPercent):
+            let current = (1 - Self.costDiscountMultiplierValue(level: level, perLevelPercent: perLevelPercent)) * 100
+            let next = (1 - Self.costDiscountMultiplierValue(level: level + 1, perLevelPercent: perLevelPercent)) * 100
+            return "-\(NumberFormatting.format(current))% cost \u{2192} -\(NumberFormatting.format(next))% cost"
+        case .flatOutputBonus(let perLevel):
+            let current = Self.flatOutputBonusValue(level: level, perLevel: perLevel)
+            let next = Self.flatOutputBonusValue(level: level + 1, perLevel: perLevel)
+            return "+\(NumberFormatting.format(current))/sec \u{2192} +\(NumberFormatting.format(next))/sec"
         }
     }
 }
@@ -51,7 +71,9 @@ struct UpgradeDefinition: Identifiable, Equatable {
 enum UpgradeCatalog {
     static let all: [UpgradeDefinition] = [
         UpgradeDefinition(id: "more_oof", name: "More Oof", baseCost: 75, maxLevel: 50, effect: .outputMultiplier(doublingInterval: 15)),
-        UpgradeDefinition(id: "faster_noobs", name: "Faster Noobs", baseCost: 10_000, maxLevel: 5, effect: .tickSpeedReduction(secondsPerLevel: 0.1))
+        UpgradeDefinition(id: "faster_noobs", name: "Faster Noobs", baseCost: 10_000, maxLevel: 5, effect: .tickSpeedReduction(secondsPerLevel: 0.1)),
+        UpgradeDefinition(id: "bulk_discount", name: "Bulk Discount", baseCost: 500, maxLevel: 20, effect: .costDiscount(perLevelPercent: 0.02)),
+        UpgradeDefinition(id: "noob_value", name: "Noob Value", baseCost: 300, maxLevel: 25, effect: .flatOutputBonus(perLevel: 5))
     ]
 
     static func definition(for id: String) -> UpgradeDefinition? {

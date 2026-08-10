@@ -117,4 +117,35 @@ final class GameLoopPassiveIncomeTests: XCTestCase {
         XCTAssertEqual(NSDecimalNumber(decimal: boosted).doubleValue, NSDecimalNumber(decimal: noob.baseOutput * 5).doubleValue, accuracy: 0.0001)
         XCTAssertEqual(NSDecimalNumber(decimal: expired).doubleValue, NSDecimalNumber(decimal: noob.baseOutput).doubleValue, accuracy: 0.0001)
     }
+
+    func testRuneOfOofAppliesToPassiveIncome() {
+        guard let noob = GeneratorCatalog.definition(for: "starter_noob"),
+              let runeOof = RuneCatalog.definition(for: "rune_oof") else {
+            return XCTFail("expected catalog entries missing")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state.runeShards = 1_000_000
+        state = GeneratorStore.buy(noob, state: state)
+        state = RuneStore.buyOne(runeOof, state: state)
+
+        let withRune = GameLoop.passiveIncomePerSecond(state)
+        XCTAssertGreaterThan(withRune, noob.baseOutput)
+    }
+
+    func testFlatOutputBonusAddsOnTopOfMultipliedGeneratorOutput() {
+        guard let noob = GeneratorCatalog.definition(for: "starter_noob"),
+              let noobValue = UpgradeCatalog.definition(for: "noob_value") else {
+            return XCTFail("expected catalog entries missing")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = GeneratorStore.buy(noob, state: state)
+        state = UpgradeStore.buyOne(noobValue, state: state)
+
+        let expected = noob.baseOutput + UpgradeEffect.flatOutputBonusValue(level: 1, perLevel: 5)
+        let actual = GameLoop.passiveIncomePerSecond(state)
+
+        XCTAssertEqual(NSDecimalNumber(decimal: actual).doubleValue, NSDecimalNumber(decimal: expected).doubleValue, accuracy: 0.0001)
+    }
 }

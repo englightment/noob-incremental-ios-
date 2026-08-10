@@ -54,4 +54,20 @@ enum UpgradeStore {
         let effectiveTick = max(GameBalance.minimumNoobTickSeconds, GameBalance.baseNoobTickSeconds - totalReductionSeconds)
         return Decimal(GameBalance.baseNoobTickSeconds / effectiveTick)
     }
+
+    /// Multiplies every Noob's cost — GeneratorStore folds this into its cost math directly.
+    static func costDiscountMultiplier(state: GameState) -> Decimal {
+        UpgradeCatalog.all.reduce(Decimal(1)) { total, definition in
+            guard case .costDiscount(let perLevelPercent) = definition.effect else { return total }
+            return total * UpgradeEffect.costDiscountMultiplierValue(level: level(definition, state: state), perLevelPercent: perLevelPercent)
+        }
+    }
+
+    /// Flat, unmultiplied Oof/sec added on top of everything else.
+    static func flatOutputBonus(state: GameState) -> Decimal {
+        UpgradeCatalog.all.reduce(Decimal(0)) { total, definition in
+            guard case .flatOutputBonus(let perLevel) = definition.effect else { return total }
+            return total + UpgradeEffect.flatOutputBonusValue(level: level(definition, state: state), perLevel: perLevel)
+        }
+    }
 }

@@ -23,7 +23,7 @@ enum RebirthSystem {
         guard canRebirth(state: state) else { return 0 }
         let req = requirement(rebirthCount: state.rebirthCount)
         let base = GameBalance.rebirthGainBaseline * Formulas.rebirthGain(currency: state.currency, divisor: req)
-        return base * RebirthUpgradeStore.rebirthGainMultiplier(state: state)
+        return base * RebirthUpgradeStore.rebirthGainMultiplier(state: state) * RuneStore.rebirthGainMultiplier(state: state)
     }
 
     /// Returns state unchanged if the requirement isn't met.
