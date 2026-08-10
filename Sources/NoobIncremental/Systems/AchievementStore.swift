@@ -26,6 +26,8 @@ enum AchievementStore {
             return false
         case .codeRedeemed:
             return !state.redeemedCodes.isEmpty
+        case .streakDays(let days):
+            return state.longestStreak >= days
         }
     }
 

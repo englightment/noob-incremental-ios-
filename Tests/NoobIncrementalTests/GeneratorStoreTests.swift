@@ -90,13 +90,26 @@ final class GeneratorStoreTests: XCTestCase {
         XCTAssertEqual(state.currency, 1_000_000 - expectedCost)
     }
 
-    func testBuyQuantityBuysAsManyAsAffordableWhenShort() {
-        // Enough for 2 levels (10 + 11.5 = 21.5) but not 3 (+ 13.225 = 34.725)
+    func testBuyQuantityIsAllOrNothingWhenShort() {
+        // Enough for 2 levels (10 + 11.5 = 21.5) but not the requested 10 — should buy
+        // nothing at all rather than silently filling as many as affordable.
         var state = GameState.newGame
         state.currency = 25
 
-        state = GeneratorStore.buyQuantity(hut, quantity: 10, state: state)
+        let result = GeneratorStore.buyQuantity(hut, quantity: 10, state: state)
 
+        XCTAssertEqual(result, state)
+        XCTAssertEqual(GeneratorStore.level(hut, state: result), 0)
+    }
+
+    func testCanAffordQuantityMatchesBuyQuantityOutcome() {
+        var state = GameState.newGame
+        state.currency = 25
+
+        XCTAssertFalse(GeneratorStore.canAffordQuantity(hut, quantity: 10, state: state))
+        XCTAssertTrue(GeneratorStore.canAffordQuantity(hut, quantity: 2, state: state))
+
+        state = GeneratorStore.buyQuantity(hut, quantity: 2, state: state)
         XCTAssertEqual(GeneratorStore.level(hut, state: state), 2)
     }
 

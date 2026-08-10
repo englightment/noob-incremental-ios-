@@ -15,31 +15,40 @@ enum GeneratorStore {
         state.currency >= cost(for: definition, state: state)
     }
 
-    /// Returns state unchanged if the purchase can't be afforded.
     static func buy(_ definition: GeneratorDefinition, state: GameState) -> GameState {
         buyQuantity(definition, quantity: 1, state: state)
     }
 
-    /// Buys up to `quantity` levels at once. Buys as many as affordable if funds run out
-    /// partway — never partially fails.
+    /// All-or-nothing: buys exactly `quantity` levels if (and only if) the full bulk cost is
+    /// affordable right now. Returns state unchanged otherwise — no silent partial fill, so a
+    /// player who picks x10 either gets 10 or is clearly told (via cost/canAfford) they can't.
     static func buyQuantity(_ definition: GeneratorDefinition, quantity: Int, state: GameState) -> GameState {
         guard quantity > 0 else { return state }
         let owned = level(definition, state: state)
-        let affordable = min(quantity, Formulas.maxAffordableLevels(base: definition.baseCost, owned: owned, availableCurrency: state.currency))
-        guard affordable > 0 else { return state }
+        let price = Formulas.bulkLevelCost(base: definition.baseCost, owned: owned, quantity: quantity)
+        guard state.currency >= price else { return state }
 
         var next = state
-        next.currency -= Formulas.bulkLevelCost(base: definition.baseCost, owned: owned, quantity: affordable)
+        next.currency -= price
 
         var generatorState = next.generators[definition.id] ?? GeneratorState(id: definition.id)
-        generatorState.level += affordable
+        generatorState.level += quantity
         generatorState.isUnlocked = true
         next.generators[definition.id] = generatorState
 
         return next
     }
 
-    /// Buys as many levels as currently affordable. Generators have no level cap.
+    static func costForQuantity(_ definition: GeneratorDefinition, quantity: Int, state: GameState) -> Decimal {
+        Formulas.bulkLevelCost(base: definition.baseCost, owned: level(definition, state: state), quantity: quantity)
+    }
+
+    static func canAffordQuantity(_ definition: GeneratorDefinition, quantity: Int, state: GameState) -> Bool {
+        state.currency >= costForQuantity(definition, quantity: quantity, state: state)
+    }
+
+    /// Buys as many levels as currently affordable — the one case where "best effort" is the
+    /// intent, not a bug: that's what "Max" means.
     static func buyMax(_ definition: GeneratorDefinition, state: GameState) -> GameState {
         let owned = level(definition, state: state)
         let affordable = Formulas.maxAffordableLevels(base: definition.baseCost, owned: owned, availableCurrency: state.currency)

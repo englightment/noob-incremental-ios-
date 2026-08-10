@@ -8,7 +8,8 @@ struct GeneratorDefinition: Identifiable, Equatable {
     let name: String
     let baseCost: Decimal
     let baseOutput: Decimal
-    /// Lifetime Oof earned required before this Noob appears in the shop.
+    /// Lifetime Oof earned required before this Noob is purchasable. Always shown in the
+    /// shop — greyed out with its unlock requirement until then, never hidden.
     let unlockThreshold: Decimal
 
     func isVisible(for state: GameState) -> Bool {

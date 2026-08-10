@@ -79,4 +79,52 @@ final class RebirthSystemTests: XCTestCase {
         XCTAssertEqual(RebirthUpgradeStore.level(rebirthMoreOof, state: result), rebirthUpgradeLevelBefore)
         XCTAssertGreaterThan(result.rebirthCurrency, 0) // leftover balance plus this rebirth's gain
     }
+
+    // MARK: - Escalating requirement (the actual bug fix)
+
+    func testRequirementAtZeroRebirthsEqualsBaseRequirement() {
+        XCTAssertEqual(RebirthSystem.requirement(rebirthCount: 0), GameBalance.rebirthRequirement)
+    }
+
+    func testRequirementEscalatesWithEachRebirth() {
+        var previous = RebirthSystem.requirement(rebirthCount: 0)
+        for count in 1...10 {
+            let current = RebirthSystem.requirement(rebirthCount: count)
+            XCTAssertGreaterThan(current, previous, "requirement should strictly increase at rebirthCount=\(count)")
+            previous = current
+        }
+    }
+
+    func testPerformRebirthRaisesTheRequirementForTheNextOne() {
+        var state = GameState.newGame
+        state.currency = GameBalance.rebirthRequirement
+
+        let afterFirst = RebirthSystem.performRebirth(state: state)
+
+        XCTAssertGreaterThan(RebirthSystem.requirement(rebirthCount: afterFirst.rebirthCount), GameBalance.rebirthRequirement)
+        XCTAssertFalse(RebirthSystem.canRebirth(state: afterFirst), "resets to starting currency, well below the new higher requirement")
+    }
+
+    func testGainAtExactlyRequirementEqualsBaseline() {
+        var state = GameState.newGame
+        state.currency = RebirthSystem.requirement(rebirthCount: 0)
+
+        let gain = NSDecimalNumber(decimal: RebirthSystem.availableGain(state: state)).doubleValue
+        let baseline = NSDecimalNumber(decimal: GameBalance.rebirthGainBaseline).doubleValue
+
+        XCTAssertEqual(gain, baseline, accuracy: 0.0001, "a rebirth right at the requirement should net the baseline, not ~1")
+    }
+
+    func testGainScalesWithOvershootPastRequirement() {
+        let requirement = RebirthSystem.requirement(rebirthCount: 0)
+        var atRequirement = GameState.newGame
+        atRequirement.currency = requirement
+        var wayOver = GameState.newGame
+        wayOver.currency = requirement * 100
+
+        let gainAtRequirement = RebirthSystem.availableGain(state: atRequirement)
+        let gainWayOver = RebirthSystem.availableGain(state: wayOver)
+
+        XCTAssertGreaterThan(gainWayOver, gainAtRequirement * 5, "pushing 100x past the requirement should be worth meaningfully more than the minimum")
+    }
 }

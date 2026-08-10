@@ -9,11 +9,18 @@ enum GameBalance {
     /// since there's no tap-to-earn to bootstrap with.
     static let startingCurrency: Decimal = 10
 
-    /// Current Oof required before a Rebirth can be performed.
-    static let rebirthRequirement: Decimal = 10_000 // matches "Requirement: 10k Oof"
+    /// Oof required before the *first* Rebirth. Each subsequent rebirth requires
+    /// requirement * rebirthRequirementGrowthRate^rebirthCount — a fixed requirement forever
+    /// let players spam cheap rebirths for ~1 currency each, which is what made rebirth
+    /// feel linear/pointless. Escalating it makes each rebirth a real step up.
+    static let rebirthRequirement: Decimal = 10_000
 
-    /// Scale factor in the rebirth-gain formula — bigger overshoot past the requirement = more gain.
-    static let rebirthGainDivisor: Decimal = 10_000
+    /// Growth rate for the escalating requirement above.
+    static let rebirthRequirementGrowthRate: Double = 1.6
+
+    /// Flat multiplier on rebirth-currency gain — without it, a rebirth performed right at
+    /// the requirement (the common case) nets ~1 currency, which reads as "barely scaling".
+    static let rebirthGainBaseline: Decimal = 10
 
     /// Cost growth rate for rebirth-currency upgrades — steeper than the Oof-currency shop
     /// since each level here is far more powerful (doubling Oof output, etc).

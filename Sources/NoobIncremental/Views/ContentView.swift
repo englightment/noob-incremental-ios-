@@ -25,7 +25,7 @@ private struct PressableButtonStyle: ButtonStyle {
 }
 
 private enum BuyQuantity: String, CaseIterable, Identifiable {
-    case one = "x1", ten = "x10", max = "Max"
+    case one = "x1", ten = "x10", hundred = "x100", max = "Max"
     var id: String { rawValue }
 }
 
@@ -52,6 +52,14 @@ struct ContentView: View {
                     }
                 }
 
+                if viewModel.canClaimDailyReward {
+                    DailyRewardBanner(
+                        streakDay: viewModel.pendingStreakDay,
+                        rewardText: viewModel.pendingDailyRewardText,
+                        onClaim: viewModel.claimDailyReward
+                    )
+                }
+
                 if let earnings = viewModel.lastOfflineEarnings {
                     OfflineEarningsBanner(amount: earnings) {
                         viewModel.dismissOfflineEarningsBanner()
@@ -75,9 +83,7 @@ struct ContentView: View {
 
                 TabView {
                     NoobsTab(
-                        generators: viewModel.visibleGenerators,
-                        autoBuyEnabled: viewModel.autoBuyEnabled,
-                        onToggleAutoBuy: viewModel.toggleAutoBuy,
+                        generators: viewModel.generatorRows,
                         onUpgrade: viewModel.buyGenerator,
                         onUpgradeMax: viewModel.buyGeneratorMax
                     )
@@ -224,6 +230,40 @@ private struct BoostBanner: View {
     }
 }
 
+// MARK: - Daily reward banner
+
+private struct DailyRewardBanner: View {
+    let streakDay: Int
+    let rewardText: String
+    let onClaim: () -> Void
+
+    var body: some View {
+        HStack {
+            Image(systemName: "flame.fill")
+                .foregroundStyle(.orange)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Day \(streakDay) Streak")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                Text("Claim \(rewardText) \u{2014} don't lose your streak!")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+            Spacer()
+            Button("Claim", action: onClaim)
+                .buttonStyle(PressableButtonStyle())
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 10))
+                .foregroundStyle(.black)
+                .font(.subheadline.weight(.bold))
+        }
+        .padding(10)
+        .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.orange.opacity(0.6), lineWidth: 1.5))
+        .shadow(color: .orange.opacity(0.3), radius: 8)
+    }
+}
+
 // MARK: - Achievement toast
 
 private struct AchievementToastView: View {
@@ -271,42 +311,27 @@ private struct GlowCard<Content: View>: View {
 
 private struct NoobsTab: View {
     let generators: [GeneratorRowViewData]
-    let autoBuyEnabled: Bool
-    let onToggleAutoBuy: () -> Void
     let onUpgrade: (String, Int) -> Void
     let onUpgradeMax: (String) -> Void
     @State private var quantity: BuyQuantity = .one
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack {
-                Picker("Quantity", selection: $quantity) {
-                    ForEach(BuyQuantity.allCases) { q in
-                        Text(q.rawValue).tag(q)
-                    }
+            Picker("Quantity", selection: $quantity) {
+                ForEach(BuyQuantity.allCases) { q in
+                    Text(q.rawValue).tag(q)
                 }
-                .pickerStyle(.segmented)
-                .frame(maxWidth: 220)
-
-                Spacer()
-
-                Toggle(isOn: Binding(get: { autoBuyEnabled }, set: { _ in onToggleAutoBuy() })) {
-                    Text("Auto")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.8))
-                }
-                .toggleStyle(.switch)
-                .tint(.yellow)
-                .fixedSize()
             }
+            .pickerStyle(.segmented)
 
             ScrollView {
                 LazyVStack(spacing: 10) {
                     ForEach(generators) { generator in
-                        GeneratorRowView(data: generator) {
+                        GeneratorRowView(data: generator, quantity: quantity) {
                             switch quantity {
                             case .one: onUpgrade(generator.id, 1)
                             case .ten: onUpgrade(generator.id, 10)
+                            case .hundred: onUpgrade(generator.id, 100)
                             case .max: onUpgradeMax(generator.id)
                             }
                         }
@@ -321,46 +346,80 @@ private struct NoobsTab: View {
 
 private struct GeneratorRowView: View {
     let data: GeneratorRowViewData
+    let quantity: BuyQuantity
     let onUpgrade: () -> Void
+
+    private var costText: String {
+        switch quantity {
+        case .one: return data.costX1
+        case .ten: return data.costX10
+        case .hundred: return data.costX100
+        case .max: return data.maxAffordableCount > 0 ? "x\(data.maxAffordableCount)" : "\u{2014}"
+        }
+    }
+
+    private var canAfford: Bool {
+        switch quantity {
+        case .one: return data.canAffordX1
+        case .ten: return data.canAffordX10
+        case .hundred: return data.canAffordX100
+        case .max: return data.maxAffordableCount > 0
+        }
+    }
 
     var body: some View {
         GlowCard(borderColor: .yellow) {
             HStack {
                 NoobFaceView(size: 40)
+                    .saturation(data.isLocked ? 0 : 1)
+                    .opacity(data.isLocked ? 0.35 : 1)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(data.name)
                         .font(.headline)
-                        .foregroundStyle(.white)
-                    Text("Level \(data.level)")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
-                    Text(data.outputPerLevelText)
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.45))
+                        .foregroundStyle(data.isLocked ? .white.opacity(0.4) : .white)
+                    if data.isLocked {
+                        Text(data.unlockText)
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.4))
+                    } else {
+                        Text("Level \(data.level)")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.6))
+                        Text(data.outputPerLevelText)
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
                 }
 
                 Spacer()
 
-                Button(action: onUpgrade) {
-                    VStack(spacing: 2) {
-                        Text("Upgrade")
-                            .font(.subheadline.weight(.bold))
-                        Text(data.costText)
-                            .font(.caption)
+                if data.isLocked {
+                    Image(systemName: "lock.fill")
+                        .foregroundStyle(.white.opacity(0.3))
+                        .padding(.trailing, 6)
+                } else {
+                    Button(action: onUpgrade) {
+                        VStack(spacing: 2) {
+                            Text(quantity == .max ? "Buy Max" : "Upgrade")
+                                .font(.subheadline.weight(.bold))
+                            Text(costText)
+                                .font(.caption)
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(
+                            canAfford ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.gray.opacity(0.3)),
+                            in: RoundedRectangle(cornerRadius: 10)
+                        )
+                        .foregroundStyle(.black)
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(
-                        data.canAfford ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.gray.opacity(0.3)),
-                        in: RoundedRectangle(cornerRadius: 10)
-                    )
-                    .foregroundStyle(.black)
+                    .buttonStyle(PressableButtonStyle())
+                    .disabled(!canAfford)
                 }
-                .buttonStyle(PressableButtonStyle())
-                .disabled(!data.canAfford)
             }
         }
+        .opacity(data.isLocked ? 0.55 : 1.0)
     }
 }
 
@@ -559,6 +618,7 @@ private struct MoreSheet: View {
                 statRow("Lifetime Oof", viewModel.lifetimeEarnedText)
                 statRow("Total Noob Levels", "\(viewModel.totalNoobLevels)")
                 statRow("Rebirths", "\(viewModel.rebirthCount)")
+                statRow("Login Streak", "\(viewModel.currentStreak) days")
                 statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
                 statRow("Time Played", viewModel.totalPlayTimeText)
             }

@@ -7,6 +7,7 @@ enum AchievementCondition: Equatable {
     case allNoobsOwned
     case upgradeMaxed(String)
     case codeRedeemed
+    case streakDays(Int)
 }
 
 struct AchievementDefinition: Identifiable, Equatable {
@@ -33,7 +34,9 @@ enum AchievementCatalog {
         AchievementDefinition(id: "five_rebirths", name: "Cycle of Life", description: "Rebirth 5 times", condition: .rebirths(5)),
         AchievementDefinition(id: "twenty_five_rebirths", name: "Rebirth Master", description: "Rebirth 25 times", condition: .rebirths(25)),
         AchievementDefinition(id: "max_rebirth_more_oof", name: "Power Overwhelming", description: "Max the rebirth-shop More Oof upgrade", condition: .upgradeMaxed("rebirth_more_oof")),
-        AchievementDefinition(id: "redeem_code", name: "Code Breaker", description: "Redeem a code", condition: .codeRedeemed)
+        AchievementDefinition(id: "redeem_code", name: "Code Breaker", description: "Redeem a code", condition: .codeRedeemed),
+        AchievementDefinition(id: "streak_7", name: "Week One", description: "Reach a 7-day login streak", condition: .streakDays(7)),
+        AchievementDefinition(id: "streak_30", name: "Dedicated", description: "Reach a 30-day login streak", condition: .streakDays(30))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {

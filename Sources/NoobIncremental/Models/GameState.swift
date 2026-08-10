@@ -43,9 +43,13 @@ struct GameState: Codable, Equatable {
     var highestMilestoneCelebrated: Int = 0
 
     // Quality-of-life settings
-    var autoBuyEnabled: Bool = false
     var soundEnabled: Bool = true
     var hapticsEnabled: Bool = true
+
+    // Daily login streak
+    var currentStreak: Int = 0
+    var longestStreak: Int = 0
+    var lastStreakClaimDate: Date?
 
     // Meta
     var lastSaveTimestamp: Date = Date()

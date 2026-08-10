@@ -24,6 +24,16 @@ final class AchievementStoreTests: XCTestCase {
         XCTAssertTrue(AchievementStore.conditionMet(rebirthAchievement, state: state))
     }
 
+    func testConditionMetForStreakDays() {
+        let definition = AchievementDefinition(id: "test_streak", name: "Test Streak", description: "", condition: .streakDays(7))
+        var state = GameState.newGame
+        state.longestStreak = 6
+        XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
+
+        state.longestStreak = 7
+        XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
+    }
+
     func testTotalNoobLevelsConditionSumsAcrossGeneratorTypes() {
         guard let starter = GeneratorCatalog.definition(for: "starter_noob"),
               let farmer = GeneratorCatalog.definition(for: "farmer_noob") else {

@@ -2,13 +2,22 @@ import Foundation
 import UIKit
 import Combine
 
+/// Cost/affordability is precomputed for every bulk-buy tier since the ViewModel has no
+/// visibility into which x1/x10/x100/Max option is currently selected in the UI.
 struct GeneratorRowViewData: Identifiable {
     let id: String
     let name: String
     let level: Int
-    let costText: String
+    let isLocked: Bool
+    let unlockText: String
     let outputPerLevelText: String
-    let canAfford: Bool
+    let costX1: String
+    let canAffordX1: Bool
+    let costX10: String
+    let canAffordX10: Bool
+    let costX100: String
+    let canAffordX100: Bool
+    let maxAffordableCount: Int
 }
 
 struct UpgradeRowViewData: Identifiable {
@@ -50,7 +59,6 @@ final class GameViewModel: ObservableObject {
     private var lastTickDate = Date()
     private var pendingFloatingIncome: Decimal = 0
     private var lastFloatingTextSpawn = Date.distantPast
-    private var lastAutoBuySpawn = Date.distantPast
     private var lastBoostRoll = Date.distantPast
     private var achievementToastQueue: [AchievementDefinition] = []
 
@@ -80,6 +88,20 @@ final class GameViewModel: ObservableObject {
         String(format: "%.0fs", BoostSystem.remainingSeconds(state: state))
     }
 
+    // MARK: - Daily streak
+
+    var currentStreak: Int { state.currentStreak }
+    var canClaimDailyReward: Bool { DailyStreakSystem.canClaim(state: state) }
+
+    var pendingStreakDay: Int { DailyStreakSystem.pendingStreakValue(state: state) }
+
+    var pendingDailyRewardText: String {
+        let reward = DailyRewardCatalog.reward(forStreak: pendingStreakDay)
+        return reward.rebirthCurrency > 0
+            ? "+\(NumberFormatting.format(reward.rebirthCurrency)) Rebirth"
+            : "+\(NumberFormatting.format(reward.oof)) Oof"
+    }
+
     // MARK: - Rebirth
 
     var rebirthCount: Int { state.rebirthCount }
@@ -91,18 +113,18 @@ final class GameViewModel: ObservableObject {
     }
 
     var rebirthRequirementText: String {
-        "Requirement: \(NumberFormatting.format(GameBalance.rebirthRequirement)) Oof"
+        "Requirement: \(NumberFormatting.format(RebirthSystem.requirement(rebirthCount: state.rebirthCount))) Oof"
     }
 
     var rebirthProgressFraction: Double {
-        guard GameBalance.rebirthRequirement > 0 else { return 0 }
-        let capped = min(state.currency / GameBalance.rebirthRequirement, 1)
+        let requirement = RebirthSystem.requirement(rebirthCount: state.rebirthCount)
+        guard requirement > 0 else { return 0 }
+        let capped = min(state.currency / requirement, 1)
         return NSDecimalNumber(decimal: capped).doubleValue
     }
 
     // MARK: - Settings
 
-    var autoBuyEnabled: Bool { state.autoBuyEnabled }
     var soundEnabled: Bool { state.soundEnabled }
     var hapticsEnabled: Bool { state.hapticsEnabled }
 
@@ -134,19 +156,24 @@ final class GameViewModel: ObservableObject {
 
     // MARK: - Shop rows
 
-    var visibleGenerators: [GeneratorRowViewData] {
-        GeneratorCatalog.all
-            .filter { $0.isVisible(for: state) }
-            .map { definition in
-                GeneratorRowViewData(
-                    id: definition.id,
-                    name: definition.name,
-                    level: GeneratorStore.level(definition, state: state),
-                    costText: NumberFormatting.format(GeneratorStore.cost(for: definition, state: state)),
-                    outputPerLevelText: "\(NumberFormatting.format(definition.baseOutput))/sec per level",
-                    canAfford: GeneratorStore.canAfford(definition, state: state)
-                )
-            }
+    var generatorRows: [GeneratorRowViewData] {
+        GeneratorCatalog.all.map { definition in
+            GeneratorRowViewData(
+                id: definition.id,
+                name: definition.name,
+                level: GeneratorStore.level(definition, state: state),
+                isLocked: !definition.isVisible(for: state),
+                unlockText: "Unlocks at \(NumberFormatting.format(definition.unlockThreshold)) lifetime Oof",
+                outputPerLevelText: "\(NumberFormatting.format(definition.baseOutput))/sec per level",
+                costX1: NumberFormatting.format(GeneratorStore.costForQuantity(definition, quantity: 1, state: state)),
+                canAffordX1: GeneratorStore.canAffordQuantity(definition, quantity: 1, state: state),
+                costX10: NumberFormatting.format(GeneratorStore.costForQuantity(definition, quantity: 10, state: state)),
+                canAffordX10: GeneratorStore.canAffordQuantity(definition, quantity: 10, state: state),
+                costX100: NumberFormatting.format(GeneratorStore.costForQuantity(definition, quantity: 100, state: state)),
+                canAffordX100: GeneratorStore.canAffordQuantity(definition, quantity: 100, state: state),
+                maxAffordableCount: Formulas.maxAffordableLevels(base: definition.baseCost, owned: GeneratorStore.level(definition, state: state), availableCurrency: state.currency)
+            )
+        }
     }
 
     var visibleUpgrades: [UpgradeRowViewData] {
@@ -270,6 +297,14 @@ final class GameViewModel: ObservableObject {
         checkForAchievements()
     }
 
+    func claimDailyReward() {
+        guard let (newState, _) = DailyStreakSystem.claim(state: state) else { return }
+        state = newState
+        fireHapticNotification(.success)
+        SoundManager.play(.milestone, enabled: state.soundEnabled)
+        checkForAchievements()
+    }
+
     func performRebirth() {
         guard RebirthSystem.canRebirth(state: state) else { return }
         state = RebirthSystem.performRebirth(state: state)
@@ -299,7 +334,6 @@ final class GameViewModel: ObservableObject {
 
     // MARK: - Settings
 
-    func toggleAutoBuy() { state.autoBuyEnabled.toggle() }
     func toggleSound() { state.soundEnabled.toggle() }
     func toggleHaptics() { state.hapticsEnabled.toggle() }
 
@@ -325,11 +359,6 @@ final class GameViewModel: ObservableObject {
             spawnFloatingText(pendingFloatingIncome)
             pendingFloatingIncome = 0
             lastFloatingTextSpawn = now
-        }
-
-        if state.autoBuyEnabled, now.timeIntervalSince(lastAutoBuySpawn) >= 0.5 {
-            lastAutoBuySpawn = now
-            state = AutoBuyStore.step(state: state)
         }
 
         rollLuckySurge(now: now)
