@@ -24,6 +24,7 @@ enum GameLoop {
             * RebirthUpgradeStore.tickSpeedMultiplier(state: state)
             * AchievementStore.outputMultiplier(state: state)
             * BoostSystem.activeMultiplier(state: state, now: now)
+            * AdBoostSystem.combinedMultiplier(state: state, now: now)
             * RuneStore.outputMultiplier(state: state)
             * RuneStore.tickSpeedMultiplier(state: state)
 

@@ -39,6 +39,11 @@ struct GameState: Codable, Equatable {
     var activeBoostMultiplier: Decimal = 1
     var activeBoostExpiresAt: Date?
 
+    // Rewarded-ad boosts: separate from Lucky Surge (different trigger, much longer
+    // duration) and from each other (both can be active at once and stack).
+    var adBoost2xExpiresAt: Date?
+    var adBoost4xExpiresAt: Date?
+
     // Net-worth milestone tier (power-of-ten index) already celebrated, so the confetti
     // burst only fires once per tier crossed.
     var highestMilestoneCelebrated: Int = 0

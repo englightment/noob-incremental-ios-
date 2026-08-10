@@ -11,12 +11,20 @@ configs:
   Debug: debug
   Release: release
 
+packages:
+  GoogleMobileAds:
+    url: https://github.com/googleads/swift-package-manager-google-mobile-ads.git
+    from: 13.0.0
+
 targets:
   NoobIncremental:
     type: application
     platform: iOS
     sources:
       - path: Sources/NoobIncremental
+    dependencies:
+      - package: GoogleMobileAds
+        product: GoogleMobileAds
     info:
       path: Sources/NoobIncremental/Info.plist
       properties:
@@ -27,6 +35,11 @@ targets:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         ITSAppUsesNonExemptEncryption: false
+        # Google's public TEST app ID — swap for your own after creating an AdMob account.
+        # See Sources/NoobIncremental/Systems/RewardedAdManager.swift for details.
+        GADApplicationIdentifier: ca-app-pub-3940256099942544~1458002511
+        SKAdNetworkItems:
+          - SKAdNetworkIdentifier: cstr6suwn9.skadnetwork
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.taragod.noobincremental

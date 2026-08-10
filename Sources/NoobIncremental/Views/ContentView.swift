@@ -35,6 +35,7 @@ private enum BuyQuantity: String, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @ObservedObject var viewModel: GameViewModel
+    @StateObject private var adManager = RewardedAdManager()
     @State private var showMore = false
     @State private var confettiPieces: [ConfettiPiece] = []
 
@@ -137,14 +138,17 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .onAppear { viewModel.start() }
+        .onAppear {
+            viewModel.start()
+            adManager.start()
+        }
         .onChange(of: viewModel.showMilestoneCelebration) { _, isShowing in
             if isShowing {
                 confettiPieces = ConfettiView.randomBurst()
             }
         }
         .sheet(isPresented: $showMore) {
-            MoreSheet(viewModel: viewModel)
+            MoreSheet(viewModel: viewModel, adManager: adManager)
         }
     }
 }
@@ -668,6 +672,7 @@ private struct OfflineEarningsBanner: View {
 
 private struct MoreSheet: View {
     @ObservedObject var viewModel: GameViewModel
+    @ObservedObject var adManager: RewardedAdManager
     @Environment(\.dismiss) private var dismiss
     @State private var codeText = ""
     @State private var showResetConfirm = false
@@ -679,6 +684,7 @@ private struct MoreSheet: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         statsSection
+                        adBoostsSection
                         codesSection
                         achievementsSection
                         settingsSection
@@ -701,7 +707,7 @@ private struct MoreSheet: View {
         GlowCard(borderColor: .cyan) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Stats").font(.headline).foregroundStyle(.white)
-                statRow("Lifetime Oof", viewModel.lifetimeEarnedText)
+                statRow("Total Earned", viewModel.lifetimeEarnedText)
                 statRow("Total Noob Levels", "\(viewModel.totalNoobLevels)")
                 statRow("Rebirths", "\(viewModel.rebirthCount)")
                 statRow("Rune Shards", viewModel.formattedRuneShards)
@@ -717,6 +723,61 @@ private struct MoreSheet: View {
             Text(label).font(.caption).foregroundStyle(.white.opacity(0.6))
             Spacer()
             Text(value).font(.caption.weight(.bold)).foregroundStyle(.white)
+        }
+    }
+
+    private var adBoostsSection: some View {
+        GlowCard(borderColor: .orange) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Ad Boosts").font(.headline).foregroundStyle(.white)
+                ForEach(AdBoostTier.allCases, id: \.self) { tier in
+                    adBoostRow(tier)
+                }
+            }
+        }
+    }
+
+    private func adBoostRow(_ tier: AdBoostTier) -> some View {
+        let isActive = viewModel.isAdBoostActive(tier)
+        let isReady = adManager.isReady[tier] == true
+
+        return HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tier.displayName)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                if isActive {
+                    Text("Active — \(viewModel.adBoostRemainingText(tier)) left")
+                        .font(.caption2)
+                        .foregroundStyle(.green)
+                } else {
+                    Text("Watch an ad for 8 hours of \(tier.displayName)")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+            Spacer()
+            if !isActive {
+                Button {
+                    adManager.show(tier) {
+                        viewModel.grantAdBoost(tier)
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "play.rectangle.fill")
+                        Text("Watch Ad")
+                    }
+                    .font(.caption.weight(.bold))
+                }
+                .buttonStyle(PressableButtonStyle())
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                .background(
+                    isReady ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.15)),
+                    in: RoundedRectangle(cornerRadius: 8)
+                )
+                .foregroundStyle(.white)
+                .disabled(!isReady)
+            }
         }
     }
 

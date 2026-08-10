@@ -34,6 +34,9 @@ enum GameBalance {
     /// Rune Shards granted each time a new net-worth milestone is celebrated.
     static let runeShardsPerMilestone: Decimal = 1
 
+    /// How long a rewarded-ad boost lasts once activated.
+    static let adBoostDuration: TimeInterval = 60 * 60 * 8 // 8 hours
+
     /// Baseline seconds-per-Noob-tick before any "Faster Noobs" upgrade is applied.
     static let baseNoobTickSeconds: TimeInterval = 1.0
 

@@ -96,6 +96,33 @@ final class GameViewModel: ObservableObject {
         String(format: "%.0fs", BoostSystem.remainingSeconds(state: state))
     }
 
+    // MARK: - Rewarded-ad boosts
+
+    func isAdBoostActive(_ tier: AdBoostTier) -> Bool {
+        AdBoostSystem.isActive(tier, state: state)
+    }
+
+    func adBoostRemainingText(_ tier: AdBoostTier) -> String {
+        formatHoursMinutes(AdBoostSystem.remainingSeconds(tier, state: state))
+    }
+
+    /// Pure state update — the View owns the actual ad loading/presentation and calls this
+    /// once the SDK confirms the reward was earned.
+    func grantAdBoost(_ tier: AdBoostTier) {
+        state = AdBoostSystem.activate(tier, state: state, duration: GameBalance.adBoostDuration)
+        fireHapticNotification(.success)
+        SoundManager.play(.milestone, enabled: state.soundEnabled)
+        checkForAchievements()
+    }
+
+    private func formatHoursMinutes(_ seconds: TimeInterval) -> String {
+        guard seconds > 0 else { return "" }
+        let totalMinutes = Int(seconds) / 60
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        return hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
+    }
+
     // MARK: - Daily streak
 
     var currentStreak: Int { state.currentStreak }
