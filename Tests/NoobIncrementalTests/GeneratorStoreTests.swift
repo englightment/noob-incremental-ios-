@@ -3,7 +3,7 @@ import XCTest
 
 final class GeneratorStoreTests: XCTestCase {
 
-    private let hut = GeneratorDefinition(id: "test_hut", name: "Test Hut", baseCost: 10, baseOutput: 1, unlockThreshold: 0)
+    private let hut = GeneratorDefinition(id: "test_hut", name: "Test Hut", zoneID: WorldCatalog.zone1ID, baseCost: 10, baseOutput: 1, unlockThreshold: 0)
 
     func testCostEqualsBaseWhenNoneOwned() {
         let state = GameState.newGame
