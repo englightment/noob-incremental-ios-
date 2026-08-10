@@ -68,4 +68,64 @@ final class GeneratorStoreTests: XCTestCase {
 
         XCTAssertEqual(GeneratorStore.level(hut, state: state), 5)
     }
+
+    // MARK: - Bulk purchase
+
+    func testBuyQuantityBuysExactlyRequestedAmountWhenAffordable() {
+        var state = GameState.newGame
+        state.currency = 1_000_000
+
+        state = GeneratorStore.buyQuantity(hut, quantity: 7, state: state)
+
+        XCTAssertEqual(GeneratorStore.level(hut, state: state), 7)
+    }
+
+    func testBuyQuantityChargesTheExactBulkCost() {
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        let expectedCost = Formulas.bulkLevelCost(base: hut.baseCost, owned: 0, quantity: 7)
+
+        state = GeneratorStore.buyQuantity(hut, quantity: 7, state: state)
+
+        XCTAssertEqual(state.currency, 1_000_000 - expectedCost)
+    }
+
+    func testBuyQuantityBuysAsManyAsAffordableWhenShort() {
+        // Enough for 2 levels (10 + 11.5 = 21.5) but not 3 (+ 13.225 = 34.725)
+        var state = GameState.newGame
+        state.currency = 25
+
+        state = GeneratorStore.buyQuantity(hut, quantity: 10, state: state)
+
+        XCTAssertEqual(GeneratorStore.level(hut, state: state), 2)
+    }
+
+    func testBuyQuantityZeroIsNoOp() {
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        let before = state
+
+        state = GeneratorStore.buyQuantity(hut, quantity: 0, state: state)
+
+        XCTAssertEqual(state, before)
+    }
+
+    func testBuyMaxBuysNothingWhenCannotAffordFirstLevel() {
+        var state = GameState.newGame
+        state.currency = 5
+
+        state = GeneratorStore.buyMax(hut, state: state)
+
+        XCTAssertEqual(GeneratorStore.level(hut, state: state), 0)
+        XCTAssertEqual(state.currency, 5)
+    }
+
+    func testBuyMaxSpendsDownToWhatsLeftUnaffordable() {
+        var state = GameState.newGame
+        state.currency = 1_000
+
+        state = GeneratorStore.buyMax(hut, state: state)
+
+        XCTAssertFalse(GeneratorStore.canAfford(hut, state: state), "should have bought until the next level is unaffordable")
+    }
 }

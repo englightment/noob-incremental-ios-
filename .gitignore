@@ -2,6 +2,9 @@
 # repo to detect a scheme; CI keeps it in sync (see the sync-xcodeproj job in ios.yml).
 # User-specific junk inside it is still ignored below.
 
+# Scratch tooling used to generate assets (e.g. browser-canvas app icon export) — not part of the app
+.icon-gen/
+
 # Xcode
 xcuserdata/
 *.xcuserstate

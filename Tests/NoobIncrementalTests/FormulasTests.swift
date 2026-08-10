@@ -40,6 +40,52 @@ final class FormulasTests: XCTestCase {
         XCTAssertEqual(Formulas.bulkLevelCost(base: 10, owned: 0, quantity: 0), 0)
     }
 
+    // MARK: - Max affordable levels
+
+    func testMaxAffordableLevelsIsZeroWhenCannotAffordFirst() {
+        let levels = Formulas.maxAffordableLevels(base: 10, owned: 0, availableCurrency: 5)
+        XCTAssertEqual(levels, 0)
+    }
+
+    func testMaxAffordableLevelsExactlyAffordsOne() {
+        let levels = Formulas.maxAffordableLevels(base: 10, owned: 0, availableCurrency: 10)
+        XCTAssertEqual(levels, 1)
+    }
+
+    func testMaxAffordableLevelsNeverExceedsWhatCostsActuallyAllow() {
+        let currency: Decimal = 50_000
+        let levels = Formulas.maxAffordableLevels(base: 10, owned: 0, growthRate: 1.15, availableCurrency: currency)
+        let costOfThatMany = Formulas.bulkLevelCost(base: 10, owned: 0, quantity: levels, growthRate: 1.15)
+        let costOfOneMore = Formulas.bulkLevelCost(base: 10, owned: 0, quantity: levels + 1, growthRate: 1.15)
+        XCTAssertLessThanOrEqual(costOfThatMany, currency)
+        XCTAssertGreaterThan(costOfOneMore, currency)
+    }
+
+    func testMaxAffordableLevelsMatchesLoopedCalculationAcrossManyBudgets() {
+        // Cross-check the closed-form estimate against a plain iterative purchase loop
+        // for a range of budgets, including values that land awkwardly between levels.
+        for currency: Decimal in [0, 9, 10, 99, 100, 1_234, 999_999] {
+            let fast = Formulas.maxAffordableLevels(base: 10, owned: 0, growthRate: 1.15, availableCurrency: currency)
+
+            var owned = 0
+            var spent: Decimal = 0
+            while true {
+                let next = Formulas.levelCost(base: 10, owned: owned, growthRate: 1.15)
+                guard spent + next <= currency else { break }
+                spent += next
+                owned += 1
+            }
+
+            XCTAssertEqual(fast, owned, "mismatch at currency=\(currency)")
+        }
+    }
+
+    func testMaxAffordableLevelsAccountsForAlreadyOwnedLevels() {
+        let fromZero = Formulas.maxAffordableLevels(base: 10, owned: 0, availableCurrency: 1_000)
+        let fromTen = Formulas.maxAffordableLevels(base: 10, owned: 10, availableCurrency: 1_000)
+        XCTAssertLessThan(fromTen, fromZero, "higher starting level costs more per purchase, so fewer are affordable")
+    }
+
     // MARK: - Generator output
 
     func testGeneratorOutputScalesWithOwnedCount() {

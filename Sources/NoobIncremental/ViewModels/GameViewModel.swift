@@ -22,6 +22,13 @@ struct UpgradeRowViewData: Identifiable {
     let canAfford: Bool
 }
 
+struct AchievementRowViewData: Identifiable {
+    let id: String
+    let name: String
+    let description: String
+    let isUnlocked: Bool
+}
+
 struct FloatingText: Identifiable, Equatable {
     let id = UUID()
     let text: String
@@ -33,6 +40,9 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var state: GameState
     @Published private(set) var lastOfflineEarnings: Decimal?
     @Published private(set) var floatingTexts: [FloatingText] = []
+    @Published private(set) var achievementToast: AchievementDefinition?
+    @Published private(set) var showMilestoneCelebration = false
+    @Published private(set) var redeemMessage: String?
 
     private let saveManager: SaveManager
     private var refreshTimer: Timer?
@@ -40,8 +50,19 @@ final class GameViewModel: ObservableObject {
     private var lastTickDate = Date()
     private var pendingFloatingIncome: Decimal = 0
     private var lastFloatingTextSpawn = Date.distantPast
+    private var lastAutoBuySpawn = Date.distantPast
+    private var lastBoostRoll = Date.distantPast
+    private var achievementToastQueue: [AchievementDefinition] = []
+
     private let buyHaptic = UIImpactFeedbackGenerator(style: .light)
-    private let rebirthHaptic = UINotificationFeedbackGenerator()
+    private let successHaptic = UINotificationFeedbackGenerator()
+
+    private let boostRollInterval: TimeInterval = 15
+    private let boostChance: Double = 0.12
+    private let boostDuration: TimeInterval = 20
+    private let boostMultiplier: Decimal = 5
+
+    // MARK: - Currency / income
 
     var formattedCurrency: String { NumberFormatting.format(state.currency) }
 
@@ -49,6 +70,14 @@ final class GameViewModel: ObservableObject {
         let perSecond = GameLoop.passiveIncomePerSecond(state)
         guard perSecond > 0 else { return "" }
         return "+\(NumberFormatting.format(perSecond))/sec"
+    }
+
+    // MARK: - Lucky Surge boost
+
+    var isBoostActive: Bool { BoostSystem.isActive(state: state) }
+    var boostMultiplierText: String { "x\(NumberFormatting.format(state.activeBoostMultiplier, fractionDigits: 0))" }
+    var boostRemainingSecondsText: String {
+        String(format: "%.0fs", BoostSystem.remainingSeconds(state: state))
     }
 
     // MARK: - Rebirth
@@ -70,6 +99,40 @@ final class GameViewModel: ObservableObject {
         let capped = min(state.currency / GameBalance.rebirthRequirement, 1)
         return NSDecimalNumber(decimal: capped).doubleValue
     }
+
+    // MARK: - Settings
+
+    var autoBuyEnabled: Bool { state.autoBuyEnabled }
+    var soundEnabled: Bool { state.soundEnabled }
+    var hapticsEnabled: Bool { state.hapticsEnabled }
+
+    // MARK: - Stats
+
+    var totalNoobLevels: Int {
+        GeneratorCatalog.all.reduce(0) { $0 + GeneratorStore.level($1, state: state) }
+    }
+    var lifetimeEarnedText: String { NumberFormatting.format(state.lifetimeEarned) }
+    var totalPlayTimeText: String {
+        let total = Int(state.totalPlayTime)
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        return hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
+    }
+    var unlockedAchievementCount: Int { state.unlockedAchievements.count }
+    var totalAchievementCount: Int { AchievementCatalog.all.count }
+
+    var achievementRows: [AchievementRowViewData] {
+        AchievementCatalog.all.map { definition in
+            AchievementRowViewData(
+                id: definition.id,
+                name: definition.name,
+                description: definition.description,
+                isUnlocked: AchievementStore.isUnlocked(definition, state: state)
+            )
+        }
+    }
+
+    // MARK: - Shop rows
 
     var visibleGenerators: [GeneratorRowViewData] {
         GeneratorCatalog.all
@@ -149,18 +212,34 @@ final class GameViewModel: ObservableObject {
         lastOfflineEarnings = nil
     }
 
-    func buyGenerator(id: String) {
-        guard let definition = GeneratorCatalog.definition(for: id),
-              GeneratorStore.canAfford(definition, state: state) else { return }
-        state = GeneratorStore.buy(definition, state: state)
-        buyHaptic.impactOccurred()
+    // MARK: - Purchases
+
+    func buyGenerator(id: String, quantity: Int = 1) {
+        guard let definition = GeneratorCatalog.definition(for: id) else { return }
+        let before = GeneratorStore.level(definition, state: state)
+        state = GeneratorStore.buyQuantity(definition, quantity: quantity, state: state)
+        if GeneratorStore.level(definition, state: state) > before {
+            fireBuyFeedback()
+        }
+        checkForAchievements()
+    }
+
+    func buyGeneratorMax(id: String) {
+        guard let definition = GeneratorCatalog.definition(for: id) else { return }
+        let before = GeneratorStore.level(definition, state: state)
+        state = GeneratorStore.buyMax(definition, state: state)
+        if GeneratorStore.level(definition, state: state) > before {
+            fireBuyFeedback()
+        }
+        checkForAchievements()
     }
 
     func buyUpgrade(id: String) {
         guard let definition = UpgradeCatalog.definition(for: id),
               UpgradeStore.canAfford(definition, state: state) else { return }
         state = UpgradeStore.buyOne(definition, state: state)
-        buyHaptic.impactOccurred()
+        fireBuyFeedback()
+        checkForAchievements()
     }
 
     func buyUpgradeMax(id: String) {
@@ -168,15 +247,17 @@ final class GameViewModel: ObservableObject {
         let before = UpgradeStore.level(definition, state: state)
         state = UpgradeStore.buyMax(definition, state: state)
         if UpgradeStore.level(definition, state: state) > before {
-            buyHaptic.impactOccurred()
+            fireBuyFeedback()
         }
+        checkForAchievements()
     }
 
     func buyRebirthUpgrade(id: String) {
         guard let definition = RebirthUpgradeCatalog.definition(for: id),
               RebirthUpgradeStore.canAfford(definition, state: state) else { return }
         state = RebirthUpgradeStore.buyOne(definition, state: state)
-        buyHaptic.impactOccurred()
+        fireBuyFeedback()
+        checkForAchievements()
     }
 
     func buyRebirthUpgradeMax(id: String) {
@@ -184,15 +265,52 @@ final class GameViewModel: ObservableObject {
         let before = RebirthUpgradeStore.level(definition, state: state)
         state = RebirthUpgradeStore.buyMax(definition, state: state)
         if RebirthUpgradeStore.level(definition, state: state) > before {
-            buyHaptic.impactOccurred()
+            fireBuyFeedback()
         }
+        checkForAchievements()
     }
 
     func performRebirth() {
         guard RebirthSystem.canRebirth(state: state) else { return }
         state = RebirthSystem.performRebirth(state: state)
-        rebirthHaptic.notificationOccurred(.success)
+        fireHapticNotification(.success)
+        SoundManager.play(.rebirth, enabled: state.soundEnabled)
+        checkForAchievements()
     }
+
+    func redeemCode(_ code: String) {
+        let (newState, result) = RedeemCodeStore.redeem(code, state: state)
+        state = newState
+        switch result {
+        case .success(let definition):
+            redeemMessage = "Redeemed \(definition.code)!"
+            fireBuyFeedback()
+        case .alreadyRedeemed:
+            redeemMessage = "Already redeemed."
+        case .invalid:
+            redeemMessage = "Invalid code."
+        }
+        checkForAchievements()
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            self?.redeemMessage = nil
+        }
+    }
+
+    // MARK: - Settings
+
+    func toggleAutoBuy() { state.autoBuyEnabled.toggle() }
+    func toggleSound() { state.soundEnabled.toggle() }
+    func toggleHaptics() { state.hapticsEnabled.toggle() }
+
+    func resetSave() {
+        stop()
+        state = .newGame
+        saveManager.save(state)
+        start()
+    }
+
+    // MARK: - Tick
 
     private func tick() {
         let now = Date()
@@ -200,13 +318,65 @@ final class GameViewModel: ObservableObject {
         lastTickDate = now
 
         let before = state.currency
-        state = GameLoop.tick(state, elapsed: elapsed)
+        state = GameLoop.tick(state, elapsed: elapsed, now: now)
         pendingFloatingIncome += state.currency - before
 
         if pendingFloatingIncome > 0, now.timeIntervalSince(lastFloatingTextSpawn) >= 1.0 {
             spawnFloatingText(pendingFloatingIncome)
             pendingFloatingIncome = 0
             lastFloatingTextSpawn = now
+        }
+
+        if state.autoBuyEnabled, now.timeIntervalSince(lastAutoBuySpawn) >= 0.5 {
+            lastAutoBuySpawn = now
+            state = AutoBuyStore.step(state: state)
+        }
+
+        rollLuckySurge(now: now)
+        checkForMilestone()
+        checkForAchievements()
+    }
+
+    private func rollLuckySurge(now: Date) {
+        guard !BoostSystem.isActive(state: state, now: now) else { return }
+        guard now.timeIntervalSince(lastBoostRoll) >= boostRollInterval else { return }
+        lastBoostRoll = now
+        guard Double.random(in: 0..<1) < boostChance else { return }
+        state = BoostSystem.start(state: state, multiplier: boostMultiplier, duration: boostDuration, now: now)
+        fireHapticNotification(.success)
+        SoundManager.play(.luckySurge, enabled: state.soundEnabled)
+    }
+
+    private func checkForMilestone() {
+        guard MilestoneSystem.hasNewMilestone(state: state) else { return }
+        state = MilestoneSystem.celebrate(state: state)
+        showMilestoneCelebration = true
+        SoundManager.play(.milestone, enabled: state.soundEnabled)
+        fireHapticNotification(.success)
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 1_800_000_000)
+            self?.showMilestoneCelebration = false
+        }
+    }
+
+    private func checkForAchievements() {
+        let (newState, unlocked) = AchievementStore.unlockNewlyMet(state: state)
+        guard !unlocked.isEmpty else { return }
+        state = newState
+        achievementToastQueue.append(contentsOf: unlocked)
+        SoundManager.play(.achievement, enabled: state.soundEnabled)
+        advanceAchievementToastIfNeeded()
+    }
+
+    private func advanceAchievementToastIfNeeded() {
+        guard achievementToast == nil, !achievementToastQueue.isEmpty else { return }
+        let next = achievementToastQueue.removeFirst()
+        achievementToast = next
+        fireHapticNotification(.success)
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            self?.achievementToast = nil
+            self?.advanceAchievementToastIfNeeded()
         }
     }
 
@@ -217,6 +387,18 @@ final class GameViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 1_100_000_000)
             self?.floatingTexts.removeAll { $0.id == item.id }
         }
+    }
+
+    private func fireBuyFeedback() {
+        if state.hapticsEnabled {
+            buyHaptic.impactOccurred()
+        }
+        SoundManager.play(.buy, enabled: state.soundEnabled)
+    }
+
+    private func fireHapticNotification(_ type: UINotificationFeedbackGenerator.FeedbackType) {
+        guard state.hapticsEnabled else { return }
+        successHaptic.notificationOccurred(type)
     }
 
     private func save() {

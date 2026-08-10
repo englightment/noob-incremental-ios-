@@ -4,11 +4,11 @@ import Foundation
 /// same function drives both the live foreground tick and the offline fast-forward step.
 enum GameLoop {
 
-    static func tick(_ state: GameState, elapsed: TimeInterval) -> GameState {
+    static func tick(_ state: GameState, elapsed: TimeInterval, now: Date = Date()) -> GameState {
         guard elapsed > 0 else { return state }
 
         var next = state
-        let passiveIncome = passiveIncomePerSecond(state) * Decimal(elapsed)
+        let passiveIncome = passiveIncomePerSecond(state, now: now) * Decimal(elapsed)
         if passiveIncome > 0 {
             next.currency += passiveIncome
             next.lifetimeEarned += passiveIncome
@@ -17,10 +17,12 @@ enum GameLoop {
         return next
     }
 
-    static func passiveIncomePerSecond(_ state: GameState) -> Decimal {
+    static func passiveIncomePerSecond(_ state: GameState, now: Date = Date()) -> Decimal {
         let outputMultiplier = UpgradeStore.outputMultiplier(state: state)
             * UpgradeStore.tickSpeedMultiplier(state: state)
             * RebirthUpgradeStore.outputMultiplier(state: state)
+            * AchievementStore.outputMultiplier(state: state)
+            * BoostSystem.activeMultiplier(state: state, now: now)
 
         return GeneratorCatalog.all.reduce(Decimal(0)) { total, definition in
             let level = state.generators[definition.id]?.level ?? 0

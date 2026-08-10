@@ -34,6 +34,19 @@ struct GameState: Codable, Equatable {
     var unlockedAchievements: Set<String> = []
     var purchasedProductIDs: Set<String> = []
 
+    // Lucky Surge: a rare, time-boxed production multiplier.
+    var activeBoostMultiplier: Decimal = 1
+    var activeBoostExpiresAt: Date?
+
+    // Net-worth milestone tier (power-of-ten index) already celebrated, so the confetti
+    // burst only fires once per tier crossed.
+    var highestMilestoneCelebrated: Int = 0
+
+    // Quality-of-life settings
+    var autoBuyEnabled: Bool = false
+    var soundEnabled: Bool = true
+    var hapticsEnabled: Bool = true
+
     // Meta
     var lastSaveTimestamp: Date = Date()
     var totalPlayTime: TimeInterval = 0

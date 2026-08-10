@@ -85,4 +85,36 @@ final class GameLoopPassiveIncomeTests: XCTestCase {
         let multiplier = UpgradeStore.tickSpeedMultiplier(state: state)
         XCTAssertEqual(NSDecimalNumber(decimal: multiplier).doubleValue, 2.0, accuracy: 0.001)
     }
+
+    func testAchievementBonusAppliesToPassiveIncome() {
+        guard let noob = GeneratorCatalog.definition(for: "starter_noob") else {
+            return XCTFail("starter_noob missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = GeneratorStore.buy(noob, state: state)
+        state.unlockedAchievements = ["a", "b"] // +2% each = x1.04
+
+        let expected = noob.baseOutput * (1 + 2 * AchievementStore.outputMultiplierPerAchievement)
+        let actual = GameLoop.passiveIncomePerSecond(state)
+
+        XCTAssertEqual(NSDecimalNumber(decimal: actual).doubleValue, NSDecimalNumber(decimal: expected).doubleValue, accuracy: 0.0001)
+    }
+
+    func testActiveLuckySurgeBoostMultipliesPassiveIncome() {
+        guard let noob = GeneratorCatalog.definition(for: "starter_noob") else {
+            return XCTFail("starter_noob missing from catalog")
+        }
+        let now = Date()
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = GeneratorStore.buy(noob, state: state)
+        state = BoostSystem.start(state: state, multiplier: 5, duration: 20, now: now)
+
+        let boosted = GameLoop.passiveIncomePerSecond(state, now: now)
+        let expired = GameLoop.passiveIncomePerSecond(state, now: now.addingTimeInterval(21))
+
+        XCTAssertEqual(NSDecimalNumber(decimal: boosted).doubleValue, NSDecimalNumber(decimal: noob.baseOutput * 5).doubleValue, accuracy: 0.0001)
+        XCTAssertEqual(NSDecimalNumber(decimal: expired).doubleValue, NSDecimalNumber(decimal: noob.baseOutput).doubleValue, accuracy: 0.0001)
+    }
 }

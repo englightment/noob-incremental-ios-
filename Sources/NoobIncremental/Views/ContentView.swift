@@ -24,18 +24,42 @@ private struct PressableButtonStyle: ButtonStyle {
     }
 }
 
+private enum BuyQuantity: String, CaseIterable, Identifiable {
+    case one = "x1", ten = "x10", max = "Max"
+    var id: String { rawValue }
+}
+
 struct ContentView: View {
     @ObservedObject var viewModel: GameViewModel
+    @State private var showMore = false
+    @State private var confettiPieces: [ConfettiPiece] = []
 
     var body: some View {
         ZStack {
             Theme.background.ignoresSafeArea()
 
             VStack(spacing: 10) {
+                HStack {
+                    NoobFaceView(size: 30)
+                    Text("Noob Incremental")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.7))
+                    Spacer()
+                    Button(action: { showMore = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                }
+
                 if let earnings = viewModel.lastOfflineEarnings {
                     OfflineEarningsBanner(amount: earnings) {
                         viewModel.dismissOfflineEarningsBanner()
                     }
+                }
+
+                if viewModel.isBoostActive {
+                    BoostBanner(multiplierText: viewModel.boostMultiplierText, remainingText: viewModel.boostRemainingSecondsText)
                 }
 
                 ZStack {
@@ -50,8 +74,14 @@ struct ContentView: View {
                 .frame(height: 100)
 
                 TabView {
-                    NoobsTab(generators: viewModel.visibleGenerators, onUpgrade: viewModel.buyGenerator)
-                        .tabItem { Label("Noobs", systemImage: "face.smiling.fill") }
+                    NoobsTab(
+                        generators: viewModel.visibleGenerators,
+                        autoBuyEnabled: viewModel.autoBuyEnabled,
+                        onToggleAutoBuy: viewModel.toggleAutoBuy,
+                        onUpgrade: viewModel.buyGenerator,
+                        onUpgradeMax: viewModel.buyGeneratorMax
+                    )
+                    .tabItem { Label("Noobs", systemImage: "face.smiling.fill") }
 
                     UpgradesTab(upgrades: viewModel.visibleUpgrades, onBuy: viewModel.buyUpgrade, onBuyMax: viewModel.buyUpgradeMax)
                         .tabItem { Label("Upgrades", systemImage: "arrow.up.circle.fill") }
@@ -72,9 +102,31 @@ struct ContentView: View {
                 }
             }
             .padding()
+
+            if let achievement = viewModel.achievementToast {
+                VStack {
+                    AchievementToastView(achievement: achievement)
+                        .padding(.top, 8)
+                    Spacer()
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.achievementToast?.id)
+            }
+
+            if viewModel.showMilestoneCelebration {
+                ConfettiView(pieces: confettiPieces)
+            }
         }
         .preferredColorScheme(.dark)
         .onAppear { viewModel.start() }
+        .onChange(of: viewModel.showMilestoneCelebration) { _, isShowing in
+            if isShowing {
+                confettiPieces = ConfettiView.randomBurst()
+            }
+        }
+        .sheet(isPresented: $showMore) {
+            MoreSheet(viewModel: viewModel)
+        }
     }
 }
 
@@ -146,6 +198,60 @@ private struct FloatingTextItemView: View {
     }
 }
 
+// MARK: - Boost banner
+
+private struct BoostBanner: View {
+    let multiplierText: String
+    let remainingText: String
+    @State private var pulse = false
+
+    var body: some View {
+        HStack {
+            Image(systemName: "bolt.fill")
+                .foregroundStyle(.yellow)
+            Text("Lucky Surge! \(multiplierText) Oof \u{2014} \(remainingText) left")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
+            Spacer()
+        }
+        .padding(10)
+        .background(Theme.rebirthGradient.opacity(pulse ? 0.9 : 0.6), in: RoundedRectangle(cornerRadius: 12))
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
+                pulse = true
+            }
+        }
+    }
+}
+
+// MARK: - Achievement toast
+
+private struct AchievementToastView: View {
+    let achievement: AchievementDefinition
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "trophy.fill")
+                .font(.title2)
+                .foregroundStyle(Theme.oofGradient)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Achievement Unlocked")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.6))
+                Text(achievement.name)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+            }
+            Spacer()
+        }
+        .padding(12)
+        .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.yellow.opacity(0.6), lineWidth: 1.5))
+        .shadow(color: .yellow.opacity(0.3), radius: 10)
+        .padding(.horizontal)
+    }
+}
+
 // MARK: - Card container
 
 private struct GlowCard<Content: View>: View {
@@ -165,18 +271,51 @@ private struct GlowCard<Content: View>: View {
 
 private struct NoobsTab: View {
     let generators: [GeneratorRowViewData]
-    let onUpgrade: (String) -> Void
+    let autoBuyEnabled: Bool
+    let onToggleAutoBuy: () -> Void
+    let onUpgrade: (String, Int) -> Void
+    let onUpgradeMax: (String) -> Void
+    @State private var quantity: BuyQuantity = .one
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 10) {
-                ForEach(generators) { generator in
-                    GeneratorRowView(data: generator) { onUpgrade(generator.id) }
+        VStack(spacing: 8) {
+            HStack {
+                Picker("Quantity", selection: $quantity) {
+                    ForEach(BuyQuantity.allCases) { q in
+                        Text(q.rawValue).tag(q)
+                    }
                 }
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 220)
+
+                Spacer()
+
+                Toggle(isOn: Binding(get: { autoBuyEnabled }, set: { _ in onToggleAutoBuy() })) {
+                    Text("Auto")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+                .toggleStyle(.switch)
+                .tint(.yellow)
+                .fixedSize()
             }
-            .padding(.vertical, 4)
+
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(generators) { generator in
+                        GeneratorRowView(data: generator) {
+                            switch quantity {
+                            case .one: onUpgrade(generator.id, 1)
+                            case .ten: onUpgrade(generator.id, 10)
+                            case .max: onUpgradeMax(generator.id)
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
     }
 }
 
@@ -187,6 +326,8 @@ private struct GeneratorRowView: View {
     var body: some View {
         GlowCard(borderColor: .yellow) {
             HStack {
+                NoobFaceView(size: 40)
+
                 VStack(alignment: .leading, spacing: 2) {
                     Text(data.name)
                         .font(.headline)
@@ -375,6 +516,148 @@ private struct OfflineEarningsBanner: View {
         }
         .padding(12)
         .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - More sheet (stats, achievements, codes, settings)
+
+private struct MoreSheet: View {
+    @ObservedObject var viewModel: GameViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var codeText = ""
+    @State private var showResetConfirm = false
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Theme.background.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 16) {
+                        statsSection
+                        codesSection
+                        achievementsSection
+                        settingsSection
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Menu")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private var statsSection: some View {
+        GlowCard(borderColor: .cyan) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Stats").font(.headline).foregroundStyle(.white)
+                statRow("Lifetime Oof", viewModel.lifetimeEarnedText)
+                statRow("Total Noob Levels", "\(viewModel.totalNoobLevels)")
+                statRow("Rebirths", "\(viewModel.rebirthCount)")
+                statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
+                statRow("Time Played", viewModel.totalPlayTimeText)
+            }
+        }
+    }
+
+    private func statRow(_ label: String, _ value: String) -> some View {
+        HStack {
+            Text(label).font(.caption).foregroundStyle(.white.opacity(0.6))
+            Spacer()
+            Text(value).font(.caption.weight(.bold)).foregroundStyle(.white)
+        }
+    }
+
+    private var codesSection: some View {
+        GlowCard(borderColor: .purple) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Redeem Code").font(.headline).foregroundStyle(.white)
+                HStack {
+                    TextField("Enter code", text: $codeText)
+                        .textFieldStyle(.plain)
+                        .padding(8)
+                        .background(Color.black.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                        .foregroundStyle(.white)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled(true)
+                    Button("Redeem") {
+                        viewModel.redeemCode(codeText)
+                        codeText = ""
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(Theme.rebirthGradient, in: RoundedRectangle(cornerRadius: 8))
+                    .foregroundStyle(.white)
+                }
+                if let message = viewModel.redeemMessage {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            }
+        }
+    }
+
+    private var achievementsSection: some View {
+        GlowCard(borderColor: .yellow) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Achievements (\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount))")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                ForEach(viewModel.achievementRows) { row in
+                    HStack(spacing: 8) {
+                        Image(systemName: row.isUnlocked ? "trophy.fill" : "lock.fill")
+                            .foregroundStyle(row.isUnlocked ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.3)))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(row.name)
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(row.isUnlocked ? .white : .white.opacity(0.4))
+                            Text(row.description)
+                                .font(.caption2)
+                                .foregroundStyle(.white.opacity(0.4))
+                        }
+                        Spacer()
+                    }
+                }
+            }
+        }
+    }
+
+    private var settingsSection: some View {
+        GlowCard(borderColor: .gray) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Settings").font(.headline).foregroundStyle(.white)
+
+                Toggle(isOn: Binding(get: { viewModel.soundEnabled }, set: { _ in viewModel.toggleSound() })) {
+                    Text("Sound").foregroundStyle(.white)
+                }
+                .tint(.pink)
+
+                Toggle(isOn: Binding(get: { viewModel.hapticsEnabled }, set: { _ in viewModel.toggleHaptics() })) {
+                    Text("Haptics").foregroundStyle(.white)
+                }
+                .tint(.pink)
+
+                Button(role: .destructive) {
+                    showResetConfirm = true
+                } label: {
+                    Text("Reset Save")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.red.opacity(0.25), in: RoundedRectangle(cornerRadius: 8))
+                        .foregroundStyle(.red)
+                }
+                .confirmationDialog("Reset all progress? This can't be undone.", isPresented: $showResetConfirm, titleVisibility: .visible) {
+                    Button("Reset Everything", role: .destructive) { viewModel.resetSave() }
+                    Button("Cancel", role: .cancel) {}
+                }
+            }
+        }
     }
 }
 
