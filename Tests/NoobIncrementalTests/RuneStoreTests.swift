@@ -99,4 +99,32 @@ final class RuneStoreTests: XCTestCase {
 
         XCTAssertEqual(RuneStore.level(runeOof, state: afterRebirth), levelBefore)
     }
+
+    func testRuneOfWealthReducesCostDiscountMultiplier() {
+        guard let runeWealth = RuneCatalog.definition(for: "rune_wealth") else {
+            return XCTFail("rune_wealth missing from catalog")
+        }
+        XCTAssertEqual(RuneStore.costDiscountMultiplier(state: .newGame), 1)
+
+        var state = GameState.newGame
+        state.runeShards = 1_000_000
+        state = RuneStore.buyOne(runeWealth, state: state)
+
+        XCTAssertLessThan(RuneStore.costDiscountMultiplier(state: state), 1)
+    }
+
+    func testRuneOfBountyAddsFlatOutputBonus() {
+        guard let runeBounty = RuneCatalog.definition(for: "rune_bounty") else {
+            return XCTFail("rune_bounty missing from catalog")
+        }
+        XCTAssertEqual(RuneStore.flatOutputBonus(state: .newGame), 0)
+
+        var state = GameState.newGame
+        state.runeShards = 1_000_000
+        for _ in 0..<2 {
+            state = RuneStore.buyOne(runeBounty, state: state)
+        }
+
+        XCTAssertEqual(RuneStore.flatOutputBonus(state: state), 50 * 2)
+    }
 }

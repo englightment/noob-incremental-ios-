@@ -85,7 +85,9 @@ enum UpgradeCatalog {
 enum RebirthUpgradeCatalog {
     static let all: [UpgradeDefinition] = [
         UpgradeDefinition(id: "rebirth_more_oof", name: "More Oof", baseCost: 12_400, maxLevel: 6, effect: .outputMultiplier(doublingInterval: 1)),
-        UpgradeDefinition(id: "rebirth_more_rebirth", name: "More Rebirth", baseCost: 142, maxLevel: 10, effect: .rebirthGainMultiplier(perLevelGrowthRate: 1.25))
+        UpgradeDefinition(id: "rebirth_more_rebirth", name: "More Rebirth", baseCost: 142, maxLevel: 10, effect: .rebirthGainMultiplier(perLevelGrowthRate: 1.25)),
+        UpgradeDefinition(id: "rebirth_speed", name: "Rebirth Speed", baseCost: 500, maxLevel: 8, effect: .tickSpeedReduction(secondsPerLevel: 0.08)),
+        UpgradeDefinition(id: "rebirth_mega_value", name: "Mega Value", baseCost: 300, maxLevel: 15, effect: .flatOutputBonus(perLevel: 500))
     ]
 
     static func definition(for id: String) -> UpgradeDefinition? {

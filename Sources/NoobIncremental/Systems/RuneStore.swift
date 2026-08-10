@@ -60,4 +60,18 @@ enum RuneStore {
         let effectiveTick = max(GameBalance.minimumNoobTickSeconds, GameBalance.baseNoobTickSeconds - totalReductionSeconds)
         return Decimal(GameBalance.baseNoobTickSeconds / effectiveTick)
     }
+
+    static func costDiscountMultiplier(state: GameState) -> Decimal {
+        RuneCatalog.all.reduce(Decimal(1)) { total, definition in
+            guard case .costDiscount(let perLevelPercent) = definition.effect else { return total }
+            return total * UpgradeEffect.costDiscountMultiplierValue(level: level(definition, state: state), perLevelPercent: perLevelPercent)
+        }
+    }
+
+    static func flatOutputBonus(state: GameState) -> Decimal {
+        RuneCatalog.all.reduce(Decimal(0)) { total, definition in
+            guard case .flatOutputBonus(let perLevel) = definition.effect else { return total }
+            return total + UpgradeEffect.flatOutputBonusValue(level: level(definition, state: state), perLevel: perLevel)
+        }
+    }
 }

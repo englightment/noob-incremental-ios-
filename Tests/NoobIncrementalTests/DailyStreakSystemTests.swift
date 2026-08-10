@@ -9,7 +9,11 @@ final class DailyStreakSystemTests: XCTestCase {
     }
 
     func testCannotClaimTwiceOnSameDay() {
-        let now = Date()
+        // Pinned to noon rather than Date() + a fixed offset — otherwise this test is flaky
+        // whenever CI happens to run within 3 hours of midnight UTC, since "+3 hours" can
+        // silently land on the next calendar day and flip the expected result.
+        let calendar = Calendar.current
+        let now = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
         var state = GameState.newGame
         state.lastStreakClaimDate = now
 

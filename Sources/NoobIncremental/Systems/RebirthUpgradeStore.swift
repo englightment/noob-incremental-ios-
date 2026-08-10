@@ -53,4 +53,20 @@ enum RebirthUpgradeStore {
             return total * UpgradeEffect.rebirthGainMultiplierValue(level: level(definition, state: state), perLevelGrowthRate: growthRate)
         }
     }
+
+    static func tickSpeedMultiplier(state: GameState) -> Decimal {
+        let totalReductionSeconds = RebirthUpgradeCatalog.all.reduce(0.0) { total, definition -> Double in
+            guard case .tickSpeedReduction(let secondsPerLevel) = definition.effect else { return total }
+            return total + Double(level(definition, state: state)) * secondsPerLevel
+        }
+        let effectiveTick = max(GameBalance.minimumNoobTickSeconds, GameBalance.baseNoobTickSeconds - totalReductionSeconds)
+        return Decimal(GameBalance.baseNoobTickSeconds / effectiveTick)
+    }
+
+    static func flatOutputBonus(state: GameState) -> Decimal {
+        RebirthUpgradeCatalog.all.reduce(Decimal(0)) { total, definition in
+            guard case .flatOutputBonus(let perLevel) = definition.effect else { return total }
+            return total + UpgradeEffect.flatOutputBonusValue(level: level(definition, state: state), perLevel: perLevel)
+        }
+    }
 }

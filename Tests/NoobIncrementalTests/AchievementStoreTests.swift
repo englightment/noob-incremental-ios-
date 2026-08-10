@@ -56,6 +56,10 @@ final class AchievementStoreTests: XCTestCase {
         state.currency = 10_000_000
         XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
 
+        // Must cover the priciest Zone 2 Noob (currently up to hundreds of millions), not
+        // just Zone 1 — this budget is intentionally generous rather than tightly pinned to
+        // today's catalog costs, so it doesn't need touching every time balance changes.
+        state.currency = 10_000_000_000
         for generator in GeneratorCatalog.all {
             state = GeneratorStore.buy(generator, state: state)
         }
@@ -112,5 +116,45 @@ final class AchievementStoreTests: XCTestCase {
         state.unlockedAchievements = ["a", "b", "c"]
         let expected = 1 + Decimal(3) * AchievementStore.outputMultiplierPerAchievement
         XCTAssertEqual(AchievementStore.outputMultiplier(state: state), expected)
+    }
+
+    func testZone2NoobLevelsConditionOnlyCountsZone2() {
+        guard let starter = GeneratorCatalog.definition(for: "starter_noob"),
+              let portal = GeneratorCatalog.definition(for: "portal_noob") else {
+            return XCTFail("expected generators missing from catalog")
+        }
+        let definition = AchievementDefinition(id: "test_zone2", name: "Test", description: "", condition: .zone2NoobLevels(1))
+        var state = GameState.newGame
+        state.currency = 10_000_000_000
+        state = GeneratorStore.buy(starter, state: state)
+        XCTAssertFalse(AchievementStore.conditionMet(definition, state: state), "Zone 1 levels shouldn't count toward a Zone 2 achievement")
+
+        state = GeneratorStore.buy(portal, state: state)
+        XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
+    }
+
+    func testAllRunesOwnedConditionRequiresEveryRune() {
+        let definition = AchievementDefinition(id: "test_all_runes", name: "Test", description: "", condition: .allRunesOwned)
+        var state = GameState.newGame
+        state.runeShards = 1_000_000
+        XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
+
+        for rune in RuneCatalog.all {
+            state = RuneStore.buyOne(rune, state: state)
+        }
+        XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
+    }
+
+    func testUpgradeMaxedConditionChecksRuneCatalogToo() {
+        guard let runeOof = RuneCatalog.definition(for: "rune_oof") else {
+            return XCTFail("rune_oof missing from catalog")
+        }
+        let definition = AchievementDefinition(id: "test_max_rune", name: "Test", description: "", condition: .upgradeMaxed("rune_oof"))
+        var state = GameState.newGame
+        state.runeShards = 1_000_000_000
+        XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
+
+        state = RuneStore.buyMax(runeOof, state: state)
+        XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
     }
 }

@@ -79,4 +79,32 @@ final class RebirthUpgradeStoreTests: XCTestCase {
         let state = GameState.newGame
         XCTAssertEqual(RebirthUpgradeStore.rebirthGainMultiplier(state: state), 1)
     }
+
+    func testRebirthSpeedIncreasesTickSpeedMultiplier() {
+        guard let def = RebirthUpgradeCatalog.definition(for: "rebirth_speed") else {
+            return XCTFail("rebirth_speed missing from catalog")
+        }
+        XCTAssertEqual(RebirthUpgradeStore.tickSpeedMultiplier(state: .newGame), 1)
+
+        var state = GameState.newGame
+        state.rebirthCurrency = 1_000_000_000
+        state = RebirthUpgradeStore.buyOne(def, state: state)
+
+        XCTAssertGreaterThan(RebirthUpgradeStore.tickSpeedMultiplier(state: state), 1)
+    }
+
+    func testRebirthMegaValueAddsFlatOutputBonus() {
+        guard let def = RebirthUpgradeCatalog.definition(for: "rebirth_mega_value") else {
+            return XCTFail("rebirth_mega_value missing from catalog")
+        }
+        XCTAssertEqual(RebirthUpgradeStore.flatOutputBonus(state: .newGame), 0)
+
+        var state = GameState.newGame
+        state.rebirthCurrency = 1_000_000_000
+        for _ in 0..<2 {
+            state = RebirthUpgradeStore.buyOne(def, state: state)
+        }
+
+        XCTAssertEqual(RebirthUpgradeStore.flatOutputBonus(state: state), 500 * 2)
+    }
 }

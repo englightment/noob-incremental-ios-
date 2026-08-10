@@ -8,6 +8,8 @@ enum AchievementCondition: Equatable {
     case upgradeMaxed(String)
     case codeRedeemed
     case streakDays(Int)
+    case zone2NoobLevels(Int)
+    case allRunesOwned
 }
 
 struct AchievementDefinition: Identifiable, Equatable {
@@ -28,15 +30,21 @@ enum AchievementCatalog {
         AchievementDefinition(id: "first_million", name: "Millionaire", description: "Earn 1,000,000 lifetime Oof", condition: .lifetimeEarned(1_000_000)),
         AchievementDefinition(id: "first_billion", name: "Billionaire", description: "Earn 1,000,000,000 lifetime Oof", condition: .lifetimeEarned(1_000_000_000)),
         AchievementDefinition(id: "first_trillion", name: "Trillionaire", description: "Earn 1,000,000,000,000 lifetime Oof", condition: .lifetimeEarned(1_000_000_000_000)),
+        AchievementDefinition(id: "first_quadrillion", name: "Quadrillionaire", description: "Earn 1,000,000,000,000,000 lifetime Oof", condition: .lifetimeEarned(1_000_000_000_000_000)),
         AchievementDefinition(id: "max_more_oof", name: "Maxed Out", description: "Max the More Oof upgrade", condition: .upgradeMaxed("more_oof")),
         AchievementDefinition(id: "max_faster_noobs", name: "Speed Demon", description: "Max the Faster Noobs upgrade", condition: .upgradeMaxed("faster_noobs")),
         AchievementDefinition(id: "first_rebirth", name: "Reborn", description: "Rebirth for the first time", condition: .rebirths(1)),
         AchievementDefinition(id: "five_rebirths", name: "Cycle of Life", description: "Rebirth 5 times", condition: .rebirths(5)),
         AchievementDefinition(id: "twenty_five_rebirths", name: "Rebirth Master", description: "Rebirth 25 times", condition: .rebirths(25)),
+        AchievementDefinition(id: "hundred_rebirths", name: "Rebirth Legend", description: "Rebirth 100 times", condition: .rebirths(100)),
         AchievementDefinition(id: "max_rebirth_more_oof", name: "Power Overwhelming", description: "Max the rebirth-shop More Oof upgrade", condition: .upgradeMaxed("rebirth_more_oof")),
         AchievementDefinition(id: "redeem_code", name: "Code Breaker", description: "Redeem a code", condition: .codeRedeemed),
         AchievementDefinition(id: "streak_7", name: "Week One", description: "Reach a 7-day login streak", condition: .streakDays(7)),
-        AchievementDefinition(id: "streak_30", name: "Dedicated", description: "Reach a 30-day login streak", condition: .streakDays(30))
+        AchievementDefinition(id: "streak_30", name: "Dedicated", description: "Reach a 30-day login streak", condition: .streakDays(30)),
+        AchievementDefinition(id: "explorer", name: "Explorer", description: "Reach Zone 2, The Overworks", condition: .zone2NoobLevels(1)),
+        AchievementDefinition(id: "overworks_master", name: "Overworks Master", description: "Reach 20 total Zone 2 Noob levels", condition: .zone2NoobLevels(20)),
+        AchievementDefinition(id: "rune_collector", name: "Rune Collector", description: "Own every Rune", condition: .allRunesOwned),
+        AchievementDefinition(id: "max_rune_oof", name: "Runed Up", description: "Max the Rune of Oof", condition: .upgradeMaxed("rune_oof"))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {

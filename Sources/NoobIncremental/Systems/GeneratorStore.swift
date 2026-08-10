@@ -11,7 +11,7 @@ enum GeneratorStore {
     /// discount through the *base* rather than the final price keeps maxAffordableLevels'
     /// closed-form math correct — it needs the real per-level cost, not a post-hoc discount.
     private static func discountedBaseCost(_ definition: GeneratorDefinition, state: GameState) -> Decimal {
-        definition.baseCost * UpgradeStore.costDiscountMultiplier(state: state)
+        definition.baseCost * UpgradeStore.costDiscountMultiplier(state: state) * RuneStore.costDiscountMultiplier(state: state)
     }
 
     static func cost(for definition: GeneratorDefinition, state: GameState) -> Decimal {

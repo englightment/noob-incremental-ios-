@@ -23,16 +23,25 @@ enum AchievementStore {
         case .upgradeMaxed(let id):
             if let def = UpgradeCatalog.definition(for: id) { return UpgradeStore.isMaxed(def, state: state) }
             if let def = RebirthUpgradeCatalog.definition(for: id) { return RebirthUpgradeStore.isMaxed(def, state: state) }
+            if let def = RuneCatalog.definition(for: id) { return RuneStore.isMaxed(def, state: state) }
             return false
         case .codeRedeemed:
             return !state.redeemedCodes.isEmpty
         case .streakDays(let days):
             return state.longestStreak >= days
+        case .zone2NoobLevels(let total):
+            return totalNoobLevels(state: state, zoneID: WorldCatalog.zone2ID) >= total
+        case .allRunesOwned:
+            return RuneCatalog.all.allSatisfy { RuneStore.level($0, state: state) > 0 }
         }
     }
 
     private static func totalNoobLevels(state: GameState) -> Int {
         GeneratorCatalog.all.reduce(0) { $0 + GeneratorStore.level($1, state: state) }
+    }
+
+    private static func totalNoobLevels(state: GameState, zoneID: String) -> Int {
+        GeneratorCatalog.all(inZone: zoneID).reduce(0) { $0 + GeneratorStore.level($1, state: state) }
     }
 
     /// Achievements whose condition is already met but aren't recorded as unlocked yet.
