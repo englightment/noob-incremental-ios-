@@ -1,10 +1,6 @@
 import SwiftUI
 
 private enum Theme {
-    static let background = LinearGradient(
-        colors: [Color(red: 0.05, green: 0.02, blue: 0.16), Color(red: 0.13, green: 0.05, blue: 0.26)],
-        startPoint: .top, endPoint: .bottom
-    )
     static let oofGradient = LinearGradient(
         colors: [Color(red: 1.0, green: 0.88, blue: 0.25), Color(red: 1.0, green: 0.55, blue: 0.1)],
         startPoint: .top, endPoint: .bottom
@@ -17,7 +13,87 @@ private enum Theme {
         colors: [Color(red: 0.3, green: 0.95, blue: 0.8), Color(red: 0.15, green: 0.6, blue: 0.55)],
         startPoint: .leading, endPoint: .trailing
     )
-    static let cardBackground = Color(red: 0.1, green: 0.08, blue: 0.19)
+}
+
+// MARK: - Ambient background
+
+/// Slow-drifting blurred color blobs over a deep gradient base, instead of a flat two-stop
+/// fill — gives the whole app a sense of depth for the glass cards to sit on top of.
+private struct AppBackground: View {
+    @State private var drift = false
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.04, green: 0.02, blue: 0.11),
+                    Color(red: 0.10, green: 0.04, blue: 0.22),
+                    Color(red: 0.05, green: 0.02, blue: 0.14)
+                ],
+                startPoint: .top, endPoint: .bottom
+            )
+
+            blob(color: .purple, size: 420, x: drift ? -130 : -170, y: drift ? -320 : -260)
+            blob(color: .pink, size: 380, x: drift ? 160 : 190, y: drift ? 440 : 400)
+            blob(color: .cyan, size: 320, x: drift ? 150 : 110, y: drift ? -60 : -20)
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation(.easeInOut(duration: 11).repeatForever(autoreverses: true)) {
+                drift = true
+            }
+        }
+    }
+
+    private func blob(color: Color, size: CGFloat, x: CGFloat, y: CGFloat) -> some View {
+        Circle()
+            .fill(RadialGradient(colors: [color.opacity(0.35), .clear], center: .center, startRadius: 0, endRadius: size / 2))
+            .frame(width: size, height: size)
+            .offset(x: x, y: y)
+            .blur(radius: 50)
+    }
+}
+
+// MARK: - Glass panel (shared card/banner styling)
+
+private struct GlassPanel: ViewModifier {
+    var tint: Color
+    var cornerRadius: CGFloat = 20
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [tint.opacity(0.22), .clear],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
+                        )
+                }
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [tint.opacity(0.75), tint.opacity(0.15)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.2
+                    )
+            )
+            .shadow(color: tint.opacity(0.25), radius: 14, y: 6)
+            .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
+    }
+}
+
+private extension View {
+    func glassPanel(tint: Color, cornerRadius: CGFloat = 20) -> some View {
+        modifier(GlassPanel(tint: tint, cornerRadius: cornerRadius))
+    }
 }
 
 private struct PressableButtonStyle: ButtonStyle {
@@ -33,15 +109,91 @@ private enum BuyQuantity: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+// MARK: - Custom tab bar
+
+private enum AppTab: Hashable, CaseIterable, Identifiable {
+    case noobs, upgrades, rebirth, runes
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .noobs: return "Noobs"
+        case .upgrades: return "Upgrades"
+        case .rebirth: return "Rebirth"
+        case .runes: return "Runes"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .noobs: return "face.smiling.fill"
+        case .upgrades: return "arrow.up.circle.fill"
+        case .rebirth: return "arrow.triangle.2.circlepath"
+        case .runes: return "seal.fill"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .noobs: return .yellow
+        case .upgrades: return .cyan
+        case .rebirth: return .pink
+        case .runes: return .mint
+        }
+    }
+}
+
+private struct PillTabBar: View {
+    @Binding var selection: AppTab
+    @Namespace private var namespace
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(AppTab.allCases) { tab in
+                Button {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                        selection = tab
+                    }
+                } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: tab.icon)
+                            .font(.system(size: 16, weight: .bold))
+                        Text(tab.title)
+                            .font(.caption2.weight(.bold))
+                    }
+                    .foregroundStyle(selection == tab ? .white : .white.opacity(0.5))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background {
+                        if selection == tab {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(tab.tint.opacity(0.85))
+                                .matchedGeometryEffect(id: "selectedTab", in: namespace)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(4)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+        )
+    }
+}
+
 struct ContentView: View {
     @ObservedObject var viewModel: GameViewModel
     @StateObject private var adManager = RewardedAdManager()
     @State private var showMore = false
     @State private var confettiPieces: [ConfettiPiece] = []
+    @State private var selectedTab: AppTab = .noobs
 
     var body: some View {
         ZStack {
-            Theme.background.ignoresSafeArea()
+            AppBackground()
 
             VStack(spacing: 10) {
                 HStack {
@@ -52,9 +204,13 @@ struct ContentView: View {
                     Spacer()
                     Button(action: { showMore = true }) {
                         Image(systemName: "gearshape.fill")
-                            .font(.title3)
-                            .foregroundStyle(.white.opacity(0.8))
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.85))
+                            .frame(width: 34, height: 34)
+                            .background(.ultraThinMaterial, in: Circle())
+                            .overlay(Circle().strokeBorder(Color.white.opacity(0.15), lineWidth: 1))
                     }
+                    .buttonStyle(PressableButtonStyle())
                 }
 
                 if viewModel.canClaimDailyReward {
@@ -82,44 +238,49 @@ struct ContentView: View {
                         subtitleText: viewModel.formattedIncomePerSecond,
                         gradient: Theme.oofGradient
                     )
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .glassPanel(tint: .yellow, cornerRadius: 22)
                     FloatingTextOverlay(items: viewModel.floatingTexts, gradient: Theme.oofGradient)
                 }
-                .frame(height: 100)
+                .frame(height: 108)
 
-                TabView {
-                    NoobsTab(
-                        worlds: viewModel.worldRows,
-                        generators: viewModel.generatorRows,
-                        onUpgrade: viewModel.buyGenerator,
-                        onUpgradeMax: viewModel.buyGeneratorMax
-                    )
-                    .tabItem { Label("Noobs", systemImage: "face.smiling.fill") }
+                PillTabBar(selection: $selectedTab)
 
-                    UpgradesTab(upgrades: viewModel.visibleUpgrades, onBuy: viewModel.buyUpgrade, onBuyMax: viewModel.buyUpgradeMax)
-                        .tabItem { Label("Upgrades", systemImage: "arrow.up.circle.fill") }
-
-                    RebirthTab(
-                        rebirthCurrencyText: viewModel.formattedRebirthCurrency,
-                        rebirthCount: viewModel.rebirthCount,
-                        canRebirth: viewModel.canRebirth,
-                        gainPreviewText: viewModel.rebirthGainPreviewText,
-                        requirementText: viewModel.rebirthRequirementText,
-                        progressFraction: viewModel.rebirthProgressFraction,
-                        onRebirth: viewModel.performRebirth,
-                        upgrades: viewModel.visibleRebirthUpgrades,
-                        onBuy: viewModel.buyRebirthUpgrade,
-                        onBuyMax: viewModel.buyRebirthUpgradeMax
-                    )
-                    .tabItem { Label("Rebirth", systemImage: "arrow.triangle.2.circlepath") }
-
-                    RunesTab(
-                        runeShardsText: viewModel.formattedRuneShards,
-                        runes: viewModel.runeRows,
-                        onBuy: viewModel.buyRune,
-                        onBuyMax: viewModel.buyRuneMax
-                    )
-                    .tabItem { Label("Runes", systemImage: "seal.fill") }
+                Group {
+                    switch selectedTab {
+                    case .noobs:
+                        NoobsTab(
+                            worlds: viewModel.worldRows,
+                            generators: viewModel.generatorRows,
+                            onUpgrade: viewModel.buyGenerator,
+                            onUpgradeMax: viewModel.buyGeneratorMax
+                        )
+                    case .upgrades:
+                        UpgradesTab(upgrades: viewModel.visibleUpgrades, onBuy: viewModel.buyUpgrade, onBuyMax: viewModel.buyUpgradeMax)
+                    case .rebirth:
+                        RebirthTab(
+                            rebirthCurrencyText: viewModel.formattedRebirthCurrency,
+                            rebirthCount: viewModel.rebirthCount,
+                            canRebirth: viewModel.canRebirth,
+                            gainPreviewText: viewModel.rebirthGainPreviewText,
+                            requirementText: viewModel.rebirthRequirementText,
+                            progressFraction: viewModel.rebirthProgressFraction,
+                            onRebirth: viewModel.performRebirth,
+                            upgrades: viewModel.visibleRebirthUpgrades,
+                            onBuy: viewModel.buyRebirthUpgrade,
+                            onBuyMax: viewModel.buyRebirthUpgradeMax
+                        )
+                    case .runes:
+                        RunesTab(
+                            runeShardsText: viewModel.formattedRuneShards,
+                            runes: viewModel.runeRows,
+                            onBuy: viewModel.buyRune,
+                            onBuyMax: viewModel.buyRuneMax
+                        )
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .padding()
 
@@ -238,7 +399,7 @@ private struct BoostBanner: View {
             Spacer()
         }
         .padding(10)
-        .background(Theme.rebirthGradient.opacity(pulse ? 0.9 : 0.6), in: RoundedRectangle(cornerRadius: 12))
+        .background(Theme.rebirthGradient.opacity(pulse ? 0.9 : 0.6), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .onAppear {
             withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
                 pulse = true
@@ -270,14 +431,12 @@ private struct DailyRewardBanner: View {
             Button("Claim", action: onClaim)
                 .buttonStyle(PressableButtonStyle())
                 .padding(.horizontal, 14).padding(.vertical, 8)
-                .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 10))
+                .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .foregroundStyle(.black)
                 .font(.subheadline.weight(.bold))
         }
         .padding(10)
-        .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.orange.opacity(0.6), lineWidth: 1.5))
-        .shadow(color: .orange.opacity(0.3), radius: 8)
+        .glassPanel(tint: .orange, cornerRadius: 16)
     }
 }
 
@@ -302,9 +461,7 @@ private struct AchievementToastView: View {
             Spacer()
         }
         .padding(12)
-        .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.yellow.opacity(0.6), lineWidth: 1.5))
-        .shadow(color: .yellow.opacity(0.3), radius: 10)
+        .glassPanel(tint: .yellow, cornerRadius: 16)
         .padding(.horizontal)
     }
 }
@@ -317,10 +474,8 @@ private struct GlowCard<Content: View>: View {
 
     var body: some View {
         content
-            .padding(12)
-            .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 14))
-            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(borderColor.opacity(0.55), lineWidth: 1.5))
-            .shadow(color: borderColor.opacity(0.3), radius: 8)
+            .padding(14)
+            .glassPanel(tint: borderColor, cornerRadius: 18)
     }
 }
 
@@ -464,7 +619,7 @@ private struct GeneratorRowView: View {
                         .padding(.vertical, 8)
                         .background(
                             canAfford ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.gray.opacity(0.3)),
-                            in: RoundedRectangle(cornerRadius: 10)
+                            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                         )
                         .foregroundStyle(.black)
                     }
@@ -523,14 +678,15 @@ private struct UpgradeRowView: View {
                     Spacer()
                     Button("Buy", action: onBuy)
                         .buttonStyle(PressableButtonStyle())
-                        .padding(.horizontal, 12).padding(.vertical, 6)
-                        .background(Color.red.opacity(data.isMaxed || !data.canAfford ? 0.2 : 0.85), in: Capsule())
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .background(borderColor.opacity(data.isMaxed || !data.canAfford ? 0.18 : 0.85), in: Capsule())
                         .foregroundStyle(.white)
                         .disabled(data.isMaxed || !data.canAfford)
                     Button("Max", action: onBuyMax)
                         .buttonStyle(PressableButtonStyle())
-                        .padding(.horizontal, 12).padding(.vertical, 6)
-                        .background(Color.purple.opacity(data.isMaxed || !data.canAfford ? 0.2 : 0.85), in: Capsule())
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .background(borderColor.opacity(data.isMaxed || !data.canAfford ? 0.1 : 0.5), in: Capsule())
+                        .overlay(Capsule().strokeBorder(borderColor.opacity(data.isMaxed || !data.canAfford ? 0.15 : 0.7), lineWidth: 1))
                         .foregroundStyle(.white)
                         .disabled(data.isMaxed || !data.canAfford)
                 }
@@ -587,7 +743,7 @@ private struct RebirthTab: View {
                                 .padding(.vertical, 10)
                                 .background(
                                     canRebirth ? AnyShapeStyle(Theme.rebirthGradient) : AnyShapeStyle(Color.gray.opacity(0.25)),
-                                    in: RoundedRectangle(cornerRadius: 12)
+                                    in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 )
                                 .foregroundStyle(.white)
                         }
@@ -664,7 +820,7 @@ private struct OfflineEarningsBanner: View {
                 .foregroundStyle(.white.opacity(0.7))
         }
         .padding(12)
-        .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+        .glassPanel(tint: .white, cornerRadius: 16)
     }
 }
 
@@ -680,7 +836,7 @@ private struct MoreSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Theme.background.ignoresSafeArea()
+                AppBackground()
                 ScrollView {
                     VStack(spacing: 16) {
                         statsSection
@@ -773,7 +929,7 @@ private struct MoreSheet: View {
                 .padding(.horizontal, 12).padding(.vertical, 8)
                 .background(
                     isReady ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.15)),
-                    in: RoundedRectangle(cornerRadius: 8)
+                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                 )
                 .foregroundStyle(.white)
                 .disabled(!isReady)
@@ -788,8 +944,8 @@ private struct MoreSheet: View {
                 HStack {
                     TextField("Enter code", text: $codeText)
                         .textFieldStyle(.plain)
-                        .padding(8)
-                        .background(Color.black.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                        .padding(10)
+                        .background(Color.black.opacity(0.25), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .foregroundStyle(.white)
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled(true)
@@ -799,7 +955,7 @@ private struct MoreSheet: View {
                     }
                     .buttonStyle(PressableButtonStyle())
                     .padding(.horizontal, 12).padding(.vertical, 8)
-                    .background(Theme.rebirthGradient, in: RoundedRectangle(cornerRadius: 8))
+                    .background(Theme.rebirthGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .foregroundStyle(.white)
                 }
                 if let message = viewModel.redeemMessage {
@@ -857,7 +1013,7 @@ private struct MoreSheet: View {
                     Text("Reset Save")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(Color.red.opacity(0.25), in: RoundedRectangle(cornerRadius: 8))
+                        .background(Color.red.opacity(0.22), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .foregroundStyle(.red)
                 }
                 .confirmationDialog("Reset all progress? This can't be undone.", isPresented: $showResetConfirm, titleVisibility: .visible) {
