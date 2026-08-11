@@ -1,0 +1,65 @@
+{
+  "identifier" : "6C0D9C1E-1A2B-4C3D-8E4F-5A6B7C8D9E0F",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "SUPPORTERPACK001",
+      "localizations" : [
+        {
+          "description" : "A thank-you badge and a permanent +10% Oof boost, forever.",
+          "displayName" : "Supporter Pack",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.taragod.noobincremental.supporterpack",
+      "referenceName" : "Supporter Pack",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "RUNESHARDSMALL001",
+      "localizations" : [
+        {
+          "description" : "+25 Rune Shards, added instantly.",
+          "displayName" : "Pouch of Rune Shards",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.taragod.noobincremental.runeshardpack.small",
+      "referenceName" : "Pouch of Rune Shards",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "3.99",
+      "familyShareable" : false,
+      "internalID" : "RUNESHARDLARGE001",
+      "localizations" : [
+        {
+          "description" : "+120 Rune Shards, added instantly.",
+          "displayName" : "Chest of Rune Shards",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.taragod.noobincremental.runeshardpack.large",
+      "referenceName" : "Chest of Rune Shards",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "0",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : []
+  },
+  "subscriptionGroups" : [],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

@@ -71,6 +71,21 @@ final class GameLoopPassiveIncomeTests: XCTestCase {
         XCTAssertEqual(NSDecimalNumber(decimal: actual).doubleValue, NSDecimalNumber(decimal: expected).doubleValue, accuracy: 0.0001)
     }
 
+    func testSupporterPackOutputMultiplierAppliesToPassiveIncome() {
+        guard let noob = GeneratorCatalog.definition(for: "starter_noob") else {
+            return XCTFail("starter_noob missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = GeneratorStore.buy(noob, state: state)
+        state = IAPSystem.applyPurchase(.supporterPack, to: state)
+
+        let expected = noob.baseOutput * IAPSystem.supporterOutputMultiplier
+        let actual = GameLoop.passiveIncomePerSecond(state)
+
+        XCTAssertEqual(NSDecimalNumber(decimal: actual).doubleValue, NSDecimalNumber(decimal: expected).doubleValue, accuracy: 0.0001)
+    }
+
     func testTickSpeedReductionIncreasesOutputMultiplier() {
         // "faster_noobs" caps at maxLevel 5, so this also verifies the multiplier reflects
         // being maxed out: 5 levels * 0.1s = 0.5s reduction -> effective tick 0.5s -> multiplier 2.0.

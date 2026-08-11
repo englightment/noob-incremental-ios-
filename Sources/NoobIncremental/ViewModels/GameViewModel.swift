@@ -492,6 +492,20 @@ final class GameViewModel: ObservableObject {
         }
     }
 
+    // MARK: - In-app purchases
+
+    func isProductOwned(_ product: IAPProduct) -> Bool {
+        IAPSystem.isOwned(product, state: state)
+    }
+
+    /// Applies a StoreKit transaction already verified by IAPManager. Safe to call more than
+    /// once for the same non-consumable (IAPSystem.applyPurchase is idempotent for those).
+    func completePurchase(_ product: IAPProduct) {
+        state = IAPSystem.applyPurchase(product, to: state)
+        fireBuyFeedback()
+        checkForAchievements()
+    }
+
     // MARK: - Settings
 
     func toggleSound() { state.soundEnabled.toggle() }

@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import StoreKit
 
 private enum Theme {
     static let oofGradient = LinearGradient(
@@ -194,6 +195,7 @@ private struct PillTabBar: View {
 struct ContentView: View {
     @ObservedObject var viewModel: GameViewModel
     @StateObject private var adManager = RewardedAdManager()
+    @StateObject private var iapManager = IAPManager()
     @State private var showMore = false
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var selectedTab: AppTab = .noobs
@@ -321,6 +323,10 @@ struct ContentView: View {
         .onAppear {
             viewModel.start()
             adManager.start()
+            iapManager.onPurchaseCompleted = { product in
+                viewModel.completePurchase(product)
+            }
+            iapManager.start()
         }
         .onChange(of: viewModel.showMilestoneCelebration) { _, isShowing in
             if isShowing {
@@ -328,7 +334,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showMore) {
-            MoreSheet(viewModel: viewModel, adManager: adManager)
+            MoreSheet(viewModel: viewModel, adManager: adManager, iapManager: iapManager)
         }
     }
 }
@@ -1130,6 +1136,7 @@ private struct OfflineEarningsBanner: View {
 private struct MoreSheet: View {
     @ObservedObject var viewModel: GameViewModel
     @ObservedObject var adManager: RewardedAdManager
+    @ObservedObject var iapManager: IAPManager
     @Environment(\.dismiss) private var dismiss
     @State private var codeText = ""
     @State private var showResetConfirm = false
@@ -1148,6 +1155,7 @@ private struct MoreSheet: View {
                         adBoostsSection
                         codesSection
                         backupSection
+                        supportSection
                         achievementsSection
                         settingsSection
                     }
@@ -1391,6 +1399,58 @@ private struct MoreSheet: View {
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.7))
                 }
+            }
+        }
+    }
+
+    private var supportSection: some View {
+        GlowCard(borderColor: .green) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Support the Game").font(.headline).foregroundStyle(.white)
+                ForEach(IAPProduct.allCases) { product in
+                    supportRow(product)
+                }
+            }
+        }
+    }
+
+    private func supportRow(_ product: IAPProduct) -> some View {
+        let isOwned = product.kind == .nonConsumable && viewModel.isProductOwned(product)
+        let storeProduct = iapManager.products[product]
+        let isPurchasing = iapManager.purchasing == product
+
+        return HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(product.displayName)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                Text(product.displayDescription)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            Spacer()
+            if isOwned {
+                Image(systemName: "checkmark.seal.fill")
+                    .foregroundStyle(.green)
+            } else {
+                Button {
+                    Task { await iapManager.purchase(product) }
+                } label: {
+                    if isPurchasing {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text(storeProduct?.displayPrice ?? "\u{2014}")
+                    }
+                }
+                .buttonStyle(PressableButtonStyle())
+                .font(.caption.weight(.bold))
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                .background(
+                    storeProduct != nil ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.15)),
+                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                )
+                .foregroundStyle(.white)
+                .disabled(storeProduct == nil || isPurchasing)
             }
         }
     }

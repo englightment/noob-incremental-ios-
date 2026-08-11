@@ -73,7 +73,7 @@ what's actually close. Sort so unlocked achievements settle to the bottom (or to
 and locked ones order by proximity-to-completion, so the list reads as "here's what to chase
 next" instead of a fixed static list.
 
-## 10. [ ] Feature: no in-app purchase scaffolding
+## 10. [x] Feature: no in-app purchase scaffolding
 
 `GameState.purchasedProductIDs` has sat as an unused stub since early in the project —
 clearly the intent was always to add IAP eventually, and every comparable incremental game
@@ -89,3 +89,26 @@ The reminder added in #8 is all-or-nothing via the OS-level permission prompt �
 wants every other feature but finds this one nagging has to fully revoke notification
 permission in iOS Settings to stop it. Add an in-app Settings toggle that gates whether
 `GameViewModel.stop()` schedules the reminder at all, independent of OS permission.
+
+## 12. [ ] Bug: purchased non-consumables have no restore path if local data is lost
+
+`GameState.purchasedProductIDs` (see #10) is currently the *only* record of IAP ownership.
+This is a real risk for the exact reason #7 exists: Sideloadly's free-Apple-ID signing
+expires every 7 days, and reinstalling to re-sign can wipe local app data. A player who paid
+for the Supporter Pack would lose the entitlement with no way to get it back in-app, even
+though StoreKit itself still knows they own it. Add a "Restore Purchases" action that
+reconciles `GameState` against `Transaction.currentEntitlements` and reapplies any owned
+non-consumables via `IAPSystem.applyPurchase`.
+
+## 13. [ ] Polish: primary controls have no VoiceOver labels
+
+The UI relies entirely on visual layout (icons, color, position) with no `accessibilityLabel`/
+`accessibilityValue` on the highest-traffic controls (currency display, generator buy buttons,
+the tab bar, the rebirth button) — unusable with VoiceOver despite #5 already covering Reduce
+Motion. Add labels to the controls a player touches most.
+
+## 14. [ ] Polish: fixed-size fonts ignore Dynamic Type
+
+Nearly all text uses fixed `.font(...)` sizes with no accommodation for the user's preferred
+text size — another App Store accessibility gap alongside #5 and #13. Audit the highest-traffic
+screens and let their text scale with Dynamic Type instead of clipping/truncating.

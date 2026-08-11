@@ -243,6 +243,21 @@ final class AchievementStoreTests: XCTestCase {
         XCTAssertNil(AchievementStore.progress(definition, state: .newGame))
     }
 
+    func testProgressIsNilForProductOwned() {
+        let definition = AchievementDefinition(id: "test_progress_product", name: "Test", description: "", condition: .productOwned(IAPProduct.supporterPack.rawValue))
+        XCTAssertNil(AchievementStore.progress(definition, state: .newGame))
+    }
+
+    func testPatronConditionMetOnceSupporterPackOwned() {
+        guard let patron = AchievementCatalog.definition(for: "patron") else {
+            return XCTFail("patron missing from catalog")
+        }
+        XCTAssertFalse(AchievementStore.conditionMet(patron, state: .newGame))
+
+        let state = IAPSystem.applyPurchase(.supporterPack, to: .newGame)
+        XCTAssertTrue(AchievementStore.conditionMet(patron, state: state))
+    }
+
     func testProgressFractionIsZeroWhenNoProgress() {
         XCTAssertEqual(AchievementStore.progressFraction(earnedAchievement, state: .newGame), 0)
     }

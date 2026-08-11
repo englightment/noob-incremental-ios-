@@ -37,6 +37,8 @@ enum AchievementStore {
             return MinionCatalog.all.allSatisfy { MinionSystem.isOwned($0, state: state) }
         case .allZoneNoobsOwned(let zoneID):
             return GeneratorCatalog.all(inZone: zoneID).allSatisfy { GeneratorStore.level($0, state: state) > 0 }
+        case .productOwned(let productID):
+            return state.purchasedProductIDs.contains(productID)
         }
     }
 
@@ -70,6 +72,8 @@ enum AchievementStore {
             if let def = RuneCatalog.definition(for: id) { return (Decimal(RuneStore.level(def, state: state)), Decimal(def.maxLevel)) }
             return nil
         case .codeRedeemed:
+            return nil
+        case .productOwned:
             return nil
         }
     }
