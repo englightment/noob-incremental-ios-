@@ -169,4 +169,20 @@ final class UpgradeStoreTests: XCTestCase {
 
         XCTAssertEqual(UpgradeStore.flatOutputBonus(state: state), 5 * 3)
     }
+
+    func testRebirthGainMultiplierIsOneWithNoUpgrades() {
+        let state = GameState.newGame
+        XCTAssertEqual(UpgradeStore.rebirthGainMultiplier(state: state), 1)
+    }
+
+    func testPrestigeInsightIncreasesRebirthGainMultiplier() {
+        guard let prestigeInsight = UpgradeCatalog.definition(for: "prestige_insight") else {
+            return XCTFail("prestige_insight missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = UpgradeStore.buyOne(prestigeInsight, state: state)
+
+        XCTAssertGreaterThan(UpgradeStore.rebirthGainMultiplier(state: state), 1)
+    }
 }

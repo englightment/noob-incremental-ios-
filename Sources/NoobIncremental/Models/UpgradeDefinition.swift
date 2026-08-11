@@ -83,7 +83,8 @@ enum UpgradeCatalog {
         UpgradeDefinition(id: "more_oof", name: "More Oof", baseCost: 75, maxLevel: 50, effect: .outputMultiplier(doublingInterval: 15)),
         UpgradeDefinition(id: "faster_noobs", name: "Faster Noobs", baseCost: 10_000, maxLevel: 5, effect: .tickSpeedReduction(secondsPerLevel: 0.1)),
         UpgradeDefinition(id: "bulk_discount", name: "Bulk Discount", baseCost: 500, maxLevel: 20, effect: .costDiscount(perLevelPercent: 0.02)),
-        UpgradeDefinition(id: "noob_value", name: "Noob Value", baseCost: 300, maxLevel: 25, effect: .flatOutputBonus(perLevel: 5))
+        UpgradeDefinition(id: "noob_value", name: "Noob Value", baseCost: 300, maxLevel: 25, effect: .flatOutputBonus(perLevel: 5)),
+        UpgradeDefinition(id: "prestige_insight", name: "Prestige Insight", baseCost: 2_000, maxLevel: 8, effect: .rebirthGainMultiplier(perLevelGrowthRate: 1.06))
     ]
 
     static func definition(for id: String) -> UpgradeDefinition? {

@@ -46,6 +46,13 @@ enum UpgradeStore {
         }
     }
 
+    static func rebirthGainMultiplier(state: GameState) -> Decimal {
+        UpgradeCatalog.all.reduce(Decimal(1)) { total, definition in
+            guard case .rebirthGainMultiplier(let growthRate) = definition.effect else { return total }
+            return total * UpgradeEffect.rebirthGainMultiplierValue(level: level(definition, state: state), perLevelGrowthRate: growthRate)
+        }
+    }
+
     static func tickSpeedMultiplier(state: GameState) -> Decimal {
         let totalReductionSeconds = UpgradeCatalog.all.reduce(0.0) { total, definition -> Double in
             guard case .tickSpeedReduction(let secondsPerLevel) = definition.effect else { return total }

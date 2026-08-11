@@ -128,6 +128,23 @@ final class RebirthSystemTests: XCTestCase {
         XCTAssertGreaterThan(gainWayOver, gainAtRequirement * 5, "pushing 100x past the requirement should be worth meaningfully more than the minimum")
     }
 
+    func testPrestigeInsightIncreasesAvailableGain() {
+        guard UpgradeCatalog.definition(for: "prestige_insight") != nil else {
+            return XCTFail("prestige_insight missing from catalog")
+        }
+        var state = GameState.newGame
+        state.currency = GameBalance.rebirthRequirement
+        let gainWithoutUpgrade = RebirthSystem.availableGain(state: state)
+
+        // Set the level directly rather than buying — Prestige Insight is bought with Oof,
+        // the same currency the gain formula reads, so spending it would confound the
+        // comparison by also shrinking the base gain.
+        state.upgradeLevels["prestige_insight"] = 1
+        let gainWithUpgrade = RebirthSystem.availableGain(state: state)
+
+        XCTAssertGreaterThan(gainWithUpgrade, gainWithoutUpgrade)
+    }
+
     func testRuneOfRebirthIncreasesAvailableGain() {
         guard let runeRebirth = RuneCatalog.definition(for: "rune_rebirth") else {
             return XCTFail("rune_rebirth missing from catalog")
