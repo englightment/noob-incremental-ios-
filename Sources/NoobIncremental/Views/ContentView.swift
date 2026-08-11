@@ -405,11 +405,18 @@ private struct CurrencyDisplay: View {
     let gradient: LinearGradient
     @State private var glowing = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    // Fixed-point .system(size:) fonts don't scale with Dynamic Type on their own —
+    // ScaledMetric grows this alongside the user's preferred text size, relative to how
+    // much .largeTitle itself would grow, so the number doesn't clip/truncate for players
+    // who've turned up their text size.
+    @ScaledMetric(relativeTo: .largeTitle) private var valueFontSize: CGFloat = 56
 
     var body: some View {
         VStack(spacing: 2) {
             Text(valueText)
-                .font(.system(size: 56, weight: .heavy, design: .rounded))
+                .font(.system(size: valueFontSize, weight: .heavy, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.4)
                 .foregroundStyle(gradient)
                 .shadow(color: .white.opacity(glowing ? 0.55 : 0.15), radius: glowing ? 16 : 6)
                 .contentTransition(.numericText())
@@ -1050,13 +1057,16 @@ private struct RebirthTab: View {
     let upgrades: [UpgradeRowViewData]
     let onBuy: (String) -> Void
     let onBuyMax: (String) -> Void
+    @ScaledMetric(relativeTo: .largeTitle) private var currencyFontSize: CGFloat = 40
 
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
                 VStack(spacing: 4) {
                     Text(rebirthCurrencyText)
-                        .font(.system(size: 40, weight: .heavy, design: .rounded))
+                        .font(.system(size: currencyFontSize, weight: .heavy, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.4)
                         .foregroundStyle(Theme.rebirthGradient)
                     Text("Rebirth \(rebirthCount)")
                         .font(.caption)
@@ -1116,13 +1126,16 @@ private struct RunesTab: View {
     let runes: [UpgradeRowViewData]
     let onBuy: (String) -> Void
     let onBuyMax: (String) -> Void
+    @ScaledMetric(relativeTo: .largeTitle) private var currencyFontSize: CGFloat = 40
 
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
                 VStack(spacing: 4) {
                     Text(runeShardsText)
-                        .font(.system(size: 40, weight: .heavy, design: .rounded))
+                        .font(.system(size: currencyFontSize, weight: .heavy, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.4)
                         .foregroundStyle(Theme.runeGradient)
                     Text("Rune Shards")
                         .font(.caption)

@@ -107,8 +107,23 @@ The UI relies entirely on visual layout (icons, color, position) with no `access
 the tab bar, the rebirth button) — unusable with VoiceOver despite #5 already covering Reduce
 Motion. Add labels to the controls a player touches most.
 
-## 14. [ ] Polish: fixed-size fonts ignore Dynamic Type
+## 14. [x] Polish: fixed-size fonts ignore Dynamic Type
 
 Nearly all text uses fixed `.font(...)` sizes with no accommodation for the user's preferred
 text size — another App Store accessibility gap alongside #5 and #13. Audit the highest-traffic
 screens and let their text scale with Dynamic Type instead of clipping/truncating.
+
+## 15. [ ] Polish: More sheet controls still lack VoiceOver labels
+
+#13 scoped itself to the main gameplay loop (currency display, buy buttons, tab bar, rebirth)
+and explicitly deferred the More sheet's ad-boost, IAP, backup, redeem-code, and settings
+controls to keep that change reviewable. Finish the sweep: add accessibilityLabel/Value/Hint
+to the "Watch Ad" buttons, the Supporter Pack / Rune Shard pack buttons, Restore Purchases,
+Copy/Restore backup code, Redeem, and the Sound/Haptics/Offline Reminder toggles.
+
+## 16. [ ] Polish: unlock moments have no VoiceOver announcement
+
+Achievement toasts, the daily-reward banner, and milestone confetti are all purely visual —
+a VoiceOver user gets no signal that something just happened, unlike a sighted player who
+sees the toast animate in. Post a `UIAccessibility.post(notification: .announcement, ...)`
+alongside each of these so the moment doesn't just silently pass by.
