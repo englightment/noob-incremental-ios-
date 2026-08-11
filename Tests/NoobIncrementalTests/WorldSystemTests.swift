@@ -90,6 +90,20 @@ final class WorldSystemTests: XCTestCase {
         assertLayoutHasExactlyOneStationPerGenerator(ZoneLayoutCatalog.zone2, zoneID: WorldCatalog.zone2ID)
     }
 
+    func testZone3LayoutHasExactlyOneStationForEveryZone3Generator() {
+        assertLayoutHasExactlyOneStationPerGenerator(ZoneLayoutCatalog.zone3, zoneID: WorldCatalog.zone3ID)
+    }
+
+    func testZone4LayoutHasExactlyOneStationForEveryZone4Generator() {
+        assertLayoutHasExactlyOneStationPerGenerator(ZoneLayoutCatalog.zone4, zoneID: WorldCatalog.zone4ID)
+    }
+
+    func testZoneLayoutCatalogCoversEveryWorld() {
+        for world in WorldCatalog.all {
+            XCTAssertNotNil(ZoneLayoutCatalog.layout(for: world.id), "no walkable layout registered for \(world.id)")
+        }
+    }
+
     private func assertLayoutHasExactlyOneStationPerGenerator(_ layout: ZoneLayout, zoneID: String, file: StaticString = #filePath, line: UInt = #line) {
         let generatorIDs = Set(GeneratorCatalog.all(inZone: zoneID).map(\.id))
         let stationGeneratorIDs = layout.stations.compactMap { station -> String? in

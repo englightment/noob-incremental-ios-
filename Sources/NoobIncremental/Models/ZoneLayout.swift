@@ -118,10 +118,85 @@ enum ZoneLayoutCatalog {
         ]
     )
 
+    static let zone3 = ZoneLayout(
+        zoneID: WorldCatalog.zone3ID,
+        canvasSize: CGSize(width: 500, height: 760),
+        // Same 100pt spawn-to-gate gap as zone2, so arriving here doesn't immediately
+        // re-trigger the "return to The Overworks" prompt.
+        spawnPoint: CGPoint(x: 250, y: 600),
+        stations: [
+            WorldStationDefinition(
+                id: "station_ascended_noob", kind: .generator(generatorID: "ascended_noob"),
+                name: "Ascended Noob", icon: "arrow.up.forward.circle.fill",
+                position: CGPoint(x: 120, y: 560), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_ethereal_noob", kind: .generator(generatorID: "ethereal_noob"),
+                name: "Ethereal Noob", icon: "wind",
+                position: CGPoint(x: 380, y: 560), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_divine_noob", kind: .generator(generatorID: "divine_noob"),
+                name: "Divine Noob", icon: "sun.max.fill",
+                position: CGPoint(x: 120, y: 400), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_phoenix_noob", kind: .generator(generatorID: "phoenix_noob"),
+                name: "Phoenix Noob", icon: "flame.fill",
+                position: CGPoint(x: 380, y: 400), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_sovereign_noob", kind: .generator(generatorID: "sovereign_noob"),
+                name: "Sovereign Noob", icon: "crown.fill",
+                position: CGPoint(x: 250, y: 240), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_zone2_gate", kind: .zoneTransition(targetZoneID: WorldCatalog.zone2ID),
+                name: "The Overworks", icon: "moon.stars.fill",
+                position: CGPoint(x: 250, y: 700), interactionRadius: 60
+            ),
+            WorldStationDefinition(
+                id: "station_zone4_gate", kind: .zoneTransition(targetZoneID: WorldCatalog.zone4ID),
+                name: "The Void Expanse", icon: "atom",
+                position: CGPoint(x: 250, y: 60), interactionRadius: 60
+            )
+        ]
+    )
+
+    static let zone4 = ZoneLayout(
+        zoneID: WorldCatalog.zone4ID,
+        canvasSize: CGSize(width: 500, height: 760),
+        spawnPoint: CGPoint(x: 250, y: 600),
+        stations: [
+            WorldStationDefinition(
+                id: "station_voidwalker_noob", kind: .generator(generatorID: "voidwalker_noob"),
+                name: "Voidwalker Noob", icon: "figure.walk",
+                position: CGPoint(x: 150, y: 480), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_eclipse_noob", kind: .generator(generatorID: "eclipse_noob"),
+                name: "Eclipse Noob", icon: "moon.fill",
+                position: CGPoint(x: 350, y: 480), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_omega_noob", kind: .generator(generatorID: "omega_noob"),
+                name: "Omega Noob", icon: "infinity",
+                position: CGPoint(x: 250, y: 300), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_zone3_gate", kind: .zoneTransition(targetZoneID: WorldCatalog.zone3ID),
+                name: "The Ascension Spire", icon: "mountain.2.fill",
+                position: CGPoint(x: 250, y: 700), interactionRadius: 60
+            )
+        ]
+    )
+
     static func layout(for zoneID: String) -> ZoneLayout? {
         switch zoneID {
         case WorldCatalog.zone1ID: return zone1
         case WorldCatalog.zone2ID: return zone2
+        case WorldCatalog.zone3ID: return zone3
+        case WorldCatalog.zone4ID: return zone4
         default: return nil
         }
     }
