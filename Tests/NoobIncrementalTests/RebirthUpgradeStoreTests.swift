@@ -120,4 +120,17 @@ final class RebirthUpgradeStoreTests: XCTestCase {
 
         XCTAssertEqual(RebirthUpgradeStore.minionSlotBonus(state: state), 1)
     }
+
+    func testExtendedRestAddsTwoHoursPerLevel() {
+        guard let def = RebirthUpgradeCatalog.definition(for: "rebirth_extended_rest") else {
+            return XCTFail("rebirth_extended_rest missing from catalog")
+        }
+        XCTAssertEqual(RebirthUpgradeStore.offlineCapBonus(state: .newGame), 0)
+
+        var state = GameState.newGame
+        state.rebirthCurrency = 1_000_000
+        state = RebirthUpgradeStore.buyOne(def, state: state)
+
+        XCTAssertEqual(RebirthUpgradeStore.offlineCapBonus(state: state), 2 * 3_600)
+    }
 }

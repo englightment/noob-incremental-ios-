@@ -56,7 +56,8 @@ enum AchievementCatalog {
         AchievementDefinition(id: "true_kinship", name: "True Kinship", description: "Max the Rune of Kinship", condition: .upgradeMaxed("rune_kinship")),
         AchievementDefinition(id: "island_native", name: "Island Native", description: "Own every Spawn Island Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone1ID)),
         AchievementDefinition(id: "overworks_tycoon", name: "Overworks Tycoon", description: "Own every Overworks Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone2ID)),
-        AchievementDefinition(id: "spire_sovereign", name: "Spire Sovereign", description: "Own every Ascension Spire Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone3ID))
+        AchievementDefinition(id: "spire_sovereign", name: "Spire Sovereign", description: "Own every Ascension Spire Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone3ID)),
+        AchievementDefinition(id: "well_rested", name: "Well Rested", description: "Max the Extended Rest upgrade", condition: .upgradeMaxed("rebirth_extended_rest"))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {

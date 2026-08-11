@@ -76,4 +76,11 @@ enum RebirthUpgradeStore {
             return total + UpgradeEffect.minionSlotBonusValue(level: level(definition, state: state), perLevel: perLevel)
         }
     }
+
+    static func offlineCapBonus(state: GameState) -> TimeInterval {
+        RebirthUpgradeCatalog.all.reduce(0) { total, definition in
+            guard case .offlineCapBonus(let perLevel) = definition.effect else { return total }
+            return total + UpgradeEffect.offlineCapBonusValue(level: level(definition, state: state), perLevel: perLevel)
+        }
+    }
 }

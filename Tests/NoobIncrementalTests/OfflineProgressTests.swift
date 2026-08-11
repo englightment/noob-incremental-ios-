@@ -54,6 +54,22 @@ final class OfflineProgressTests: XCTestCase {
         XCTAssertEqual(result.state.totalPlayTime, 30, accuracy: 0.001)
     }
 
+    func testExtendedRestUpgradeRaisesTheOfflineCap() {
+        guard let extendedRest = RebirthUpgradeCatalog.definition(for: "rebirth_extended_rest") else {
+            return XCTFail("rebirth_extended_rest missing from catalog")
+        }
+        let now = Date()
+        var state = GameState.newGame
+        state.rebirthCurrency = 1_000_000
+        state = RebirthUpgradeStore.buyOne(extendedRest, state: state)
+        // Long enough to exceed the base cap but stay within base + one level of the upgrade.
+        state.lastSaveTimestamp = now.addingTimeInterval(-(GameBalance.maxOfflineProgressDuration + 3_600))
+
+        let result = OfflineProgress.apply(to: state, now: now)
+
+        XCTAssertGreaterThan(result.elapsedDuration, GameBalance.maxOfflineProgressDuration, "one level of Extended Rest should raise the cap above the base 8h")
+    }
+
     func testCurrencyEarnedMatchesDifferenceBeforeAndAfter() {
         let now = Date()
         var state = GameState.newGame

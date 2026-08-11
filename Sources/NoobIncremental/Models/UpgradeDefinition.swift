@@ -15,6 +15,8 @@ enum UpgradeEffect: Equatable {
     case flatOutputBonus(perLevel: Decimal)
     /// Raises how many Minions can be equipped at once by `perLevel` per level.
     case minionSlotBonus(perLevel: Int)
+    /// Raises the offline-progress cap by `perLevel` seconds per level.
+    case offlineCapBonus(perLevel: TimeInterval)
 
     static func outputMultiplierValue(level: Int, doublingInterval: Int) -> Decimal {
         guard doublingInterval > 0 else { return 1 }
@@ -36,6 +38,10 @@ enum UpgradeEffect: Equatable {
 
     static func minionSlotBonusValue(level: Int, perLevel: Int) -> Int {
         perLevel * level
+    }
+
+    static func offlineCapBonusValue(level: Int, perLevel: TimeInterval) -> TimeInterval {
+        perLevel * Double(level)
     }
 
     /// "current -> next level" text matching the source game's upgrade cards.
@@ -65,6 +71,10 @@ enum UpgradeEffect: Equatable {
             let current = Self.minionSlotBonusValue(level: level, perLevel: perLevel)
             let next = Self.minionSlotBonusValue(level: level + 1, perLevel: perLevel)
             return "+\(current) slot \u{2192} +\(next) slot"
+        case .offlineCapBonus(let perLevel):
+            let currentHours = Self.offlineCapBonusValue(level: level, perLevel: perLevel) / 3_600
+            let nextHours = Self.offlineCapBonusValue(level: level + 1, perLevel: perLevel) / 3_600
+            return String(format: "+%.0fh offline \u{2192} +%.0fh offline", currentHours, nextHours)
         }
     }
 }
@@ -101,7 +111,8 @@ enum RebirthUpgradeCatalog {
         UpgradeDefinition(id: "rebirth_more_rebirth", name: "More Rebirth", baseCost: 50, maxLevel: 10, effect: .rebirthGainMultiplier(perLevelGrowthRate: 1.25)),
         UpgradeDefinition(id: "rebirth_speed", name: "Rebirth Speed", baseCost: 100, maxLevel: 8, effect: .tickSpeedReduction(secondsPerLevel: 0.08)),
         UpgradeDefinition(id: "rebirth_mega_value", name: "Mega Value", baseCost: 75, maxLevel: 15, effect: .flatOutputBonus(perLevel: 500)),
-        UpgradeDefinition(id: "rebirth_minion_slots", name: "Extra Minion Slots", baseCost: 400, maxLevel: 2, effect: .minionSlotBonus(perLevel: 1))
+        UpgradeDefinition(id: "rebirth_minion_slots", name: "Extra Minion Slots", baseCost: 400, maxLevel: 2, effect: .minionSlotBonus(perLevel: 1)),
+        UpgradeDefinition(id: "rebirth_extended_rest", name: "Extended Rest", baseCost: 150, maxLevel: 4, effect: .offlineCapBonus(perLevel: 2 * 3_600))
     ]
 
     static func definition(for id: String) -> UpgradeDefinition? {

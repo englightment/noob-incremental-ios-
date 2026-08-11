@@ -19,7 +19,7 @@ adding fields going forward never nukes an existing save.
 `ForEach` every time the sheet is opened, instead of a `LazyVStack`. Harmless today, but it'll
 only get worse as more achievements are added. Switch it to lazy rendering.
 
-## 3. [ ] Feature: no way to extend the offline-progress cap
+## 3. [x] Feature: no way to extend the offline-progress cap
 
 `GameBalance.maxOfflineProgressDuration` is a hardcoded 8 hours with no upgrade path — a
 classic idle-game gap players expect to be able to close. Add a way to extend it (e.g. a new
