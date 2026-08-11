@@ -68,6 +68,7 @@
 		BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13E6847D2D71E92B21BF9C2 /* UpgradeDefinition.swift */; };
 		BE90EC6D4AB8EFF30652BEFD /* NumberFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1616AA4F5E49D1A089625AC1 /* NumberFormatting.swift */; };
 		BF2F95ED7470FDD6B857ABB7 /* AdBoostSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B2EB3C206472485AE9F1A8 /* AdBoostSystem.swift */; };
+		C1CC2F3F45260C7ABEF2FCA9 /* GamePassesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9F69F5EE4DB0CB8017A8A2 /* GamePassesView.swift */; };
 		C256ACD485F0935656E20815 /* MinionDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA191966A4F308D808D478F /* MinionDefinition.swift */; };
 		C6D6C157D44844E41E80FF30 /* AdBoostTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5D15538058B1DA10C4A6D5 /* AdBoostTier.swift */; };
 		C8120884DA12BDB85C870E3E /* GameCenterSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C56DBD0419B46ADE94106C9 /* GameCenterSystem.swift */; };
@@ -169,6 +170,7 @@
 		B612B7B59F4CE29F5DFD1D98 /* OverworldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverworldView.swift; sourceTree = "<group>"; };
 		B8D76D06754DBFE22CD1B15E /* OnboardingSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSystemTests.swift; sourceTree = "<group>"; };
 		BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formulas.swift; sourceTree = "<group>"; };
+		BC9F69F5EE4DB0CB8017A8A2 /* GamePassesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePassesView.swift; sourceTree = "<group>"; };
 		BFC12A83B89E0907154AB583 /* UpgradeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeStore.swift; sourceTree = "<group>"; };
 		C2D9ED406DD0557491410368 /* NoobFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoobFaceView.swift; sourceTree = "<group>"; };
 		C4CD89245D4F148580E586A7 /* BoostSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostSystem.swift; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 			children = (
 				96EFC80C3F6D91160B7C4AC2 /* ConfettiView.swift */,
 				9A10F64BBF3AE4F3B20A3C4B /* ContentView.swift */,
+				BC9F69F5EE4DB0CB8017A8A2 /* GamePassesView.swift */,
 				5122287A366A865F35D09D3A /* GeneratorStationPopupView.swift */,
 				C2D9ED406DD0557491410368 /* NoobFaceView.swift */,
 				B612B7B59F4CE29F5DFD1D98 /* OverworldView.swift */,
@@ -501,6 +504,7 @@
 				790D4655D6456599DEE10327 /* GameCenterManager.swift in Sources */,
 				C8120884DA12BDB85C870E3E /* GameCenterSystem.swift in Sources */,
 				70C504122BF04C983B888DB5 /* GameLoop.swift in Sources */,
+				C1CC2F3F45260C7ABEF2FCA9 /* GamePassesView.swift in Sources */,
 				B8AC0B69FB413DD03CAAAE74 /* GameState.swift in Sources */,
 				0EF915C8504FB351EBC648EE /* GameViewModel.swift in Sources */,
 				E126A5AB62EE4CA58CAA5427 /* GeneratorDefinition.swift in Sources */,
