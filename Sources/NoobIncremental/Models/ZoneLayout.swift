@@ -45,6 +45,21 @@ enum ZoneLayoutCatalog {
                 position: CGPoint(x: 250, y: 240), interactionRadius: 55
             ),
             WorldStationDefinition(
+                id: "station_rebirth_altar", kind: .rebirthAltar,
+                name: "Rebirth Altar", icon: "arrow.triangle.2.circlepath",
+                position: CGPoint(x: 250, y: 460), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_upgrade_workshop", kind: .upgradeWorkshop,
+                name: "Upgrade Workshop", icon: "arrow.up.circle.fill",
+                position: CGPoint(x: 60, y: 220), interactionRadius: 55
+            ),
+            WorldStationDefinition(
+                id: "station_rune_shrine", kind: .runeShrine,
+                name: "Rune Shrine", icon: "seal.fill",
+                position: CGPoint(x: 440, y: 220), interactionRadius: 55
+            ),
+            WorldStationDefinition(
                 id: "station_zone2_gate", kind: .zoneTransition(targetZoneID: WorldCatalog.zone2ID),
                 name: "The Overworks", icon: "moon.stars.fill",
                 position: CGPoint(x: 250, y: 60), interactionRadius: 60

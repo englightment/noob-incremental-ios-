@@ -206,13 +206,7 @@ struct ContentView: View {
                 Group {
                     switch selectedTab {
                     case .noobs:
-                        OverworldView(
-                            layout: ZoneLayoutCatalog.zone1,
-                            generators: viewModel.generatorRows,
-                            isZone2Unlocked: viewModel.worldRows.first(where: { $0.id == WorldCatalog.zone2ID })?.isUnlocked ?? false,
-                            onBuyGenerator: viewModel.buyGenerator,
-                            onBuyGeneratorMax: viewModel.buyGeneratorMax
-                        )
+                        OverworldView(viewModel: viewModel, layout: ZoneLayoutCatalog.zone1)
                     case .upgrades:
                         UpgradesTab(upgrades: viewModel.visibleUpgrades, onBuy: viewModel.buyUpgrade, onBuyMax: viewModel.buyUpgradeMax)
                     case .rebirth:
@@ -766,7 +760,7 @@ private struct VoidMotifs: View {
 
 // MARK: - Upgrades tab (shared row style for both Oof and Rebirth shops)
 
-private struct UpgradesTab: View {
+struct UpgradesTab: View {
     let upgrades: [UpgradeRowViewData]
     let onBuy: (String) -> Void
     let onBuyMax: (String) -> Void
@@ -784,7 +778,7 @@ private struct UpgradesTab: View {
     }
 }
 
-private struct UpgradeRowView: View {
+struct UpgradeRowView: View {
     let data: UpgradeRowViewData
     let borderColor: Color
     let onBuy: () -> Void
@@ -833,7 +827,7 @@ private struct UpgradeRowView: View {
 
 // MARK: - Rebirth tab
 
-private struct RebirthTab: View {
+struct RebirthTab: View {
     let rebirthCurrencyText: String
     let rebirthCount: Int
     let canRebirth: Bool
@@ -908,7 +902,7 @@ private struct RebirthTab: View {
 
 // MARK: - Runes tab
 
-private struct RunesTab: View {
+struct RunesTab: View {
     let runeShardsText: String
     let runes: [UpgradeRowViewData]
     let onBuy: (String) -> Void

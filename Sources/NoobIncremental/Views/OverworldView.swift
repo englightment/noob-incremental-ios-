@@ -9,11 +9,8 @@ import SwiftUI
 /// session from exactly that pattern (see MoreSheet.statsSection's own split into
 /// statsRows/shareProgressButton for the same reason).
 struct OverworldView: View {
+    @ObservedObject var viewModel: GameViewModel
     let layout: ZoneLayout
-    let generators: [GeneratorRowViewData]
-    let isZone2Unlocked: Bool
-    let onBuyGenerator: (String, Int) -> Void
-    let onBuyGeneratorMax: (String) -> Void
 
     @State private var playerPosition: CGPoint
     @State private var joystickDirection: CGVector = .zero
@@ -22,14 +19,20 @@ struct OverworldView: View {
     @State private var nearbyStationID: String?
     @State private var activePopupGeneratorID: String?
     @State private var zoneGateMessage: String?
+    @State private var showRebirthAltar = false
+    @State private var showUpgradeWorkshop = false
+    @State private var showRuneShrine = false
 
-    init(layout: ZoneLayout, generators: [GeneratorRowViewData], isZone2Unlocked: Bool, onBuyGenerator: @escaping (String, Int) -> Void, onBuyGeneratorMax: @escaping (String) -> Void) {
+    init(viewModel: GameViewModel, layout: ZoneLayout) {
+        self.viewModel = viewModel
         self.layout = layout
-        self.generators = generators
-        self.isZone2Unlocked = isZone2Unlocked
-        self.onBuyGenerator = onBuyGenerator
-        self.onBuyGeneratorMax = onBuyGeneratorMax
         _playerPosition = State(initialValue: layout.spawnPoint)
+    }
+
+    private var generators: [GeneratorRowViewData] { viewModel.generatorRows }
+
+    private var isTargetZoneUnlocked: (String) -> Bool {
+        { targetZoneID in viewModel.worldRows.first(where: { $0.id == targetZoneID })?.isUnlocked ?? false }
     }
 
     private var nearbyStation: WorldStationDefinition? {
@@ -50,12 +53,21 @@ struct OverworldView: View {
             if let generatorID = activePopupGeneratorID, let data = generators.first(where: { $0.id == generatorID }) {
                 GeneratorStationPopupView(
                     generator: data,
-                    onBuy: { onBuyGenerator(generatorID, $0) },
-                    onBuyMax: { onBuyGeneratorMax(generatorID) }
+                    onBuy: { viewModel.buyGenerator(generatorID, $0) },
+                    onBuyMax: { viewModel.buyGeneratorMax(generatorID) }
                 )
             }
         }
-        .alert("The Overworks", isPresented: zoneGateAlertBinding, presenting: zoneGateMessage) { _ in
+        .sheet(isPresented: $showRebirthAltar) {
+            RebirthAltarSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showUpgradeWorkshop) {
+            UpgradeWorkshopSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showRuneShrine) {
+            RuneShrineSheet(viewModel: viewModel)
+        }
+        .alert("Locked", isPresented: zoneGateAlertBinding, presenting: zoneGateMessage) { _ in
             Button("OK", role: .cancel) {}
         } message: { message in
             Text(message)
@@ -163,10 +175,16 @@ struct OverworldView: View {
         switch station.kind {
         case .generator(let generatorID):
             activePopupGeneratorID = generatorID
-        case .zoneTransition:
-            zoneGateMessage = isZone2Unlocked
-                ? "The Overworks is unlocked! It isn't walkable yet — for now, keep growing Spawn Island."
-                : "Rebirth at least once to unlock The Overworks."
+        case .zoneTransition(let targetZoneID):
+            zoneGateMessage = isTargetZoneUnlocked(targetZoneID)
+                ? "\(station.name) is unlocked! It isn't walkable yet — for now, keep growing this zone."
+                : "Rebirth to unlock \(station.name)."
+        case .rebirthAltar:
+            showRebirthAltar = true
+        case .upgradeWorkshop:
+            showUpgradeWorkshop = true
+        case .runeShrine:
+            showRuneShrine = true
         }
     }
 

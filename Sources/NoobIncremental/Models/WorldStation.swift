@@ -4,7 +4,11 @@ import CoreGraphics
 enum WorldStationKind: Equatable {
     case generator(generatorID: String)
     case zoneTransition(targetZoneID: String)
-    // .rebirthAltar, .runeShrine, .minionDen intentionally not added yet — later phases.
+    case rebirthAltar
+    case upgradeWorkshop
+    case runeShrine
+    // .minionDen intentionally not added yet — bundled with removing Minions from
+    // Settings in a later phase, never before that station exists.
 }
 
 /// A fixed, interactive point of interest placed in a zone's walkable world (see
