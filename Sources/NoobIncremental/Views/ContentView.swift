@@ -1429,8 +1429,9 @@ private struct MoreSheet: View {
                     }
                     .buttonStyle(PressableButtonStyle())
                     .padding(.horizontal, 12).padding(.vertical, 8)
-                    .background(Theme.rebirthGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(Theme.rebirthGradient.opacity(codeText.isEmpty ? 0.4 : 1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .foregroundStyle(.white)
+                    .disabled(codeText.isEmpty)
                 }
                 if let message = viewModel.redeemMessage {
                     Text(message)

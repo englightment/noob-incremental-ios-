@@ -152,8 +152,17 @@ single buy/rebirth — likely the single most frequent animation in the whole ap
 `@Environment(\.accessibilityReduceMotion)` check. Both were added around the same time as
 #4's onboarding work, before #5's Reduce Motion audit landed, and slipped through.
 
-## 20. [ ] Polish: Redeem Code button doesn't disable on an empty field
+## 20. [x] Polish: Redeem Code button doesn't disable on an empty field
 
 Tapping "Redeem" with an empty code field just round-trips to "Invalid code." instead of
 being disabled outright — inconsistent with the backup "Restore" button a few sections down,
 which already disables on `importCodeText.isEmpty`.
+
+## 21. [ ] Feature: Zone 4, a new endgame frontier
+
+Zones 2 (Overworks) and 3 (Ascension Spire) each shipped 3-5 new Noob tiers plus matching
+achievements, and both have been fully built out for a while now — meanwhile #17/#18 added
+IAP and sharing, which only matter if there's fresh content to earn/brag about. Add a fourth
+zone following the same pattern: new `GeneratorDefinition`s in the new zone, a `WorldCatalog`
+entry, zone-completion achievements (mirroring `allZoneNoobsOwned`), and balance numbers that
+continue the existing cost/output curve rather than restarting it.
