@@ -8,7 +8,7 @@ enum AchievementCondition: Equatable {
     case upgradeMaxed(String)
     case codeRedeemed
     case streakDays(Int)
-    case zone2NoobLevels(Int)
+    case zoneNoobLevels(zoneID: String, total: Int)
     case allRunesOwned
     case allMinionsOwned
 }
@@ -42,8 +42,10 @@ enum AchievementCatalog {
         AchievementDefinition(id: "redeem_code", name: "Code Breaker", description: "Redeem a code", condition: .codeRedeemed),
         AchievementDefinition(id: "streak_7", name: "Week One", description: "Reach a 7-day login streak", condition: .streakDays(7)),
         AchievementDefinition(id: "streak_30", name: "Dedicated", description: "Reach a 30-day login streak", condition: .streakDays(30)),
-        AchievementDefinition(id: "explorer", name: "Explorer", description: "Reach Zone 2, The Overworks", condition: .zone2NoobLevels(1)),
-        AchievementDefinition(id: "overworks_master", name: "Overworks Master", description: "Reach 20 total Zone 2 Noob levels", condition: .zone2NoobLevels(20)),
+        AchievementDefinition(id: "explorer", name: "Explorer", description: "Reach Zone 2, The Overworks", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone2ID, total: 1)),
+        AchievementDefinition(id: "overworks_master", name: "Overworks Master", description: "Reach 20 total Zone 2 Noob levels", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone2ID, total: 20)),
+        AchievementDefinition(id: "ascendant", name: "Ascendant", description: "Reach Zone 3, The Ascension Spire", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone3ID, total: 1)),
+        AchievementDefinition(id: "spire_master", name: "Spire Master", description: "Reach 20 total Zone 3 Noob levels", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone3ID, total: 20)),
         AchievementDefinition(id: "rune_collector", name: "Rune Collector", description: "Own every Rune", condition: .allRunesOwned),
         AchievementDefinition(id: "max_rune_oof", name: "Runed Up", description: "Max the Rune of Oof", condition: .upgradeMaxed("rune_oof")),
         AchievementDefinition(id: "menagerie", name: "Menagerie", description: "Unlock every Minion", condition: .allMinionsOwned)

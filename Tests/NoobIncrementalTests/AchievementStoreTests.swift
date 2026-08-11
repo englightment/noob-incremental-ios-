@@ -56,10 +56,10 @@ final class AchievementStoreTests: XCTestCase {
         state.currency = 10_000_000
         XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
 
-        // Must cover the priciest Zone 2 Noob (currently up to hundreds of millions), not
-        // just Zone 1 — this budget is intentionally generous rather than tightly pinned to
+        // Must cover the priciest Zone 3 Noob (currently up to low trillions), not just
+        // Zone 1/2 — this budget is intentionally generous rather than tightly pinned to
         // today's catalog costs, so it doesn't need touching every time balance changes.
-        state.currency = 10_000_000_000
+        state.currency = 10_000_000_000_000
         for generator in GeneratorCatalog.all {
             state = GeneratorStore.buy(generator, state: state)
         }
@@ -123,7 +123,7 @@ final class AchievementStoreTests: XCTestCase {
               let portal = GeneratorCatalog.definition(for: "portal_noob") else {
             return XCTFail("expected generators missing from catalog")
         }
-        let definition = AchievementDefinition(id: "test_zone2", name: "Test", description: "", condition: .zone2NoobLevels(1))
+        let definition = AchievementDefinition(id: "test_zone2", name: "Test", description: "", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone2ID, total: 1))
         var state = GameState.newGame
         state.currency = 10_000_000_000
         state = GeneratorStore.buy(starter, state: state)

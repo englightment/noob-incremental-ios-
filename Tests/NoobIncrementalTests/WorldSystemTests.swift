@@ -35,11 +35,29 @@ final class WorldSystemTests: XCTestCase {
         }
     }
 
-    func testZone1AndZone2PartitionAllGenerators() {
-        let zone1Count = GeneratorCatalog.all(inZone: WorldCatalog.zone1ID).count
-        let zone2Count = GeneratorCatalog.all(inZone: WorldCatalog.zone2ID).count
-        XCTAssertEqual(zone1Count + zone2Count, GeneratorCatalog.all.count)
-        XCTAssertGreaterThan(zone1Count, 0)
-        XCTAssertGreaterThan(zone2Count, 0)
+    func testAllZonesPartitionAllGenerators() {
+        let counts = WorldCatalog.all.map { GeneratorCatalog.all(inZone: $0.id).count }
+        XCTAssertEqual(counts.reduce(0, +), GeneratorCatalog.all.count)
+        for count in counts {
+            XCTAssertGreaterThan(count, 0)
+        }
+    }
+
+    func testZone3IsLockedBeforeFiveRebirths() {
+        guard let zone3 = WorldCatalog.definition(for: WorldCatalog.zone3ID) else {
+            return XCTFail("zone_3 missing from catalog")
+        }
+        var state = GameState.newGame
+        state.rebirthCount = 4
+        XCTAssertFalse(WorldSystem.isUnlocked(zone3, state: state))
+    }
+
+    func testZone3UnlocksAtFiveRebirths() {
+        guard let zone3 = WorldCatalog.definition(for: WorldCatalog.zone3ID) else {
+            return XCTFail("zone_3 missing from catalog")
+        }
+        var state = GameState.newGame
+        state.rebirthCount = 5
+        XCTAssertTrue(WorldSystem.isUnlocked(zone3, state: state))
     }
 }

@@ -29,8 +29,8 @@ enum AchievementStore {
             return !state.redeemedCodes.isEmpty
         case .streakDays(let days):
             return state.longestStreak >= days
-        case .zone2NoobLevels(let total):
-            return totalNoobLevels(state: state, zoneID: WorldCatalog.zone2ID) >= total
+        case .zoneNoobLevels(let zoneID, let total):
+            return totalNoobLevels(state: state, zoneID: zoneID) >= total
         case .allRunesOwned:
             return RuneCatalog.all.allSatisfy { RuneStore.level($0, state: state) > 0 }
         case .allMinionsOwned:
