@@ -204,8 +204,8 @@ private struct GeneratorPopupModifier: ViewModifier {
             if let generatorID = activePopupGeneratorID, let data = generators.first(where: { $0.id == generatorID }) {
                 GeneratorStationPopupView(
                     generator: data,
-                    onBuy: { viewModel.buyGenerator(generatorID, $0) },
-                    onBuyMax: { viewModel.buyGeneratorMax(generatorID) }
+                    onBuy: { viewModel.buyGenerator(id: generatorID, quantity: $0) },
+                    onBuyMax: { viewModel.buyGeneratorMax(id: generatorID) }
                 )
             }
         }
