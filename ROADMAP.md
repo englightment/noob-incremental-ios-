@@ -174,10 +174,30 @@ consistent with new content. Zone 4 (#21) shipped without one — add at least o
 Void-Expanse-themed Minion, unlocked via a Zone 4 achievement (e.g. `voidbound` or
 `void_master`), following the existing MinionCatalog/MinionSystem pattern.
 
-## 23. [ ] Balance: verify GeneratorMilestoneSystem thresholds still make sense for Zone 4
+## 23. [x] Balance: verify GeneratorMilestoneSystem thresholds still make sense for Zone 4
 
 `GeneratorMilestoneSystem`'s per-level multiplier thresholds were presumably tuned against
 Zones 1-3's level-up pace. Zone 4 (#21) has a noticeably steeper cost curve than earlier
 zones (each tier costs ~15x the previous, up from Zone 1's ~9-11x jumps) - check whether the
 existing milestone thresholds still land at reasonable points for Zone 4 Noobs, or whether
 they need their own tuning so late-game milestone bonuses don't feel out of reach.
+
+**Finding: no change needed.** The premise didn't hold up once I actually read the code.
+Milestone thresholds (`[25, 50, 100, 250, 500, 1_000]`) are pure *level counts*, and every
+generator - Zone 4's included - levels up along the exact same `Formulas.levelCost` curve
+(`growthRate: 1.12`, no per-zone override; confirmed in `GeneratorStore.cost`). A Zone 4
+Noob's baseCost/baseOutput being ~15x steeper per *tier* has no bearing on how many
+purchases it takes to go from level 24 to 25 on any single Noob - that's governed entirely
+by the shared growth rate, not the starting cost. The system was already zone-agnostic by
+design; there was nothing to tune.
+
+## 24. [ ] Feature: Game Center integration (achievements + a leaderboard)
+
+Missing entirely, and standard for the genre. Add GameKit scaffolding following the same
+"test now, verify what I can't on a real device before release" pattern already used for
+AdMob (#52, prior session) and StoreKit (#10): authenticate the local player on launch,
+report `GKAchievement` progress alongside the existing achievement-unlock flow (mirroring,
+not replacing, the in-app AchievementStore/toast system), and add one leaderboard for
+lifetime Oof earned. Needs the Game Center capability enabled in project.yml's Info.plist
+entries; the actual authentication UI and leaderboard rendering can't be verified without a
+signed-in device, same caveat as RewardedAdManager/IAPManager.
