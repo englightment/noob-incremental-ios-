@@ -128,7 +128,7 @@ a VoiceOver user gets no signal that something just happened, unlike a sighted p
 sees the toast animate in. Post a `UIAccessibility.post(notification: .announcement, ...)`
 alongside each of these so the moment doesn't just silently pass by.
 
-## 17. [ ] Feature: no App Store review prompt
+## 17. [x] Feature: no App Store review prompt
 
 Standard practice for this genre — asking at a well-earned moment (after a rebirth, a
 handful of achievements) rather than on cold launch. Missing entirely right now. Add a pure

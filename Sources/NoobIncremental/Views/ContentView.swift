@@ -202,6 +202,7 @@ struct ContentView: View {
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var selectedTab: AppTab = .noobs
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.requestReview) private var requestReview
 
     var body: some View {
         ZStack {
@@ -346,8 +347,22 @@ struct ContentView: View {
                 UIAccessibility.post(notification: .announcement, argument: "Daily reward available")
             }
         }
+        .onChange(of: viewModel.rebirthCount) { _, _ in checkForReviewPrompt() }
+        .onChange(of: viewModel.unlockedAchievementCount) { _, _ in checkForReviewPrompt() }
         .sheet(isPresented: $showMore) {
             MoreSheet(viewModel: viewModel, adManager: adManager, iapManager: iapManager)
+        }
+    }
+
+    /// Flips the one-shot guard immediately so this can never fire twice, then asks after a
+    /// short delay - avoids the system prompt colliding with whatever triggered it (a rebirth
+    /// VFX burst, an achievement toast animating in).
+    private func checkForReviewPrompt() {
+        guard viewModel.shouldRequestReview else { return }
+        viewModel.markReviewRequested()
+        Task {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            requestReview()
         }
     }
 }

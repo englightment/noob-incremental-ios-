@@ -71,6 +71,10 @@ struct GameState: Codable, Equatable {
     // save that already has real progress, so this can never resurface for existing players.
     var hasSeenOnboarding: Bool = false
 
+    // One-shot guard so the App Store review prompt (see ReviewPromptSystem) is only ever
+    // requested once, regardless of how many times its trigger conditions are re-met.
+    var hasRequestedReview: Bool = false
+
     static var newGame: GameState { GameState() }
 
     init() {}
@@ -89,6 +93,7 @@ struct GameState: Codable, Equatable {
         case currentStreak, longestStreak, lastStreakClaimDate
         case lastSaveTimestamp, totalPlayTime
         case hasSeenOnboarding
+        case hasRequestedReview
     }
 
     init(from decoder: Decoder) throws {
@@ -121,6 +126,7 @@ struct GameState: Codable, Equatable {
         lastSaveTimestamp = try container.decodeIfPresent(Date.self, forKey: .lastSaveTimestamp) ?? Date()
         totalPlayTime = try container.decodeIfPresent(TimeInterval.self, forKey: .totalPlayTime) ?? 0
         hasSeenOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasSeenOnboarding) ?? false
+        hasRequestedReview = try container.decodeIfPresent(Bool.self, forKey: .hasRequestedReview) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -153,5 +159,6 @@ struct GameState: Codable, Equatable {
         try container.encode(lastSaveTimestamp, forKey: .lastSaveTimestamp)
         try container.encode(totalPlayTime, forKey: .totalPlayTime)
         try container.encode(hasSeenOnboarding, forKey: .hasSeenOnboarding)
+        try container.encode(hasRequestedReview, forKey: .hasRequestedReview)
     }
 }

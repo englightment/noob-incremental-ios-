@@ -492,6 +492,19 @@ final class GameViewModel: ObservableObject {
         }
     }
 
+    // MARK: - App Store review prompt
+
+    var shouldRequestReview: Bool {
+        ReviewPromptSystem.shouldRequest(state: state)
+    }
+
+    /// Flips the one-shot guard. Called as soon as the caller decides to ask, independent of
+    /// whether StoreKit actually shows the system prompt (it rate-limits itself) — this guard
+    /// exists so the app itself never asks more than once, not to track whether it was shown.
+    func markReviewRequested() {
+        state.hasRequestedReview = true
+    }
+
     // MARK: - In-app purchases
 
     func isProductOwned(_ product: IAPProduct) -> Bool {
