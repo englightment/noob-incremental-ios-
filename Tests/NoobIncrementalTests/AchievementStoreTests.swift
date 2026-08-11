@@ -57,10 +57,13 @@ final class AchievementStoreTests: XCTestCase {
         XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
 
         // Must cover the priciest Zone 4 Noob (currently up to ~945 quadrillion) — this
-        // budget is intentionally generous (a full quintillion headroom) rather than tightly
-        // pinned to today's catalog costs, so it doesn't need touching every time balance
-        // changes. It has already had to move once (from 1 quadrillion) when Zone 4 shipped.
-        state.currency = 1_000_000_000_000_000_000_000
+        // budget is intentionally generous rather than tightly pinned to today's catalog
+        // costs, so it doesn't need touching every time balance changes. It has already had
+        // to move once (from 1 quadrillion) when Zone 4 shipped. Capped just under Int64.max
+        // (~9.22 quintillion) since Decimal's ExpressibleByIntegerLiteral takes an Int, so an
+        // integer literal any larger than that overflows at compile time even though Decimal
+        // itself can represent far bigger values constructed other ways.
+        state.currency = 2_000_000_000_000_000_000
         for generator in GeneratorCatalog.all {
             state = GeneratorStore.buy(generator, state: state)
         }
@@ -161,7 +164,7 @@ final class AchievementStoreTests: XCTestCase {
             return XCTFail("expected multiple Zone 4 generators")
         }
         var state = GameState.newGame
-        state.currency = 1_000_000_000_000_000_000_000
+        state.currency = 2_000_000_000_000_000_000
 
         for generator in zone4Generators.dropLast() {
             state = GeneratorStore.buy(generator, state: state)

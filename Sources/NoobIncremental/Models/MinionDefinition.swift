@@ -77,6 +77,14 @@ enum MinionCatalog {
             unlockAchievementID: "spire_master",
             unlockHint: "Reach 20 total Zone 3 Noob levels",
             outputBonus: 0.15
+        ),
+        MinionDefinition(
+            id: "minion_riftling",
+            name: "Riftling",
+            icon: "atom",
+            unlockAchievementID: "voidbound",
+            unlockHint: "Reach Zone 4, The Void Expanse",
+            outputBonus: 0.16
         )
     ]
 

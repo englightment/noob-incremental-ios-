@@ -167,9 +167,17 @@ zone following the same pattern: new `GeneratorDefinition`s in the new zone, a `
 entry, zone-completion achievements (mirroring `allZoneNoobsOwned`), and balance numbers that
 continue the existing cost/output curve rather than restarting it.
 
-## 22. [ ] Feature: a Zone 4-themed Minion
+## 22. [x] Feature: a Zone 4-themed Minion
 
 Zone 3's launch included two matching Minions (#58) to keep that reward system's pacing
 consistent with new content. Zone 4 (#21) shipped without one — add at least one
 Void-Expanse-themed Minion, unlocked via a Zone 4 achievement (e.g. `voidbound` or
 `void_master`), following the existing MinionCatalog/MinionSystem pattern.
+
+## 23. [ ] Balance: verify GeneratorMilestoneSystem thresholds still make sense for Zone 4
+
+`GeneratorMilestoneSystem`'s per-level multiplier thresholds were presumably tuned against
+Zones 1-3's level-up pace. Zone 4 (#21) has a noticeably steeper cost curve than earlier
+zones (each tier costs ~15x the previous, up from Zone 1's ~9-11x jumps) - check whether the
+existing milestone thresholds still land at reasonable points for Zone 4 Noobs, or whether
+they need their own tuning so late-game milestone bonuses don't feel out of reach.

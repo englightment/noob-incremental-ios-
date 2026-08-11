@@ -65,6 +65,18 @@ final class MinionSystemTests: XCTestCase {
         XCTAssertLessThan(MinionSystem.maxEquipped(state: state), MinionCatalog.all.count)
     }
 
+    func testRiftlingUnlocksWhenVoidboundAchievementIsEarned() {
+        guard let riftling = MinionCatalog.definition(for: "minion_riftling") else {
+            return XCTFail("minion_riftling missing from catalog")
+        }
+        var state = GameState.newGame
+        XCTAssertFalse(MinionSystem.isOwned(riftling, state: state))
+
+        state.unlockedAchievements.insert(riftling.unlockAchievementID)
+        state = MinionSystem.syncOwnership(state: state)
+        XCTAssertTrue(MinionSystem.isOwned(riftling, state: state))
+    }
+
     func testEveryMinionReferencesARealAchievement() {
         for definition in MinionCatalog.all {
             XCTAssertNotNil(
