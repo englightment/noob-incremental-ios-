@@ -64,6 +64,7 @@
 		A65D3A7E310E9FDE9C920EE4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4B7BB345AAB314803A868CE /* Assets.xcassets */; };
 		ACAAE70F345EC7F6C0750E48 /* MinionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2E29CB1B6E4CC9B3A8C317 /* MinionState.swift */; };
 		AE7AD251B20277C9746FA5EC /* ReviewPromptSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9E3B505C8C4AB150229CA1 /* ReviewPromptSystemTests.swift */; };
+		B3EB6FFA92871883D25A40BD /* MinionDenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F42CFE2D395596F8E9EDC33 /* MinionDenView.swift */; };
 		B735E179606FF7ED03EC92CA /* IAPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D39EBAFF6DF5EBF380AEC6 /* IAPManager.swift */; };
 		B8AC0B69FB413DD03CAAAE74 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C14AD1238FC37E53805ECF /* GameState.swift */; };
 		BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13E6847D2D71E92B21BF9C2 /* UpgradeDefinition.swift */; };
@@ -156,6 +157,7 @@
 		98BBD9F8D7888AF0AEF95417 /* WorldSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldSystemTests.swift; sourceTree = "<group>"; };
 		98E303E868D2D07673027F91 /* GeneratorDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorDefinition.swift; sourceTree = "<group>"; };
 		9A10F64BBF3AE4F3B20A3C4B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9F42CFE2D395596F8E9EDC33 /* MinionDenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinionDenView.swift; sourceTree = "<group>"; };
 		9F90E01719EB5431EA35B938 /* MinionSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinionSystemTests.swift; sourceTree = "<group>"; };
 		A176DC510D4E504705C05D6E /* NoobIncrementalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoobIncrementalApp.swift; sourceTree = "<group>"; };
 		A1A5334149B8528D7DC2A4AD /* RebirthUpgradeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RebirthUpgradeStoreTests.swift; sourceTree = "<group>"; };
@@ -391,6 +393,7 @@
 				9A10F64BBF3AE4F3B20A3C4B /* ContentView.swift */,
 				BC9F69F5EE4DB0CB8017A8A2 /* GamePassesView.swift */,
 				5122287A366A865F35D09D3A /* GeneratorStationPopupView.swift */,
+				9F42CFE2D395596F8E9EDC33 /* MinionDenView.swift */,
 				C2D9ED406DD0557491410368 /* NoobFaceView.swift */,
 				B612B7B59F4CE29F5DFD1D98 /* OverworldView.swift */,
 				8D063BE011E055297A3341C4 /* PlayerAvatarView.swift */,
@@ -520,6 +523,7 @@
 				F5BC4086C34469E49AC93F43 /* IAPSystem.swift in Sources */,
 				F5951C5C5FD4FC62E555164A /* MilestoneSystem.swift in Sources */,
 				C256ACD485F0935656E20815 /* MinionDefinition.swift in Sources */,
+				B3EB6FFA92871883D25A40BD /* MinionDenView.swift in Sources */,
 				ACAAE70F345EC7F6C0750E48 /* MinionState.swift in Sources */,
 				A347901CD1A41D6547EC7987 /* MinionSystem.swift in Sources */,
 				CA34CD22AA380AF9298E7589 /* NoobFaceView.swift in Sources */,
