@@ -26,6 +26,12 @@ final class GameStateDecodingTests: XCTestCase {
         state.unlockedAchievements = ["first_noob"]
         state.currentStreak = 5
         state.soundEnabled = false
+        // Pinned to whole-second precision: the default `Date()` carries sub-second precision,
+        // but the .iso8601 encoding strategy truncates to whole seconds, which would make the
+        // round-tripped value differ from the in-memory original by a fraction of a second and
+        // fail this full-struct equality check for reasons that have nothing to do with what
+        // this test is actually verifying.
+        state.lastSaveTimestamp = Date(timeIntervalSince1970: 1_700_000_000)
 
         let data = try encoder.encode(state)
         let decoded = try decoder.decode(GameState.self, from: data)
@@ -43,7 +49,23 @@ final class GameStateDecodingTests: XCTestCase {
 
         let decoded = try decoder.decode(GameState.self, from: emptyObjectData)
 
-        XCTAssertEqual(decoded, GameState.newGame)
+        // Not compared via full-struct equality against a fresh GameState.newGame — both it
+        // and this decode independently default lastSaveTimestamp to Date(), captured at
+        // slightly different wall-clock moments, so that single field would almost never
+        // compare equal. Check the fields that actually matter for "did defaults apply".
+        XCTAssertEqual(decoded.currency, GameBalance.startingCurrency)
+        XCTAssertEqual(decoded.lifetimeEarned, 0)
+        XCTAssertTrue(decoded.generators.isEmpty)
+        XCTAssertTrue(decoded.upgradeLevels.isEmpty)
+        XCTAssertEqual(decoded.rebirthCurrency, 0)
+        XCTAssertEqual(decoded.rebirthCount, 0)
+        XCTAssertTrue(decoded.ownedMinions.isEmpty)
+        XCTAssertTrue(decoded.unlockedAchievements.isEmpty)
+        XCTAssertEqual(decoded.activeBoostMultiplier, 1)
+        XCTAssertNil(decoded.activeBoostExpiresAt)
+        XCTAssertTrue(decoded.soundEnabled)
+        XCTAssertTrue(decoded.hapticsEnabled)
+        XCTAssertEqual(decoded.currentStreak, 0)
     }
 
     func testDecodingWithOnlySomeKeysPresentKeepsThoseValuesAndDefaultsTheRest() throws {
@@ -78,7 +100,12 @@ final class GameStateDecodingTests: XCTestCase {
         let manager = SaveManager(fileURL: tempURL)
         let state = manager.load()
 
-        XCTAssertEqual(state, GameState.newGame)
+        // Same reasoning as above: skip lastSaveTimestamp, which independently defaults to
+        // Date() on both sides and would make full-struct equality flaky.
+        XCTAssertEqual(state.currency, GameBalance.startingCurrency)
+        XCTAssertEqual(state.lifetimeEarned, 0)
+        XCTAssertTrue(state.generators.isEmpty)
+        XCTAssertEqual(state.rebirthCount, 0)
     }
 
     func testSaveManagerLoadsASaveMissingNewerFieldsWithoutLosingOlderData() throws {
