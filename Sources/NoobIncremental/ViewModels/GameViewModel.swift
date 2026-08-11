@@ -19,11 +19,14 @@ struct GeneratorRowViewData: Identifiable {
     let costX100: String
     let canAffordX100: Bool
     let maxAffordableCount: Int
+    let milestoneBonusText: String?
+    let nextMilestoneText: String?
 }
 
 struct WorldRowViewData: Identifiable {
     let id: String
     let name: String
+    let icon: String
     let isUnlocked: Bool
     let lockedDescription: String
 }
@@ -241,6 +244,7 @@ final class GameViewModel: ObservableObject {
             WorldRowViewData(
                 id: world.id,
                 name: world.name,
+                icon: world.icon,
                 isUnlocked: WorldSystem.isUnlocked(world, state: state),
                 lockedDescription: world.lockedDescription
             )
@@ -251,11 +255,15 @@ final class GameViewModel: ObservableObject {
 
     var generatorRows: [GeneratorRowViewData] {
         GeneratorCatalog.all.map { definition in
-            GeneratorRowViewData(
+            let level = GeneratorStore.level(definition, state: state)
+            let milestoneMultiplier = GeneratorMilestoneSystem.multiplier(level: level)
+            let nextThreshold = GeneratorMilestoneSystem.nextThreshold(level: level)
+
+            return GeneratorRowViewData(
                 id: definition.id,
                 name: definition.name,
                 zoneID: definition.zoneID,
-                level: GeneratorStore.level(definition, state: state),
+                level: level,
                 isLocked: !definition.isVisible(for: state),
                 unlockText: "Unlocks at \(NumberFormatting.format(definition.unlockThreshold)) Oof",
                 outputPerLevelText: "\(NumberFormatting.format(definition.baseOutput))/sec per level",
@@ -265,7 +273,11 @@ final class GameViewModel: ObservableObject {
                 canAffordX10: GeneratorStore.canAffordQuantity(definition, quantity: 10, state: state),
                 costX100: NumberFormatting.format(GeneratorStore.costForQuantity(definition, quantity: 100, state: state)),
                 canAffordX100: GeneratorStore.canAffordQuantity(definition, quantity: 100, state: state),
-                maxAffordableCount: GeneratorStore.maxAffordableCount(definition, state: state)
+                maxAffordableCount: GeneratorStore.maxAffordableCount(definition, state: state),
+                milestoneBonusText: milestoneMultiplier > 1 ? "x\(NumberFormatting.format(milestoneMultiplier, fractionDigits: 0)) milestone bonus" : nil,
+                nextMilestoneText: nextThreshold.map { threshold in
+                    "Lv \(threshold) \u{2192} x\(NumberFormatting.format(GeneratorMilestoneSystem.multiplier(level: threshold), fractionDigits: 0))"
+                }
             )
         }
     }
@@ -339,8 +351,10 @@ final class GameViewModel: ObservableObject {
         guard let definition = GeneratorCatalog.definition(for: id) else { return }
         let before = GeneratorStore.level(definition, state: state)
         state = GeneratorStore.buyQuantity(definition, quantity: quantity, state: state)
-        if GeneratorStore.level(definition, state: state) > before {
+        let after = GeneratorStore.level(definition, state: state)
+        if after > before {
             fireBuyFeedback()
+            fireGeneratorMilestoneFeedbackIfCrossed(from: before, to: after)
         }
         checkForAchievements()
     }
@@ -349,10 +363,18 @@ final class GameViewModel: ObservableObject {
         guard let definition = GeneratorCatalog.definition(for: id) else { return }
         let before = GeneratorStore.level(definition, state: state)
         state = GeneratorStore.buyMax(definition, state: state)
-        if GeneratorStore.level(definition, state: state) > before {
+        let after = GeneratorStore.level(definition, state: state)
+        if after > before {
             fireBuyFeedback()
+            fireGeneratorMilestoneFeedbackIfCrossed(from: before, to: after)
         }
         checkForAchievements()
+    }
+
+    private func fireGeneratorMilestoneFeedbackIfCrossed(from before: Int, to after: Int) {
+        guard GeneratorMilestoneSystem.crossedCount(from: before, to: after) > 0 else { return }
+        fireHapticNotification(.success)
+        SoundManager.play(.milestone, enabled: state.soundEnabled)
     }
 
     func buyUpgrade(id: String) {

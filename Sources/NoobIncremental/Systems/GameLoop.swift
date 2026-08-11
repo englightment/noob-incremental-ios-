@@ -33,7 +33,7 @@ enum GameLoop {
             let output = Formulas.generatorOutput(
                 baseOutput: definition.baseOutput,
                 owned: level,
-                outputMultiplier: outputMultiplier
+                outputMultiplier: outputMultiplier * GeneratorMilestoneSystem.multiplier(level: level)
             )
             return total + output
         }

@@ -481,6 +481,15 @@ private struct GlowCard<Content: View>: View {
 
 // MARK: - Noobs tab
 
+private func worldTint(for zoneID: String) -> Color {
+    switch zoneID {
+    case WorldCatalog.zone1ID: return .green
+    case WorldCatalog.zone2ID: return .purple
+    case WorldCatalog.zone3ID: return .pink
+    default: return .white
+    }
+}
+
 private struct NoobsTab: View {
     let worlds: [WorldRowViewData]
     let generators: [GeneratorRowViewData]
@@ -499,15 +508,6 @@ private struct NoobsTab: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            if worlds.count > 1 {
-                Picker("World", selection: $selectedZoneID) {
-                    ForEach(worlds) { world in
-                        Text(world.isUnlocked ? world.name : "\u{1F512} \(world.name)").tag(world.id)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
-
             Picker("Quantity", selection: $quantity) {
                 ForEach(BuyQuantity.allCases) { q in
                     Text(q.rawValue).tag(q)
@@ -549,7 +549,66 @@ private struct NoobsTab: View {
                 }
                 .scrollIndicators(.hidden)
             }
+
+            if worlds.count > 1 {
+                WorldSelector(worlds: worlds, selectedZoneID: $selectedZoneID)
+            }
         }
+    }
+}
+
+private struct WorldSelector: View {
+    let worlds: [WorldRowViewData]
+    @Binding var selectedZoneID: String
+    @Namespace private var namespace
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(worlds) { world in
+                let tint = worldTint(for: world.id)
+                let isSelected = world.id == selectedZoneID
+
+                Button {
+                    guard world.isUnlocked else { return }
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                        selectedZoneID = world.id
+                    }
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: world.isUnlocked ? world.icon : "lock.fill")
+                            .font(.system(size: 18, weight: .bold))
+                        Text(world.name)
+                            .font(.caption2.weight(.bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .foregroundStyle(isSelected ? .white : .white.opacity(world.isUnlocked ? 0.65 : 0.35))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background {
+                        if isSelected {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [tint, tint.opacity(0.6)],
+                                        startPoint: .top, endPoint: .bottom
+                                    )
+                                )
+                                .matchedGeometryEffect(id: "selectedWorld", in: namespace)
+                                .shadow(color: tint.opacity(0.5), radius: 8, y: 3)
+                        }
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .strokeBorder(tint.opacity(isSelected ? 0 : (world.isUnlocked ? 0.5 : 0.15)), lineWidth: 1.2)
+                    )
+                }
+                .buttonStyle(.plain)
+                .opacity(world.isUnlocked ? 1 : 0.6)
+            }
+        }
+        .padding(6)
+        .glassPanel(tint: .white, cornerRadius: 20)
     }
 }
 
@@ -598,6 +657,15 @@ private struct GeneratorRowView: View {
                         Text(data.outputPerLevelText)
                             .font(.caption2)
                             .foregroundStyle(.white.opacity(0.45))
+                        if let bonus = data.milestoneBonusText {
+                            Text(bonus)
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(.cyan)
+                        } else if let next = data.nextMilestoneText {
+                            Text("Milestone: \(next)")
+                                .font(.caption2)
+                                .foregroundStyle(.white.opacity(0.35))
+                        }
                     }
                 }
 
