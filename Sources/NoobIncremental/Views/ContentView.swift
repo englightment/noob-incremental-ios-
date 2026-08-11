@@ -1446,6 +1446,11 @@ private struct MoreSheet: View {
                 }
                 .tint(.pink)
 
+                Toggle(isOn: Binding(get: { viewModel.offlineReminderEnabled }, set: { _ in viewModel.toggleOfflineReminder() })) {
+                    Text("Offline Reminder").foregroundStyle(.white)
+                }
+                .tint(.pink)
+
                 Button(role: .destructive) {
                     showResetConfirm = true
                 } label: {

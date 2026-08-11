@@ -186,6 +186,7 @@ final class GameViewModel: ObservableObject {
 
     var soundEnabled: Bool { state.soundEnabled }
     var hapticsEnabled: Bool { state.hapticsEnabled }
+    var offlineReminderEnabled: Bool { state.offlineReminderEnabled }
 
     // MARK: - Stats
 
@@ -353,6 +354,7 @@ final class GameViewModel: ObservableObject {
         autosaveTimer?.invalidate()
         autosaveTimer = nil
         save()
+        guard state.offlineReminderEnabled else { return }
         let offlineCap = GameBalance.maxOfflineProgressDuration + RebirthUpgradeStore.offlineCapBonus(state: state)
         OfflineReminderManager.scheduleReminder(after: offlineCap)
     }
@@ -494,6 +496,7 @@ final class GameViewModel: ObservableObject {
 
     func toggleSound() { state.soundEnabled.toggle() }
     func toggleHaptics() { state.hapticsEnabled.toggle() }
+    func toggleOfflineReminder() { state.offlineReminderEnabled.toggle() }
 
     func resetSave() {
         stop()

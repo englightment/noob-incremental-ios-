@@ -83,7 +83,7 @@ Store Connect config before release" pattern already used for the AdMob integrat
 behind a simple entitlement check (e.g. an "ads removed" flag derived from
 `purchasedProductIDs`).
 
-## 11. [ ] Polish: no way to opt out of the offline-cap reminder notification specifically
+## 11. [x] Polish: no way to opt out of the offline-cap reminder notification specifically
 
 The reminder added in #8 is all-or-nothing via the OS-level permission prompt — a player who
 wants every other feature but finds this one nagging has to fully revoke notification

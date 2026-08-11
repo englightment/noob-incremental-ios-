@@ -56,6 +56,7 @@ struct GameState: Codable, Equatable {
     // Quality-of-life settings
     var soundEnabled: Bool = true
     var hapticsEnabled: Bool = true
+    var offlineReminderEnabled: Bool = true
 
     // Daily login streak
     var currentStreak: Int = 0
@@ -84,7 +85,7 @@ struct GameState: Codable, Equatable {
         case activeBoostMultiplier, activeBoostExpiresAt
         case adBoost2xExpiresAt, adBoost4xExpiresAt
         case highestMilestoneCelebrated
-        case soundEnabled, hapticsEnabled
+        case soundEnabled, hapticsEnabled, offlineReminderEnabled
         case currentStreak, longestStreak, lastStreakClaimDate
         case lastSaveTimestamp, totalPlayTime
         case hasSeenOnboarding
@@ -113,6 +114,7 @@ struct GameState: Codable, Equatable {
         highestMilestoneCelebrated = try container.decodeIfPresent(Int.self, forKey: .highestMilestoneCelebrated) ?? 0
         soundEnabled = try container.decodeIfPresent(Bool.self, forKey: .soundEnabled) ?? true
         hapticsEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticsEnabled) ?? true
+        offlineReminderEnabled = try container.decodeIfPresent(Bool.self, forKey: .offlineReminderEnabled) ?? true
         currentStreak = try container.decodeIfPresent(Int.self, forKey: .currentStreak) ?? 0
         longestStreak = try container.decodeIfPresent(Int.self, forKey: .longestStreak) ?? 0
         lastStreakClaimDate = try container.decodeIfPresent(Date.self, forKey: .lastStreakClaimDate)
@@ -144,6 +146,7 @@ struct GameState: Codable, Equatable {
         try container.encode(highestMilestoneCelebrated, forKey: .highestMilestoneCelebrated)
         try container.encode(soundEnabled, forKey: .soundEnabled)
         try container.encode(hapticsEnabled, forKey: .hapticsEnabled)
+        try container.encode(offlineReminderEnabled, forKey: .offlineReminderEnabled)
         try container.encode(currentStreak, forKey: .currentStreak)
         try container.encode(longestStreak, forKey: .longestStreak)
         try container.encodeIfPresent(lastStreakClaimDate, forKey: .lastStreakClaimDate)
