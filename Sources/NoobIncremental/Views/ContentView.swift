@@ -462,7 +462,14 @@ private struct CurrencyDisplay: View {
                 .foregroundStyle(gradient)
                 .shadow(color: .white.opacity(glowing ? 0.55 : 0.15), radius: glowing ? 16 : 6)
                 .contentTransition(.numericText())
-                .animation(.snappy, value: valueText)
+                // Unlike the other animations in this file, this one isn't a one-shot or a
+                // repeatForever loop — it re-fires on every currency tick, which happens
+                // continuously during passive income. For a Reduce Motion user that's a
+                // constant rolling-digit effect, arguably more persistent than the achievement
+                // toast's spring (which does get shortened, see below). nil disables the
+                // animation entirely so contentTransition has nothing to interpolate and the
+                // number just snaps to its new value instead.
+                .animation(reduceMotion ? nil : .snappy, value: valueText)
                 .onAppear {
                     guard !reduceMotion else { return }
                     withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {

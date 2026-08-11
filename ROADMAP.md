@@ -235,3 +235,13 @@ never get that history synced, since the report calls only fire on the moment so
 newly changes. Added a one-time sync of every already-unlocked achievement plus the current
 lifetime-earned leaderboard score, triggered right after `gameCenterManager.isAuthenticated`
 flips true.
+
+## 29. [x] Bug: CurrencyDisplay's number animation still ignores Reduce Motion
+
+Re-audited every `.animation`/`withAnimation` call in ContentView.swift after #19 found two
+gaps from the same root cause — found one more. `CurrencyDisplay`'s
+`.animation(.snappy, value: valueText)` re-fires on every currency tick (continuous during
+passive income), unlike the other now-fixed cases which were one-shot or clearly-looping.
+For a Reduce Motion user that's arguably a more persistent motion source than the
+already-fixed achievement toast spring. Set to `nil` under Reduce Motion so
+`.contentTransition(.numericText())` has nothing to interpolate and the number just snaps.
