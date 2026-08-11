@@ -92,14 +92,16 @@ enum UpgradeCatalog {
     }
 }
 
-/// Bought with Rebirth currency, rare and powerful — survives resets.
+/// Bought with Rebirth currency, rare and powerful — survives resets. Costs are sized against
+/// a realistic per-rebirth gain (tens to low hundreds early on, see GameBalance.rebirthGainBaseline)
+/// so the first level of each is reachable within a handful of rebirths, not hundreds of them.
 enum RebirthUpgradeCatalog {
     static let all: [UpgradeDefinition] = [
-        UpgradeDefinition(id: "rebirth_more_oof", name: "More Oof", baseCost: 12_400, maxLevel: 6, effect: .outputMultiplier(doublingInterval: 1)),
-        UpgradeDefinition(id: "rebirth_more_rebirth", name: "More Rebirth", baseCost: 142, maxLevel: 10, effect: .rebirthGainMultiplier(perLevelGrowthRate: 1.25)),
-        UpgradeDefinition(id: "rebirth_speed", name: "Rebirth Speed", baseCost: 500, maxLevel: 8, effect: .tickSpeedReduction(secondsPerLevel: 0.08)),
-        UpgradeDefinition(id: "rebirth_mega_value", name: "Mega Value", baseCost: 300, maxLevel: 15, effect: .flatOutputBonus(perLevel: 500)),
-        UpgradeDefinition(id: "rebirth_minion_slots", name: "Extra Minion Slots", baseCost: 5_000, maxLevel: 2, effect: .minionSlotBonus(perLevel: 1))
+        UpgradeDefinition(id: "rebirth_more_oof", name: "More Oof", baseCost: 200, maxLevel: 6, effect: .outputMultiplier(doublingInterval: 1)),
+        UpgradeDefinition(id: "rebirth_more_rebirth", name: "More Rebirth", baseCost: 50, maxLevel: 10, effect: .rebirthGainMultiplier(perLevelGrowthRate: 1.25)),
+        UpgradeDefinition(id: "rebirth_speed", name: "Rebirth Speed", baseCost: 100, maxLevel: 8, effect: .tickSpeedReduction(secondsPerLevel: 0.08)),
+        UpgradeDefinition(id: "rebirth_mega_value", name: "Mega Value", baseCost: 75, maxLevel: 15, effect: .flatOutputBonus(perLevel: 500)),
+        UpgradeDefinition(id: "rebirth_minion_slots", name: "Extra Minion Slots", baseCost: 400, maxLevel: 2, effect: .minionSlotBonus(perLevel: 1))
     ]
 
     static func definition(for id: String) -> UpgradeDefinition? {

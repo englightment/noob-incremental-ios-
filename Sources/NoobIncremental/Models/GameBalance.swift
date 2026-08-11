@@ -18,7 +18,10 @@ enum GameBalance {
 
     /// Flat multiplier on rebirth-currency gain — without it, a rebirth performed right at
     /// the requirement (the common case) nets ~1 currency, which reads as "barely scaling".
-    static let rebirthGainBaseline: Decimal = 10
+    /// Raised from 10 to 25: at the old value a rebirth-shop upgrade like More Oof (originally
+    /// 12,400) cost 200+ rebirths' worth of currency to even start leveling, which felt like
+    /// rebirthing "didn't work" even though the mechanic itself was functioning correctly.
+    static let rebirthGainBaseline: Decimal = 25
 
     /// Cost growth rate for rebirth-currency upgrades — steeper than the Oof-currency shop
     /// since each level here is far more powerful (doubling Oof output, etc).

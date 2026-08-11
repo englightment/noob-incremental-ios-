@@ -128,6 +128,23 @@ final class RebirthSystemTests: XCTestCase {
         XCTAssertGreaterThan(gainWayOver, gainAtRequirement * 5, "pushing 100x past the requirement should be worth meaningfully more than the minimum")
     }
 
+    func testFirstRebirthAffordsCheapestRebirthShopUpgrade() {
+        // A modest, very achievable overshoot (5x the requirement) should net enough rebirth
+        // currency to afford at least the cheapest rebirth-shop upgrade. Pins the fix for a
+        // real balance bug: rebirth-shop costs were set assuming much larger per-rebirth
+        // gains than the formula actually produced, so the cheapest upgrade took 200+
+        // rebirths to reach — which read to a player as "rebirthing doesn't work."
+        guard let cheapest = RebirthUpgradeCatalog.all.min(by: { $0.baseCost < $1.baseCost }) else {
+            return XCTFail("RebirthUpgradeCatalog is empty")
+        }
+        var state = GameState.newGame
+        state.currency = RebirthSystem.requirement(rebirthCount: 0) * 5
+
+        let result = RebirthSystem.performRebirth(state: state)
+
+        XCTAssertGreaterThanOrEqual(result.rebirthCurrency, cheapest.baseCost)
+    }
+
     func testPrestigeInsightIncreasesAvailableGain() {
         guard UpgradeCatalog.definition(for: "prestige_insight") != nil else {
             return XCTFail("prestige_insight missing from catalog")
