@@ -39,6 +39,7 @@
 		5D1E78C87504AC80DA6510CD /* MinionSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F90E01719EB5431EA35B938 /* MinionSystemTests.swift */; };
 		5EA32FE7047CE1A8F4BA55AD /* OfflineProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */; };
 		63A9A993FE47275EF310DFEC /* BoostSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0249C924F5337ED81C9733D4 /* BoostSystemTests.swift */; };
+		69B535C577E981DADDD4A018 /* StationSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B4F699817F2C6EFB9E6D86 /* StationSheets.swift */; };
 		6FC7BF5BDF1502E276274D14 /* OfflineProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A6DF5E50215E9B2048DADC /* OfflineProgressTests.swift */; };
 		70C504122BF04C983B888DB5 /* GameLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF13B3804E62DA65AE06A1F4 /* GameLoop.swift */; };
 		73F79AEC5B0056D6D72F0CB7 /* RewardedAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F530D937662570E1B748BD95 /* RewardedAdManager.swift */; };
@@ -167,6 +168,7 @@
 		B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormattingTests.swift; sourceTree = "<group>"; };
 		B3D39EBAFF6DF5EBF380AEC6 /* IAPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPManager.swift; sourceTree = "<group>"; };
 		B46AAC80EE22DFD9DF50568A /* MilestoneSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneSystem.swift; sourceTree = "<group>"; };
+		B4B4F699817F2C6EFB9E6D86 /* StationSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationSheets.swift; sourceTree = "<group>"; };
 		B612B7B59F4CE29F5DFD1D98 /* OverworldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverworldView.swift; sourceTree = "<group>"; };
 		B8D76D06754DBFE22CD1B15E /* OnboardingSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSystemTests.swift; sourceTree = "<group>"; };
 		BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formulas.swift; sourceTree = "<group>"; };
@@ -393,6 +395,7 @@
 				B612B7B59F4CE29F5DFD1D98 /* OverworldView.swift */,
 				8D063BE011E055297A3341C4 /* PlayerAvatarView.swift */,
 				4DA66A8B7A6C1B79E57F7F6E /* SharedRowComponents.swift */,
+				B4B4F699817F2C6EFB9E6D86 /* StationSheets.swift */,
 				DD43E97D103ACDCAB7FE1E7A /* VirtualJoystickView.swift */,
 			);
 			path = Views;
@@ -540,6 +543,7 @@
 				FD3CDA6A01EB499A0BABA45F /* ShareSummary.swift in Sources */,
 				745313F31CDA4844A2D4FE3F /* SharedRowComponents.swift in Sources */,
 				385640CAC69744E5DA3DF486 /* SoundManager.swift in Sources */,
+				69B535C577E981DADDD4A018 /* StationSheets.swift in Sources */,
 				BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */,
 				F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */,
 				9C04859A9F9AD0F15151F2B7 /* VirtualJoystickView.swift in Sources */,
