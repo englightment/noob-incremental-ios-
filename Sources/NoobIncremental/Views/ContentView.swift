@@ -297,6 +297,14 @@ struct ContentView: View {
             if viewModel.showMilestoneCelebration {
                 ConfettiView(pieces: confettiPieces)
             }
+
+            if viewModel.showOnboarding {
+                OnboardingOverlay {
+                    viewModel.dismissOnboarding()
+                }
+                .transition(.opacity)
+                .animation(.easeOut(duration: 0.3), value: viewModel.showOnboarding)
+            }
         }
         .preferredColorScheme(.dark)
         .onAppear {
@@ -310,6 +318,60 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showMore) {
             MoreSheet(viewModel: viewModel, adManager: adManager)
+        }
+    }
+}
+
+// MARK: - First-launch onboarding
+
+private struct OnboardingOverlay: View {
+    let onDismiss: () -> Void
+
+    private let steps: [(icon: String, text: String)] = [
+        ("face.smiling.fill", "Noobs work for you \u{2014} buy them and watch Oof grow, even while you're away."),
+        ("arrow.up.circle.fill", "Spend Oof on more Noobs and Upgrades to grow faster."),
+        ("arrow.triangle.2.circlepath", "Once you've saved enough, Rebirth for a permanent currency that unlocks powerful upgrades.")
+    ]
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.75)
+                .ignoresSafeArea()
+
+            VStack(spacing: 18) {
+                NoobFaceView(size: 56)
+                Text("Welcome to Noob Incremental!")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(Array(steps.enumerated()), id: \.offset) { _, step in
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: step.icon)
+                                .font(.title3)
+                                .foregroundStyle(Theme.oofGradient)
+                                .frame(width: 26)
+                            Text(step.text)
+                                .font(.subheadline)
+                                .foregroundStyle(.white.opacity(0.85))
+                        }
+                    }
+                }
+                .padding(.top, 4)
+
+                Button("Let's Go!", action: onDismiss)
+                    .buttonStyle(PressableButtonStyle())
+                    .font(.headline.weight(.bold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .foregroundStyle(.black)
+                    .padding(.top, 6)
+            }
+            .padding(24)
+            .glassPanel(tint: .yellow, cornerRadius: 24)
+            .padding(.horizontal, 28)
         }
     }
 }

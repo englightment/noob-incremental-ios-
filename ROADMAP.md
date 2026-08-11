@@ -25,7 +25,7 @@ only get worse as more achievements are added. Switch it to lazy rendering.
 classic idle-game gap players expect to be able to close. Add a way to extend it (e.g. a new
 Rebirth-shop upgrade using a new `offlineCapBonus` effect).
 
-## 4. [ ] Feature: no first-launch onboarding
+## 4. [x] Feature: no first-launch onboarding
 
 Brand-new players are dropped straight into the game with zero explanation of the core loop
 (buy Noobs, watch Oof grow, eventually Rebirth). Add a lightweight one-time first-launch

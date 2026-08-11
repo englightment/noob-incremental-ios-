@@ -66,6 +66,10 @@ struct GameState: Codable, Equatable {
     var lastSaveTimestamp: Date = Date()
     var totalPlayTime: TimeInterval = 0
 
+    // First-launch onboarding — see OnboardingSystem. Backfilled to true on load for any
+    // save that already has real progress, so this can never resurface for existing players.
+    var hasSeenOnboarding: Bool = false
+
     static var newGame: GameState { GameState() }
 
     init() {}
@@ -83,6 +87,7 @@ struct GameState: Codable, Equatable {
         case soundEnabled, hapticsEnabled
         case currentStreak, longestStreak, lastStreakClaimDate
         case lastSaveTimestamp, totalPlayTime
+        case hasSeenOnboarding
     }
 
     init(from decoder: Decoder) throws {
@@ -113,6 +118,7 @@ struct GameState: Codable, Equatable {
         lastStreakClaimDate = try container.decodeIfPresent(Date.self, forKey: .lastStreakClaimDate)
         lastSaveTimestamp = try container.decodeIfPresent(Date.self, forKey: .lastSaveTimestamp) ?? Date()
         totalPlayTime = try container.decodeIfPresent(TimeInterval.self, forKey: .totalPlayTime) ?? 0
+        hasSeenOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasSeenOnboarding) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -143,5 +149,6 @@ struct GameState: Codable, Equatable {
         try container.encodeIfPresent(lastStreakClaimDate, forKey: .lastStreakClaimDate)
         try container.encode(lastSaveTimestamp, forKey: .lastSaveTimestamp)
         try container.encode(totalPlayTime, forKey: .totalPlayTime)
+        try container.encode(hasSeenOnboarding, forKey: .hasSeenOnboarding)
     }
 }

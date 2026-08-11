@@ -317,7 +317,8 @@ final class GameViewModel: ObservableObject {
         self.saveManager = saveManager
         let loaded = saveManager.load()
         let offline = OfflineProgress.apply(to: loaded)
-        self.state = MinionSystem.syncOwnership(state: offline.state)
+        let synced = MinionSystem.syncOwnership(state: offline.state)
+        self.state = OnboardingSystem.backfillIfNeeded(synced)
         self.lastOfflineEarnings = offline.currencyEarned > 0 ? offline.currencyEarned : nil
     }
 
@@ -343,6 +344,14 @@ final class GameViewModel: ObservableObject {
 
     func dismissOfflineEarningsBanner() {
         lastOfflineEarnings = nil
+    }
+
+    // MARK: - First-launch onboarding
+
+    var showOnboarding: Bool { OnboardingSystem.shouldShowOnboarding(state) }
+
+    func dismissOnboarding() {
+        state = OnboardingSystem.dismiss(state)
     }
 
     // MARK: - Purchases
