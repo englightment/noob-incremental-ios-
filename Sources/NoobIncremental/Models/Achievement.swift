@@ -48,7 +48,8 @@ enum AchievementCatalog {
         AchievementDefinition(id: "spire_master", name: "Spire Master", description: "Reach 20 total Zone 3 Noob levels", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone3ID, total: 20)),
         AchievementDefinition(id: "rune_collector", name: "Rune Collector", description: "Own every Rune", condition: .allRunesOwned),
         AchievementDefinition(id: "max_rune_oof", name: "Runed Up", description: "Max the Rune of Oof", condition: .upgradeMaxed("rune_oof")),
-        AchievementDefinition(id: "menagerie", name: "Menagerie", description: "Unlock every Minion", condition: .allMinionsOwned)
+        AchievementDefinition(id: "menagerie", name: "Menagerie", description: "Unlock every Minion", condition: .allMinionsOwned),
+        AchievementDefinition(id: "minion_master", name: "Minion Master", description: "Max the Extra Minion Slots upgrade", condition: .upgradeMaxed("rebirth_minion_slots"))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {

@@ -61,6 +61,22 @@ enum MinionCatalog {
             unlockAchievementID: "hundred_rebirths",
             unlockHint: "Rebirth 100 times",
             outputBonus: 0.20
+        ),
+        MinionDefinition(
+            id: "minion_seraph",
+            name: "Seraph",
+            icon: "star.fill",
+            unlockAchievementID: "ascendant",
+            unlockHint: "Reach Zone 3, The Ascension Spire",
+            outputBonus: 0.12
+        ),
+        MinionDefinition(
+            id: "minion_celestine",
+            name: "Celestine",
+            icon: "crown.fill",
+            unlockAchievementID: "spire_master",
+            unlockHint: "Reach 20 total Zone 3 Noob levels",
+            outputBonus: 0.15
         )
     ]
 

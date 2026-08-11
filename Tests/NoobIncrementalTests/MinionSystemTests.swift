@@ -65,6 +65,15 @@ final class MinionSystemTests: XCTestCase {
         XCTAssertLessThan(MinionSystem.maxEquipped(state: state), MinionCatalog.all.count)
     }
 
+    func testEveryMinionReferencesARealAchievement() {
+        for definition in MinionCatalog.all {
+            XCTAssertNotNil(
+                AchievementCatalog.definition(for: definition.unlockAchievementID),
+                "\(definition.id) references unknown achievement \(definition.unlockAchievementID)"
+            )
+        }
+    }
+
     func testExtraMinionSlotsUpgradeRaisesMaxEquipped() {
         guard let extraSlots = RebirthUpgradeCatalog.definition(for: "rebirth_minion_slots") else {
             return XCTFail("rebirth_minion_slots missing from catalog")
