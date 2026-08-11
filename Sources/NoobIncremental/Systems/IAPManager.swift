@@ -50,6 +50,19 @@ final class IAPManager: NSObject, ObservableObject {
         products = next
     }
 
+    /// Reconciles local entitlements against StoreKit's own record of what this Apple ID has
+    /// bought — the recovery path for #12: local save data can be wiped (Sideloadly re-signing,
+    /// a reinstall, a restored backup that predates a purchase) while the App Store still knows
+    /// the transaction happened. Safe to call anytime; re-applying an already-owned
+    /// non-consumable is a no-op (IAPSystem.applyPurchase is idempotent for those). Consumables
+    /// don't appear in currentEntitlements once finished, so this can't double-grant them.
+    func restorePurchases() async {
+        try? await AppStore.sync()
+        for await entitlement in Transaction.currentEntitlements {
+            await handle(entitlement)
+        }
+    }
+
     func purchase(_ product: IAPProduct) async {
         guard let storeProduct = products[product], purchasing == nil else { return }
         purchasing = product

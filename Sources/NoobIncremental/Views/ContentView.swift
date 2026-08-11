@@ -1143,6 +1143,7 @@ private struct MoreSheet: View {
     @State private var importCodeText = ""
     @State private var backupMessage: String?
     @State private var showImportConfirm = false
+    @State private var restoreMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -1409,6 +1410,22 @@ private struct MoreSheet: View {
                 Text("Support the Game").font(.headline).foregroundStyle(.white)
                 ForEach(IAPProduct.allCases) { product in
                     supportRow(product)
+                }
+
+                Button("Restore Purchases") {
+                    Task {
+                        await iapManager.restorePurchases()
+                        restoreMessage = "Restore complete."
+                    }
+                }
+                .buttonStyle(PressableButtonStyle())
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.6))
+
+                if let restoreMessage {
+                    Text(restoreMessage)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
             }
         }

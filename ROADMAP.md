@@ -90,7 +90,7 @@ wants every other feature but finds this one nagging has to fully revoke notific
 permission in iOS Settings to stop it. Add an in-app Settings toggle that gates whether
 `GameViewModel.stop()` schedules the reminder at all, independent of OS permission.
 
-## 12. [ ] Bug: purchased non-consumables have no restore path if local data is lost
+## 12. [x] Bug: purchased non-consumables have no restore path if local data is lost
 
 `GameState.purchasedProductIDs` (see #10) is currently the *only* record of IAP ownership.
 This is a real risk for the exact reason #7 exists: Sideloadly's free-Apple-ID signing
