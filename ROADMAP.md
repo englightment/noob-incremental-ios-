@@ -3,7 +3,7 @@
 Working list of the next bugs/features to tackle, based on the current state of the game.
 Checked off items include the commit that shipped them.
 
-## 1. [ ] Bug: save loading isn't resilient to schema changes
+## 1. [x] Bug: save loading isn't resilient to schema changes
 
 `SaveManager.load()` relies on `GameState`'s synthesized `Decodable` conformance, which
 requires every stored key to be present. Any future field addition to `GameState` (which has
