@@ -499,6 +499,29 @@ final class GameViewModel: ObservableObject {
         start()
     }
 
+    // MARK: - Save backup/restore
+
+    enum ImportSaveResult {
+        case success
+        case invalidCode
+    }
+
+    func exportSaveCode() -> String? {
+        saveManager.exportCode(state)
+    }
+
+    /// Replaces the current save with the one encoded in `code`. Runs the same
+    /// ownership-sync/onboarding-backfill pass as a fresh load so an imported save (which
+    /// might be older, or from a different point in this session) ends up just as consistent
+    /// as one loaded at launch.
+    func importSaveCode(_ code: String) -> ImportSaveResult {
+        guard let imported = saveManager.decodeImportCode(code) else { return .invalidCode }
+        let synced = MinionSystem.syncOwnership(state: imported)
+        state = OnboardingSystem.backfillIfNeeded(synced)
+        saveManager.save(state)
+        return .success
+    }
+
     // MARK: - Tick
 
     private func tick() {

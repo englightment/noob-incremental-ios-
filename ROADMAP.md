@@ -48,7 +48,7 @@ progress on the countable conditions (`lifetimeEarned`, `rebirths`, `totalNoobLe
 pulls people back in) and costs little to add given the data's already computed for
 `conditionMet`.
 
-## 7. [ ] Feature: no way to back up/restore a save manually
+## 7. [x] Feature: no way to back up/restore a save manually
 
 Saves are local-only JSON in the app's Documents directory with no export path. This is a
 real risk *specifically* for this project's testing setup: Sideloadly's free-Apple-ID signing

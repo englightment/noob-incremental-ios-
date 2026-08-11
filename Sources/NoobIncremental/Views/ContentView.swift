@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 private enum Theme {
     static let oofGradient = LinearGradient(
@@ -1132,6 +1133,9 @@ private struct MoreSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var codeText = ""
     @State private var showResetConfirm = false
+    @State private var importCodeText = ""
+    @State private var backupMessage: String?
+    @State private var showImportConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -1143,6 +1147,7 @@ private struct MoreSheet: View {
                         minionsSection
                         adBoostsSection
                         codesSection
+                        backupSection
                         achievementsSection
                         settingsSection
                     }
@@ -1318,6 +1323,70 @@ private struct MoreSheet: View {
                     .foregroundStyle(.white)
                 }
                 if let message = viewModel.redeemMessage {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            }
+        }
+    }
+
+    private var backupSection: some View {
+        GlowCard(borderColor: .blue) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Backup Save").font(.headline).foregroundStyle(.white)
+                Text("Copy a backup code somewhere safe, or restore from one you saved earlier.")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.5))
+
+                Button("Copy Backup Code") {
+                    guard let code = viewModel.exportSaveCode() else {
+                        backupMessage = "Couldn't create a backup code."
+                        return
+                    }
+                    UIPasteboard.general.string = code
+                    backupMessage = "Copied to clipboard!"
+                }
+                .buttonStyle(PressableButtonStyle())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .foregroundStyle(.black)
+                .font(.subheadline.weight(.bold))
+
+                HStack {
+                    TextField("Paste backup code", text: $importCodeText)
+                        .textFieldStyle(.plain)
+                        .padding(10)
+                        .background(Color.black.opacity(0.25), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .foregroundStyle(.white)
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
+                    Button("Restore") {
+                        guard !importCodeText.isEmpty else { return }
+                        showImportConfirm = true
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(Color.blue.opacity(importCodeText.isEmpty ? 0.2 : 0.85), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .foregroundStyle(.white)
+                    .disabled(importCodeText.isEmpty)
+                }
+                .confirmationDialog("Restoring will replace your current save. This can't be undone.", isPresented: $showImportConfirm, titleVisibility: .visible) {
+                    Button("Restore Save", role: .destructive) {
+                        let result = viewModel.importSaveCode(importCodeText)
+                        switch result {
+                        case .success:
+                            backupMessage = "Save restored!"
+                            importCodeText = ""
+                        case .invalidCode:
+                            backupMessage = "That backup code isn't valid."
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }
+
+                if let message = backupMessage {
                     Text(message)
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.7))
