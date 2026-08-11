@@ -46,84 +46,6 @@ private struct AppBackground: View {
     }
 }
 
-// MARK: - Custom tab bar
-
-private enum AppTab: Hashable, CaseIterable, Identifiable {
-    case noobs, upgrades, rebirth, runes
-    var id: Self { self }
-
-    var title: String {
-        switch self {
-        case .noobs: return "Noobs"
-        case .upgrades: return "Upgrades"
-        case .rebirth: return "Rebirth"
-        case .runes: return "Runes"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .noobs: return "face.smiling.fill"
-        case .upgrades: return "arrow.up.circle.fill"
-        case .rebirth: return "arrow.triangle.2.circlepath"
-        case .runes: return "seal.fill"
-        }
-    }
-
-    var tint: Color {
-        switch self {
-        case .noobs: return .yellow
-        case .upgrades: return .cyan
-        case .rebirth: return .pink
-        case .runes: return .mint
-        }
-    }
-}
-
-private struct PillTabBar: View {
-    @Binding var selection: AppTab
-    @Namespace private var namespace
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(AppTab.allCases) { tab in
-                Button {
-                    withAnimation(reduceMotion ? .linear(duration: 0.1) : .spring(response: 0.35, dampingFraction: 0.82)) {
-                        selection = tab
-                    }
-                } label: {
-                    VStack(spacing: 3) {
-                        Image(systemName: tab.icon)
-                            .font(.system(size: 16, weight: .bold))
-                        Text(tab.title)
-                            .font(.caption2.weight(.bold))
-                    }
-                    .foregroundStyle(selection == tab ? .white : .white.opacity(0.5))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background {
-                        if selection == tab {
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(tab.tint.opacity(0.85))
-                                .matchedGeometryEffect(id: "selectedTab", in: namespace)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(tab.title)
-                .accessibilityAddTraits(selection == tab ? .isSelected : [])
-            }
-        }
-        .padding(4)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-        )
-    }
-}
-
 struct ContentView: View {
     @ObservedObject var viewModel: GameViewModel
     @StateObject private var adManager = RewardedAdManager()
@@ -132,7 +54,6 @@ struct ContentView: View {
     @State private var showMore = false
     @State private var showGamePasses = false
     @State private var confettiPieces: [ConfettiPiece] = []
-    @State private var selectedTab: AppTab = .noobs
     @State private var currentZoneID: String = WorldCatalog.zone1ID
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.requestReview) private var requestReview
@@ -202,41 +123,12 @@ struct ContentView: View {
                 }
                 .frame(height: 108)
 
-                PillTabBar(selection: $selectedTab)
-
-                Group {
-                    switch selectedTab {
-                    case .noobs:
-                        OverworldView(
-                            viewModel: viewModel,
-                            layout: ZoneLayoutCatalog.layout(for: currentZoneID) ?? ZoneLayoutCatalog.zone1,
-                            onTravel: { targetZoneID in currentZoneID = targetZoneID }
-                        )
-                        .id(currentZoneID)
-                    case .upgrades:
-                        UpgradesTab(upgrades: viewModel.visibleUpgrades, onBuy: viewModel.buyUpgrade, onBuyMax: viewModel.buyUpgradeMax)
-                    case .rebirth:
-                        RebirthTab(
-                            rebirthCurrencyText: viewModel.formattedRebirthCurrency,
-                            rebirthCount: viewModel.rebirthCount,
-                            canRebirth: viewModel.canRebirth,
-                            gainPreviewText: viewModel.rebirthGainPreviewText,
-                            requirementText: viewModel.rebirthRequirementText,
-                            progressFraction: viewModel.rebirthProgressFraction,
-                            onRebirth: viewModel.performRebirth,
-                            upgrades: viewModel.visibleRebirthUpgrades,
-                            onBuy: viewModel.buyRebirthUpgrade,
-                            onBuyMax: viewModel.buyRebirthUpgradeMax
-                        )
-                    case .runes:
-                        RunesTab(
-                            runeShardsText: viewModel.formattedRuneShards,
-                            runes: viewModel.runeRows,
-                            onBuy: viewModel.buyRune,
-                            onBuyMax: viewModel.buyRuneMax
-                        )
-                    }
-                }
+                OverworldView(
+                    viewModel: viewModel,
+                    layout: ZoneLayoutCatalog.layout(for: currentZoneID) ?? ZoneLayoutCatalog.zone1,
+                    onTravel: { targetZoneID in currentZoneID = targetZoneID }
+                )
+                .id(currentZoneID)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .padding()
