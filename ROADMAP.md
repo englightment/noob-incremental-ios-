@@ -38,3 +38,29 @@ transitions on tab/world switches) with no way to tone it down. Respect
 `UIAccessibility.isReduceMotionEnabled` (via `@Environment(\.accessibilityReduceMotion)`) to
 disable or shorten the purely-decorative animations for players who want/need it — also an
 App Store accessibility best practice.
+
+## 6. [ ] Feature: locked achievements show no progress
+
+Every locked achievement row shows the same generic lock icon regardless of how close it is —
+a player at 999,900/1,000,000 lifetime Oof looks identical to one at 10. Showing numeric
+progress on the countable conditions (`lifetimeEarned`, `rebirths`, `totalNoobLevels`,
+`streakDays`, `zoneNoobLevels`) is a well-established retention hook (seeing "almost there"
+pulls people back in) and costs little to add given the data's already computed for
+`conditionMet`.
+
+## 7. [ ] Feature: no way to back up/restore a save manually
+
+Saves are local-only JSON in the app's Documents directory with no export path. This is a
+real risk *specifically* for this project's testing setup: Sideloadly's free-Apple-ID signing
+expires every 7 days, and reinstalling to re-sign can wipe local app data — there's currently
+no way to protect progress against that. Add an export-to-clipboard/share-sheet "backup code"
+(base64 of the save JSON, or similar) and a matching import flow in Settings.
+
+## 8. [ ] Feature: no reminder when offline-progress caps out
+
+Idle games live and die on getting players to come back at the right moment. Right now there's
+no nudge — a player who closes the app has no signal that their offline-earnings cap (8h, or
+more with Extended Rest) has been reached and they're leaving value on the table. Schedule a
+local notification (no server needed) for when the cap will be hit, cancel it on next
+foreground/dismiss, and request notification permission the first time it's relevant rather
+than on cold launch.
