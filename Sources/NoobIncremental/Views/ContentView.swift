@@ -481,12 +481,160 @@ private struct GlowCard<Content: View>: View {
 
 // MARK: - Noobs tab
 
+private enum WorldThemeKind {
+    case jungle, space, desert
+
+    static func kind(for zoneID: String) -> WorldThemeKind {
+        switch zoneID {
+        case WorldCatalog.zone1ID: return .jungle
+        case WorldCatalog.zone2ID: return .space
+        case WorldCatalog.zone3ID: return .desert
+        default: return .jungle
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .jungle: return .green
+        case .space: return .purple
+        case .desert: return .orange
+        }
+    }
+
+    var gradientColors: [Color] {
+        switch self {
+        case .jungle:
+            return [Color(red: 0.02, green: 0.12, blue: 0.06), Color(red: 0.05, green: 0.22, blue: 0.10), Color(red: 0.02, green: 0.10, blue: 0.05)]
+        case .space:
+            return [Color(red: 0.02, green: 0.02, blue: 0.10), Color(red: 0.10, green: 0.04, blue: 0.24), Color(red: 0.02, green: 0.02, blue: 0.12)]
+        case .desert:
+            return [Color(red: 0.18, green: 0.07, blue: 0.02), Color(red: 0.35, green: 0.16, blue: 0.04), Color(red: 0.12, green: 0.04, blue: 0.06)]
+        }
+    }
+}
+
 private func worldTint(for zoneID: String) -> Color {
-    switch zoneID {
-    case WorldCatalog.zone1ID: return .green
-    case WorldCatalog.zone2ID: return .purple
-    case WorldCatalog.zone3ID: return .pink
-    default: return .white
+    WorldThemeKind.kind(for: zoneID).tint
+}
+
+private struct WorldBackdrop: View {
+    let zoneID: String
+
+    private var kind: WorldThemeKind { WorldThemeKind.kind(for: zoneID) }
+
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: kind.gradientColors, startPoint: .top, endPoint: .bottom)
+            motifs
+        }
+        .allowsHitTesting(false)
+        .animation(.easeInOut(duration: 0.5), value: zoneID)
+    }
+
+    @ViewBuilder
+    private var motifs: some View {
+        switch kind {
+        case .jungle: JungleMotifs()
+        case .space: SpaceMotifs()
+        case .desert: DesertMotifs()
+        }
+    }
+}
+
+private struct JungleMotifs: View {
+    private let leafOffsets: [(CGFloat, CGFloat, Double, Double)] = [
+        (-140, -220, 24, 0.16), (150, -260, -18, 0.14), (-170, 180, 12, 0.12),
+        (160, 240, -30, 0.15), (0, -300, 8, 0.10), (-100, 60, -22, 0.11)
+    ]
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(RadialGradient(colors: [Color.yellow.opacity(0.22), .clear], center: .center, startRadius: 0, endRadius: 180))
+                .frame(width: 320, height: 320)
+                .offset(x: -110, y: -280)
+                .blur(radius: 40)
+            Circle()
+                .fill(RadialGradient(colors: [Color.green.opacity(0.3), .clear], center: .center, startRadius: 0, endRadius: 200))
+                .frame(width: 360, height: 360)
+                .offset(x: 130, y: 260)
+                .blur(radius: 50)
+            ForEach(Array(leafOffsets.enumerated()), id: \.offset) { _, leaf in
+                Image(systemName: "leaf.fill")
+                    .font(.system(size: 46))
+                    .foregroundStyle(Color.green.opacity(leaf.3))
+                    .rotationEffect(.degrees(leaf.2))
+                    .offset(x: leaf.0, y: leaf.1)
+            }
+        }
+    }
+}
+
+private struct SpaceMotifs: View {
+    private let starPositions: [(CGFloat, CGFloat, CGFloat)] = [
+        (-160, -320, 2), (140, -280, 3), (-100, -180, 1.5), (170, -120, 2),
+        (-180, 40, 2.5), (120, 100, 1.5), (-60, 220, 2), (60, -350, 1.5),
+        (200, 200, 2), (-200, 300, 1.5), (10, 300, 2), (-40, -260, 1.5)
+    ]
+
+    var body: some View {
+        ZStack {
+            ForEach(Array(starPositions.enumerated()), id: \.offset) { _, star in
+                Circle()
+                    .fill(Color.white.opacity(0.7))
+                    .frame(width: star.2, height: star.2)
+                    .offset(x: star.0, y: star.1)
+            }
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [Color.purple.opacity(0.55), Color.blue.opacity(0.25), .clear],
+                        center: .center, startRadius: 0, endRadius: 110
+                    )
+                )
+                .frame(width: 180, height: 180)
+                .offset(x: 120, y: -260)
+                .blur(radius: 6)
+            Ellipse()
+                .strokeBorder(Color.cyan.opacity(0.35), lineWidth: 3)
+                .frame(width: 260, height: 70)
+                .rotationEffect(.degrees(-20))
+                .offset(x: 120, y: -260)
+            Circle()
+                .fill(RadialGradient(colors: [Color.pink.opacity(0.25), .clear], center: .center, startRadius: 0, endRadius: 220))
+                .frame(width: 380, height: 380)
+                .offset(x: -140, y: 300)
+                .blur(radius: 50)
+        }
+    }
+}
+
+private struct DesertMotifs: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(RadialGradient(colors: [Color.yellow.opacity(0.45), Color.orange.opacity(0.2), .clear], center: .center, startRadius: 0, endRadius: 150))
+                .frame(width: 260, height: 260)
+                .offset(x: 0, y: -300)
+                .blur(radius: 10)
+            duneShape
+                .fill(Color.black.opacity(0.28))
+                .offset(y: 210)
+            duneShape
+                .fill(Color.black.opacity(0.4))
+                .offset(y: 260)
+                .scaleEffect(x: 1.15, y: 0.8, anchor: .bottom)
+        }
+    }
+
+    private var duneShape: some Shape {
+        Path { path in
+            path.move(to: CGPoint(x: -220, y: 60))
+            path.addCurve(to: CGPoint(x: 220, y: 60), control1: CGPoint(x: -80, y: -60), control2: CGPoint(x: 80, y: 100))
+            path.addLine(to: CGPoint(x: 220, y: 200))
+            path.addLine(to: CGPoint(x: -220, y: 200))
+            path.closeSubpath()
+        }
     }
 }
 
@@ -507,52 +655,58 @@ private struct NoobsTab: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
-            Picker("Quantity", selection: $quantity) {
-                ForEach(BuyQuantity.allCases) { q in
-                    Text(q.rawValue).tag(q)
-                }
-            }
-            .pickerStyle(.segmented)
+        ZStack {
+            WorldBackdrop(zoneID: selectedZoneID)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
 
-            if let world = selectedWorld, !world.isUnlocked {
-                GlowCard(borderColor: .gray) {
-                    VStack(spacing: 6) {
-                        Image(systemName: "lock.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(.white.opacity(0.4))
-                        Text(world.name)
-                            .font(.headline)
-                            .foregroundStyle(.white.opacity(0.6))
-                        Text(world.lockedDescription)
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.4))
+            VStack(spacing: 8) {
+                Picker("Quantity", selection: $quantity) {
+                    ForEach(BuyQuantity.allCases) { q in
+                        Text(q.rawValue).tag(q)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
                 }
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(rowsForSelectedZone) { generator in
-                            GeneratorRowView(data: generator, quantity: quantity) {
-                                switch quantity {
-                                case .one: onUpgrade(generator.id, 1)
-                                case .ten: onUpgrade(generator.id, 10)
-                                case .hundred: onUpgrade(generator.id, 100)
-                                case .max: onUpgradeMax(generator.id)
+                .pickerStyle(.segmented)
+
+                if let world = selectedWorld, !world.isUnlocked {
+                    GlowCard(borderColor: .gray) {
+                        VStack(spacing: 6) {
+                            Image(systemName: "lock.fill")
+                                .font(.largeTitle)
+                                .foregroundStyle(.white.opacity(0.4))
+                            Text(world.name)
+                                .font(.headline)
+                                .foregroundStyle(.white.opacity(0.6))
+                            Text(world.lockedDescription)
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.4))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 24)
+                    }
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 10) {
+                            ForEach(rowsForSelectedZone) { generator in
+                                GeneratorRowView(data: generator, quantity: quantity) {
+                                    switch quantity {
+                                    case .one: onUpgrade(generator.id, 1)
+                                    case .ten: onUpgrade(generator.id, 10)
+                                    case .hundred: onUpgrade(generator.id, 100)
+                                    case .max: onUpgradeMax(generator.id)
+                                    }
                                 }
                             }
                         }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
+                    .scrollIndicators(.hidden)
                 }
-                .scrollIndicators(.hidden)
-            }
 
-            if worlds.count > 1 {
-                WorldSelector(worlds: worlds, selectedZoneID: $selectedZoneID)
+                if worlds.count > 1 {
+                    WorldSelector(worlds: worlds, selectedZoneID: $selectedZoneID)
+                }
             }
+            .padding(10)
         }
     }
 }
