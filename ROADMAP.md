@@ -113,7 +113,7 @@ Nearly all text uses fixed `.font(...)` sizes with no accommodation for the user
 text size — another App Store accessibility gap alongside #5 and #13. Audit the highest-traffic
 screens and let their text scale with Dynamic Type instead of clipping/truncating.
 
-## 15. [ ] Polish: More sheet controls still lack VoiceOver labels
+## 15. [x] Polish: More sheet controls still lack VoiceOver labels
 
 #13 scoped itself to the main gameplay loop (currency display, buy buttons, tab bar, rebirth)
 and explicitly deferred the More sheet's ad-boost, IAP, backup, redeem-code, and settings

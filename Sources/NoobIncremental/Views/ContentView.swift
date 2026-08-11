@@ -1354,6 +1354,8 @@ private struct MoreSheet: View {
                 )
                 .foregroundStyle(.white)
                 .disabled(!isReady)
+                .accessibilityLabel("Watch ad for \(tier.displayName)")
+                .accessibilityHint(isReady ? "" : "Ad not ready yet")
             }
         }
     }
@@ -1428,6 +1430,8 @@ private struct MoreSheet: View {
                     .background(Color.blue.opacity(importCodeText.isEmpty ? 0.2 : 0.85), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .foregroundStyle(.white)
                     .disabled(importCodeText.isEmpty)
+                    .accessibilityLabel("Restore from backup code")
+                    .accessibilityHint(importCodeText.isEmpty ? "Paste a backup code first" : "")
                 }
                 .confirmationDialog("Restoring will replace your current save. This can't be undone.", isPresented: $showImportConfirm, titleVisibility: .visible) {
                     Button("Restore Save", role: .destructive) {
@@ -1469,6 +1473,7 @@ private struct MoreSheet: View {
                 .buttonStyle(PressableButtonStyle())
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.6))
+                .accessibilityHint("Reapplies any purchases already made with this Apple ID")
 
                 if let restoreMessage {
                     Text(restoreMessage)
@@ -1497,6 +1502,7 @@ private struct MoreSheet: View {
             if isOwned {
                 Image(systemName: "checkmark.seal.fill")
                     .foregroundStyle(.green)
+                    .accessibilityLabel("Owned")
             } else {
                 Button {
                     Task { await iapManager.purchase(product) }
@@ -1516,6 +1522,8 @@ private struct MoreSheet: View {
                 )
                 .foregroundStyle(.white)
                 .disabled(storeProduct == nil || isPurchasing)
+                .accessibilityLabel("Buy \(product.displayName)")
+                .accessibilityValue(storeProduct?.displayPrice ?? "Unavailable")
             }
         }
     }
