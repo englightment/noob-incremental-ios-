@@ -194,6 +194,7 @@ final class GameViewModel: ObservableObject {
         GeneratorCatalog.all.reduce(0) { $0 + GeneratorStore.level($1, state: state) }
     }
     var lifetimeEarnedText: String { NumberFormatting.format(state.lifetimeEarned) }
+    var lifetimeEarned: Decimal { state.lifetimeEarned }
     var totalPlayTimeText: String {
         let total = Int(state.totalPlayTime)
         let hours = total / 3600

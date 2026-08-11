@@ -198,6 +198,7 @@ struct ContentView: View {
     @ObservedObject var viewModel: GameViewModel
     @StateObject private var adManager = RewardedAdManager()
     @StateObject private var iapManager = IAPManager()
+    @StateObject private var gameCenterManager = GameCenterManager()
     @State private var showMore = false
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var selectedTab: AppTab = .noobs
@@ -331,6 +332,7 @@ struct ContentView: View {
                 viewModel.completePurchase(product)
             }
             iapManager.start()
+            gameCenterManager.authenticate()
         }
         .onChange(of: viewModel.showMilestoneCelebration) { _, isShowing in
             if isShowing {
@@ -341,13 +343,17 @@ struct ContentView: View {
         .onChange(of: viewModel.achievementToast?.id) { _, newValue in
             guard newValue != nil, let achievement = viewModel.achievementToast else { return }
             UIAccessibility.post(notification: .announcement, argument: "Achievement unlocked: \(achievement.name)")
+            gameCenterManager.reportAchievementUnlocked(achievement.id)
         }
         .onChange(of: viewModel.canClaimDailyReward) { _, canClaim in
             if canClaim {
                 UIAccessibility.post(notification: .announcement, argument: "Daily reward available")
             }
         }
-        .onChange(of: viewModel.rebirthCount) { _, _ in checkForReviewPrompt() }
+        .onChange(of: viewModel.rebirthCount) { _, _ in
+            checkForReviewPrompt()
+            gameCenterManager.reportLifetimeEarned(viewModel.lifetimeEarned)
+        }
         .onChange(of: viewModel.unlockedAchievementCount) { _, _ in checkForReviewPrompt() }
         .sheet(isPresented: $showMore) {
             MoreSheet(viewModel: viewModel, adManager: adManager, iapManager: iapManager)

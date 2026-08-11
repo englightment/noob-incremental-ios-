@@ -191,7 +191,7 @@ purchases it takes to go from level 24 to 25 on any single Noob - that's governe
 by the shared growth rate, not the starting cost. The system was already zone-agnostic by
 design; there was nothing to tune.
 
-## 24. [ ] Feature: Game Center integration (achievements + a leaderboard)
+## 24. [x] Feature: Game Center integration (achievements + a leaderboard)
 
 Missing entirely, and standard for the genre. Add GameKit scaffolding following the same
 "test now, verify what I can't on a real device before release" pattern already used for
