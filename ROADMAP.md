@@ -201,7 +201,7 @@ app - unlike IAP's "Owned" checkmark or the achievements list, there's no way fo
 "Game Center: Connected/Not Connected" row to the Stats section, matching the existing
 statRow pattern.
 
-## 26. [ ] Polish: statsSection is creeping back toward the type-checking timeout it already hit once
+## 26. [x] Polish: statsSection is creeping back toward the type-checking timeout it already hit once
 
 #18 broke CI because statsSection's VStack got one expression too many for Swift's
 type-checker (fixed by extracting shareProgressButton). It's since grown further (#25 added

@@ -1306,17 +1306,26 @@ private struct MoreSheet: View {
         GlowCard(borderColor: .cyan) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Stats").font(.headline).foregroundStyle(.white)
-                statRow("Total Earned", viewModel.lifetimeEarnedText)
-                statRow("Total Noob Levels", "\(viewModel.totalNoobLevels)")
-                statRow("Rebirths", "\(viewModel.rebirthCount)")
-                statRow("Rune Shards", viewModel.formattedRuneShards)
-                statRow("Login Streak", "\(viewModel.currentStreak) days")
-                statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
-                statRow("Time Played", viewModel.totalPlayTimeText)
-                statRow("Game Center", gameCenterManager.isAuthenticated ? "Connected" : "Not Connected")
+                statsRows
                 shareProgressButton
             }
         }
+    }
+
+    // Split out from statsSection alongside shareProgressButton (see its comment) — this
+    // section keeps growing (#25 added a ninth row) and each `some View` boundary here is
+    // one less expression Swift's type-checker has to reason about as a single unit,
+    // proactively rather than waiting for another CI break to force it (#26).
+    @ViewBuilder
+    private var statsRows: some View {
+        statRow("Total Earned", viewModel.lifetimeEarnedText)
+        statRow("Total Noob Levels", "\(viewModel.totalNoobLevels)")
+        statRow("Rebirths", "\(viewModel.rebirthCount)")
+        statRow("Rune Shards", viewModel.formattedRuneShards)
+        statRow("Login Streak", "\(viewModel.currentStreak) days")
+        statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
+        statRow("Time Played", viewModel.totalPlayTimeText)
+        statRow("Game Center", gameCenterManager.isAuthenticated ? "Connected" : "Not Connected")
     }
 
     // Split out from statsSection - adding this ShareLink inline pushed that VStack's
