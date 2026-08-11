@@ -26,6 +26,7 @@
 		385640CAC69744E5DA3DF486 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1D3AE977C368F1B7F475C6 /* SoundManager.swift */; };
 		3ADAABF37B6870DF36306F7F /* AchievementStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE25E8E740EB26C78AC0EED /* AchievementStoreTests.swift */; };
 		3B0F4D3F6CF32BEAF4CAB058 /* NoobIncrementalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A176DC510D4E504705C05D6E /* NoobIncrementalApp.swift */; };
+		47022FDFD2A52769E090B07D /* GeneratorMilestoneSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D51AF8145913BC8374F6B4D8 /* GeneratorMilestoneSystem.swift */; };
 		4C53C3DF992E92B2B73B6666 /* RebirthSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B3C57A6C63ED8BFA9AE459 /* RebirthSystemTests.swift */; };
 		4ED4A2D18DD72D4C68B08532 /* AchievementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59BBB38C537C401B390BA2A /* AchievementStore.swift */; };
 		5662F0BF7E9998E7746F8CC8 /* FormulasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9102C53B66EE95A238CE1C0D /* FormulasTests.swift */; };
@@ -42,6 +43,7 @@
 		81E1B483C93537F0DD5EBE50 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EFC80C3F6D91160B7C4AC2 /* ConfettiView.swift */; };
 		83C213142E2E00B2B1D706C5 /* RedeemCodeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25ACC1DF21B323B8DEBD00F /* RedeemCodeStoreTests.swift */; };
 		84A93CE002F19753FBA371D3 /* RedeemCodeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339213DC8553D38B91E3553A /* RedeemCodeStore.swift */; };
+		8D2803565938F31C79A21CB4 /* GeneratorMilestoneSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6917D32E5994E8ECB31EB358 /* GeneratorMilestoneSystemTests.swift */; };
 		8EF54F390B50CC2CC427862A /* Formulas.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */; };
 		90FF55CC043EAB85B5D77752 /* RebirthUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A5334149B8528D7DC2A4AD /* RebirthUpgradeStoreTests.swift */; };
 		93399FAF8EDF0D0AFC9DF65C /* BoostSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4CD89245D4F148580E586A7 /* BoostSystem.swift */; };
@@ -100,6 +102,7 @@
 		4F1D3AE977C368F1B7F475C6 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		54B575B677372D934D11F4C8 /* DailyStreakSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyStreakSystem.swift; sourceTree = "<group>"; };
 		63F01DD25682182DD9350069 /* RebirthUpgradeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RebirthUpgradeStore.swift; sourceTree = "<group>"; };
+		6917D32E5994E8ECB31EB358 /* GeneratorMilestoneSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorMilestoneSystemTests.swift; sourceTree = "<group>"; };
 		6A2B014BBA193687A6084D9F /* RedeemCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedeemCode.swift; sourceTree = "<group>"; };
 		7081E2503F71D0B4790301A7 /* DailyReward.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReward.swift; sourceTree = "<group>"; };
 		70E4B7D9C6FD4E0A7258A4C6 /* MilestoneSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneSystemTests.swift; sourceTree = "<group>"; };
@@ -127,6 +130,7 @@
 		C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineProgress.swift; sourceTree = "<group>"; };
 		CCDF48CF0CC309DFEE2DF0C3 /* AdBoostSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdBoostSystemTests.swift; sourceTree = "<group>"; };
 		CD4A7CB0ECD22071F278E647 /* RebirthSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RebirthSystem.swift; sourceTree = "<group>"; };
+		D51AF8145913BC8374F6B4D8 /* GeneratorMilestoneSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorMilestoneSystem.swift; sourceTree = "<group>"; };
 		E164BB617C986177AA688455 /* NoobIncrementalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoobIncrementalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E18A0896ECC21EC4833B7340 /* UpgradeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeStoreTests.swift; sourceTree = "<group>"; };
 		E37B9372F19D47069C143984 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -255,6 +259,7 @@
 				32A99268C33FA4C38DD8B211 /* DailyStreakSystemTests.swift */,
 				9102C53B66EE95A238CE1C0D /* FormulasTests.swift */,
 				0E1131683B10CC5CB75CA716 /* GameLoopPassiveIncomeTests.swift */,
+				6917D32E5994E8ECB31EB358 /* GeneratorMilestoneSystemTests.swift */,
 				EDFCA9BD2719FCF5AA254E72 /* GeneratorStoreTests.swift */,
 				70E4B7D9C6FD4E0A7258A4C6 /* MilestoneSystemTests.swift */,
 				9F90E01719EB5431EA35B938 /* MinionSystemTests.swift */,
@@ -279,6 +284,7 @@
 				54B575B677372D934D11F4C8 /* DailyStreakSystem.swift */,
 				BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */,
 				AF13B3804E62DA65AE06A1F4 /* GameLoop.swift */,
+				D51AF8145913BC8374F6B4D8 /* GeneratorMilestoneSystem.swift */,
 				0428B2EB50771DBE1BA4CC4A /* GeneratorStore.swift */,
 				B46AAC80EE22DFD9DF50568A /* MilestoneSystem.swift */,
 				16F1617C25BBC17994990ACA /* MinionSystem.swift */,
@@ -421,6 +427,7 @@
 				B8AC0B69FB413DD03CAAAE74 /* GameState.swift in Sources */,
 				0EF915C8504FB351EBC648EE /* GameViewModel.swift in Sources */,
 				E126A5AB62EE4CA58CAA5427 /* GeneratorDefinition.swift in Sources */,
+				47022FDFD2A52769E090B07D /* GeneratorMilestoneSystem.swift in Sources */,
 				E7F3F6218BC45A35902F2903 /* GeneratorState.swift in Sources */,
 				CDFA142A60E72F35B51D6303 /* GeneratorStore.swift in Sources */,
 				F5951C5C5FD4FC62E555164A /* MilestoneSystem.swift in Sources */,
@@ -457,6 +464,7 @@
 				2C1DBE8BFC070CC5C337AB1A /* DailyStreakSystemTests.swift in Sources */,
 				5662F0BF7E9998E7746F8CC8 /* FormulasTests.swift in Sources */,
 				CE54B7F076646DD58CDE2503 /* GameLoopPassiveIncomeTests.swift in Sources */,
+				8D2803565938F31C79A21CB4 /* GeneratorMilestoneSystemTests.swift in Sources */,
 				780C15320F83BD4132C3BDE5 /* GeneratorStoreTests.swift in Sources */,
 				7A975D28117F65FC7C9A5AB4 /* MilestoneSystemTests.swift in Sources */,
 				5D1E78C87504AC80DA6510CD /* MinionSystemTests.swift in Sources */,
