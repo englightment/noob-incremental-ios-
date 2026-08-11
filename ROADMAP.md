@@ -193,6 +193,23 @@ design; there was nothing to tune.
 
 ## 24. [x] Feature: Game Center integration (achievements + a leaderboard)
 
+## 25. [x] Polish: no UI feedback for Game Center connection status
+
+#24 shipped GameCenterManager as pure scaffolding with no visible surface anywhere in the
+app - unlike IAP's "Owned" checkmark or the achievements list, there's no way for a player
+(or anyone reviewing this code) to tell whether Game Center actually connected. Added a
+"Game Center: Connected/Not Connected" row to the Stats section, matching the existing
+statRow pattern.
+
+## 26. [ ] Polish: statsSection is creeping back toward the type-checking timeout it already hit once
+
+#18 broke CI because statsSection's VStack got one expression too many for Swift's
+type-checker (fixed by extracting shareProgressButton). It's since grown further (#25 added
+a ninth statRow, and #18 already added the ShareLink) - proactively split it into smaller
+sub-views (e.g. group the currency/progress stats separately from the
+share/Game-Center/meta rows) before it silently creeps past the budget again, rather than
+waiting for another CI break to notice.
+
 Missing entirely, and standard for the genre. Add GameKit scaffolding following the same
 "test now, verify what I can't on a real device before release" pattern already used for
 AdMob (#52, prior session) and StoreKit (#10): authenticate the local player on launch,

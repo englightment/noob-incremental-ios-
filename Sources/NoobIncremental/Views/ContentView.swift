@@ -356,7 +356,7 @@ struct ContentView: View {
         }
         .onChange(of: viewModel.unlockedAchievementCount) { _, _ in checkForReviewPrompt() }
         .sheet(isPresented: $showMore) {
-            MoreSheet(viewModel: viewModel, adManager: adManager, iapManager: iapManager)
+            MoreSheet(viewModel: viewModel, adManager: adManager, iapManager: iapManager, gameCenterManager: gameCenterManager)
         }
     }
 
@@ -1264,6 +1264,7 @@ private struct MoreSheet: View {
     @ObservedObject var viewModel: GameViewModel
     @ObservedObject var adManager: RewardedAdManager
     @ObservedObject var iapManager: IAPManager
+    @ObservedObject var gameCenterManager: GameCenterManager
     @Environment(\.dismiss) private var dismiss
     @State private var codeText = ""
     @State private var showResetConfirm = false
@@ -1312,6 +1313,7 @@ private struct MoreSheet: View {
                 statRow("Login Streak", "\(viewModel.currentStreak) days")
                 statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
                 statRow("Time Played", viewModel.totalPlayTimeText)
+                statRow("Game Center", gameCenterManager.isAuthenticated ? "Connected" : "Not Connected")
                 shareProgressButton
             }
         }
