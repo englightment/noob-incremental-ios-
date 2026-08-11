@@ -1258,6 +1258,19 @@ private struct MoreSheet: View {
                 statRow("Login Streak", "\(viewModel.currentStreak) days")
                 statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
                 statRow("Time Played", viewModel.totalPlayTimeText)
+
+                ShareLink(item: viewModel.shareSummaryText) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "square.and.arrow.up")
+                        Text("Share Progress")
+                    }
+                    .font(.subheadline.weight(.bold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .foregroundStyle(.black)
+                }
+                .padding(.top, 2)
             }
         }
     }

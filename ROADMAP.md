@@ -137,9 +137,23 @@ handful of achievements) rather than on cold launch. Missing entirely right now.
 reasonable window (Apple also rate-limits this itself, but the app shouldn't rely solely on
 that).
 
-## 18. [ ] Feature: no way to share progress
+## 18. [x] Feature: no way to share progress
 
 Every comparable incremental game has some kind of "brag" mechanic. Add a native `ShareLink`
 somewhere reachable (Stats section of the More sheet is the natural spot) that shares a short
 plain-text summary — lifetime Oof earned, rebirth count, achievements unlocked. The summary
 string itself should be a pure, testable function.
+
+## 19. [ ] Bug: two views still ignore Reduce Motion despite #5's sweep
+
+Found while working on #18: `FloatingTextItemView` (the "+X" VFX text that plays on every
+single buy/rebirth — likely the single most frequent animation in the whole app) and
+`OnboardingOverlay`'s fade-in both call `withAnimation`/`.animation` unconditionally, with no
+`@Environment(\.accessibilityReduceMotion)` check. Both were added around the same time as
+#4's onboarding work, before #5's Reduce Motion audit landed, and slipped through.
+
+## 20. [ ] Polish: Redeem Code button doesn't disable on an empty field
+
+Tapping "Redeem" with an empty code field just round-trips to "Invalid code." instead of
+being disabled outright — inconsistent with the backup "Restore" button a few sections down,
+which already disables on `importCodeText.isEmpty`.

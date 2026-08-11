@@ -492,6 +492,12 @@ final class GameViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Share progress
+
+    var shareSummaryText: String {
+        ShareSummary.text(state: state)
+    }
+
     // MARK: - App Store review prompt
 
     var shouldRequestReview: Bool {
