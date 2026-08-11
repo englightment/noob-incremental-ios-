@@ -210,6 +210,13 @@ sub-views (e.g. group the currency/progress stats separately from the
 share/Game-Center/meta rows) before it silently creeps past the budget again, rather than
 waiting for another CI break to notice.
 
+## 27. [x] Bug: Zone 4 shipped without a celebration redeem code, breaking precedent
+
+`ASCEND` was added specifically as a "Zone 3 celebration bonus" redeem code when Zone 3
+shipped. Zone 4 (#21) launched without a matching one, breaking that precedent. Added `VOID`
+("Zone 4 celebration bonus", +25 Rebirth currency - a bit more generous than ASCEND's +15,
+continuing the escalation).
+
 Missing entirely, and standard for the genre. Add GameKit scaffolding following the same
 "test now, verify what I can't on a real device before release" pattern already used for
 AdMob (#52, prior session) and StoreKit (#10): authenticate the local player on launch,

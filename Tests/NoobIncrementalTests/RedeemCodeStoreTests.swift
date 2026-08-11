@@ -58,4 +58,11 @@ final class RedeemCodeStoreTests: XCTestCase {
         }
         XCTAssertEqual(newState.rebirthCurrency, definition.rewardRebirth)
     }
+
+    func testVoidCodeExistsAsZone4CelebrationBonus() {
+        guard let definition = RedeemCodeCatalog.definition(for: "VOID") else {
+            return XCTFail("VOID code missing from catalog")
+        }
+        XCTAssertGreaterThan(definition.rewardRebirth, 0)
+    }
 }
