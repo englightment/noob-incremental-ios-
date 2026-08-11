@@ -64,3 +64,28 @@ more with Extended Rest) has been reached and they're leaving value on the table
 local notification (no server needed) for when the cap will be hit, cancel it on next
 foreground/dismiss, and request notification permission the first time it's relevant rather
 than on cold launch.
+
+## 9. [ ] Feature: achievement list has no sense of priority
+
+Now that locked achievements show progress (#6), the list itself still renders in raw catalog
+order — a 90%-done achievement can sit below a 2%-done one with no way to tell at a glance
+what's actually close. Sort so unlocked achievements settle to the bottom (or top, TBD by feel)
+and locked ones order by proximity-to-completion, so the list reads as "here's what to chase
+next" instead of a fixed static list.
+
+## 10. [ ] Feature: no in-app purchase scaffolding
+
+`GameState.purchasedProductIDs` has sat as an unused stub since early in the project —
+clearly the intent was always to add IAP eventually, and every comparable incremental game
+has some (remove ads, a starter/support pack, etc). Build the StoreKit 2 product-fetch and
+purchase flow against Apple's public test product IDs (same "test now, swap for real App
+Store Connect config before release" pattern already used for the AdMob integration), gated
+behind a simple entitlement check (e.g. an "ads removed" flag derived from
+`purchasedProductIDs`).
+
+## 11. [ ] Polish: no way to opt out of the offline-cap reminder notification specifically
+
+The reminder added in #8 is all-or-nothing via the OS-level permission prompt — a player who
+wants every other feature but finds this one nagging has to fully revoke notification
+permission in iOS Settings to stop it. Add an in-app Settings toggle that gates whether
+`GameViewModel.stop()` schedules the reminder at all, independent of OS permission.
