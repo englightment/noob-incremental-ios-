@@ -193,6 +193,15 @@ design; there was nothing to tune.
 
 ## 24. [x] Feature: Game Center integration (achievements + a leaderboard)
 
+Missing entirely, and standard for the genre. Add GameKit scaffolding following the same
+"test now, verify what I can't on a real device before release" pattern already used for
+AdMob (#52, prior session) and StoreKit (#10): authenticate the local player on launch,
+report `GKAchievement` progress alongside the existing achievement-unlock flow (mirroring,
+not replacing, the in-app AchievementStore/toast system), and add one leaderboard for
+lifetime Oof earned. Needs the Game Center capability enabled in project.yml's Info.plist
+entries; the actual authentication UI and leaderboard rendering can't be verified without a
+signed-in device, same caveat as RewardedAdManager/IAPManager.
+
 ## 25. [x] Polish: no UI feedback for Game Center connection status
 
 #24 shipped GameCenterManager as pure scaffolding with no visible surface anywhere in the
@@ -217,11 +226,12 @@ shipped. Zone 4 (#21) launched without a matching one, breaking that precedent. 
 ("Zone 4 celebration bonus", +25 Rebirth currency - a bit more generous than ASCEND's +15,
 continuing the escalation).
 
-Missing entirely, and standard for the genre. Add GameKit scaffolding following the same
-"test now, verify what I can't on a real device before release" pattern already used for
-AdMob (#52, prior session) and StoreKit (#10): authenticate the local player on launch,
-report `GKAchievement` progress alongside the existing achievement-unlock flow (mirroring,
-not replacing, the in-app AchievementStore/toast system), and add one leaderboard for
-lifetime Oof earned. Needs the Game Center capability enabled in project.yml's Info.plist
-entries; the actual authentication UI and leaderboard rendering can't be verified without a
-signed-in device, same caveat as RewardedAdManager/IAPManager.
+## 28. [x] Bug: existing local progress never syncs to Game Center
+
+#24/#25 report achievements and the leaderboard only on a *new* unlock or a *new* rebirth.
+A player who already has achievements/lifetime-earnings before ever signing into Game
+Center — or who restores a backup (#7) with progress Game Center has never seen — would
+never get that history synced, since the report calls only fire on the moment something
+newly changes. Added a one-time sync of every already-unlocked achievement plus the current
+lifetime-earned leaderboard score, triggered right after `gameCenterManager.isAuthenticated`
+flips true.

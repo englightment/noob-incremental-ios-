@@ -203,6 +203,7 @@ final class GameViewModel: ObservableObject {
     }
     var unlockedAchievementCount: Int { state.unlockedAchievements.count }
     var totalAchievementCount: Int { AchievementCatalog.all.count }
+    var unlockedAchievementIDs: [String] { Array(state.unlockedAchievements) }
 
     var achievementRows: [AchievementRowViewData] {
         AchievementStore.sortedForDisplay(state: state).map { definition in

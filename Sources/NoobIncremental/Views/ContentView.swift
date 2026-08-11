@@ -350,6 +350,17 @@ struct ContentView: View {
                 UIAccessibility.post(notification: .announcement, argument: "Daily reward available")
             }
         }
+        .onChange(of: gameCenterManager.isAuthenticated) { _, isAuthenticated in
+            // Achievement/leaderboard reporting elsewhere only fires on a *new* unlock or
+            // rebirth - a player who already has local progress before ever signing into
+            // Game Center (or who restores a backup, #7) would otherwise never get that
+            // history synced. Report everything already unlocked once, right after sign-in.
+            guard isAuthenticated else { return }
+            for id in viewModel.unlockedAchievementIDs {
+                gameCenterManager.reportAchievementUnlocked(id)
+            }
+            gameCenterManager.reportLifetimeEarned(viewModel.lifetimeEarned)
+        }
         .onChange(of: viewModel.rebirthCount) { _, _ in
             checkForReviewPrompt()
             gameCenterManager.reportLifetimeEarned(viewModel.lifetimeEarned)
