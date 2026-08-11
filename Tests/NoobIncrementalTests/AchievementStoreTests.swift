@@ -157,4 +157,14 @@ final class AchievementStoreTests: XCTestCase {
         state = RuneStore.buyMax(runeOof, state: state)
         XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
     }
+
+    func testEveryUpgradeMaxedAchievementReferencesARealUpgrade() {
+        for achievement in AchievementCatalog.all {
+            guard case .upgradeMaxed(let id) = achievement.condition else { continue }
+            let existsSomewhere = UpgradeCatalog.definition(for: id) != nil
+                || RebirthUpgradeCatalog.definition(for: id) != nil
+                || RuneCatalog.definition(for: id) != nil
+            XCTAssertTrue(existsSomewhere, "\(achievement.id) references unknown upgrade \(id)")
+        }
+    }
 }
