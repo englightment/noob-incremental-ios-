@@ -11,6 +11,7 @@ enum AchievementCondition: Equatable {
     case zoneNoobLevels(zoneID: String, total: Int)
     case allRunesOwned
     case allMinionsOwned
+    case allZoneNoobsOwned(zoneID: String)
 }
 
 struct AchievementDefinition: Identifiable, Equatable {
@@ -52,7 +53,10 @@ enum AchievementCatalog {
         AchievementDefinition(id: "menagerie", name: "Menagerie", description: "Unlock every Minion", condition: .allMinionsOwned),
         AchievementDefinition(id: "minion_master", name: "Minion Master", description: "Max the Extra Minion Slots upgrade", condition: .upgradeMaxed("rebirth_minion_slots")),
         AchievementDefinition(id: "insightful", name: "Insightful", description: "Max the Prestige Insight upgrade", condition: .upgradeMaxed("prestige_insight")),
-        AchievementDefinition(id: "true_kinship", name: "True Kinship", description: "Max the Rune of Kinship", condition: .upgradeMaxed("rune_kinship"))
+        AchievementDefinition(id: "true_kinship", name: "True Kinship", description: "Max the Rune of Kinship", condition: .upgradeMaxed("rune_kinship")),
+        AchievementDefinition(id: "island_native", name: "Island Native", description: "Own every Spawn Island Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone1ID)),
+        AchievementDefinition(id: "overworks_tycoon", name: "Overworks Tycoon", description: "Own every Overworks Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone2ID)),
+        AchievementDefinition(id: "spire_sovereign", name: "Spire Sovereign", description: "Own every Ascension Spire Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone3ID))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {

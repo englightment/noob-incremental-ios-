@@ -133,6 +133,24 @@ final class AchievementStoreTests: XCTestCase {
         XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
     }
 
+    func testAllZoneNoobsOwnedRequiresEveryNoobInThatZoneOnly() {
+        let zone2Generators = GeneratorCatalog.all(inZone: WorldCatalog.zone2ID)
+        guard zone2Generators.count > 1 else {
+            return XCTFail("expected multiple Zone 2 generators")
+        }
+        let definition = AchievementDefinition(id: "test_zone2_complete", name: "Test", description: "", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone2ID))
+        var state = GameState.newGame
+        state.currency = 1_000_000_000_000
+
+        for generator in zone2Generators.dropLast() {
+            state = GeneratorStore.buy(generator, state: state)
+        }
+        XCTAssertFalse(AchievementStore.conditionMet(definition, state: state), "shouldn't unlock until every Zone 2 Noob is owned")
+
+        state = GeneratorStore.buy(zone2Generators.last!, state: state)
+        XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
+    }
+
     func testAllRunesOwnedConditionRequiresEveryRune() {
         let definition = AchievementDefinition(id: "test_all_runes", name: "Test", description: "", condition: .allRunesOwned)
         var state = GameState.newGame
