@@ -9,6 +9,11 @@ final class SaveManagerBackupTests: XCTestCase {
         state.currency = 54_321
         state.rebirthCount = 4
         state.unlockedAchievements = ["first_noob", "first_rebirth"]
+        // Pinned to whole-second precision — the default Date() carries sub-second precision,
+        // but .iso8601 encoding truncates to whole seconds, so an unpinned timestamp would
+        // differ from its own round-tripped copy and fail this equality check for reasons
+        // unrelated to what the test is actually verifying (same trap as GameStateDecodingTests).
+        state.lastSaveTimestamp = Date(timeIntervalSince1970: 1_700_000_000)
 
         guard let code = manager.exportCode(state) else {
             return XCTFail("exportCode returned nil")
@@ -33,6 +38,7 @@ final class SaveManagerBackupTests: XCTestCase {
         let manager = SaveManager(fileURL: FileManager.default.temporaryDirectory.appendingPathComponent("unused-\(UUID().uuidString).json"))
         var state = GameState.newGame
         state.currency = 777
+        state.lastSaveTimestamp = Date(timeIntervalSince1970: 1_700_000_000)
 
         guard let code = manager.exportCode(state) else {
             return XCTFail("exportCode returned nil")
