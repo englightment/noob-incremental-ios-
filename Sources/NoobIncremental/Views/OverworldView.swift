@@ -25,6 +25,7 @@ struct OverworldView: View {
     @State private var isJoystickActive = false
     @State private var lastFrameDate: Date?
     @State private var nearbyStationID: String?
+    @State private var facingRight = true
     @State private var activePopupGeneratorID: String?
     @State private var zoneGateMessage: String?
     @State private var showRebirthAltar = false
@@ -55,6 +56,26 @@ struct OverworldView: View {
             .modifier(RebirthAndUpgradeSheetsModifier(viewModel: viewModel, showRebirthAltar: $showRebirthAltar, showUpgradeWorkshop: $showUpgradeWorkshop))
             .modifier(RuneAndMinionSheetsModifier(viewModel: viewModel, showRuneShrine: $showRuneShrine, showMinionDen: $showMinionDen))
             .modifier(ZoneGateAlertModifier(zoneGateMessage: $zoneGateMessage))
+            .task(id: nearbyStationID) { await runRuneAutoCollection() }
+    }
+
+    /// Standing at the Rune Shrine passively levels runes up over time - one affordable,
+    /// non-maxed rune per tick, cheapest-first via GameViewModel.runeRows' catalog order.
+    /// A `.task(id: nearbyStationID)` (not the joystick-driven movementDriver) so this keeps
+    /// running even if the player stops moving while parked on the shrine; SwiftUI cancels
+    /// and restarts it automatically whenever nearbyStationID changes.
+    private func runRuneAutoCollection() async {
+        guard let station = nearbyStation, case .runeShrine = station.kind else { return }
+        while true {
+            if let rune = viewModel.runeRows.first(where: { !$0.isMaxed && $0.canAfford }) {
+                viewModel.buyRune(id: rune.id)
+            }
+            do {
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+            } catch {
+                return
+            }
+        }
     }
 
     private var sceneContent: some View {
@@ -83,7 +104,7 @@ struct OverworldView: View {
             WorldBackdrop(zoneID: layout.zoneID)
                 .frame(width: layout.canvasSize.width, height: layout.canvasSize.height)
             stationMarkersLayer
-            PlayerAvatarView(size: 56)
+            PlayerAvatarView(size: 56, facingRight: facingRight)
                 .position(playerPosition)
         }
         .frame(width: layout.canvasSize.width, height: layout.canvasSize.height)
@@ -92,7 +113,7 @@ struct OverworldView: View {
     @ViewBuilder
     private var stationMarkersLayer: some View {
         ForEach(layout.stations) { station in
-            StationMarkerView(station: station, isNearby: station.id == nearbyStationID)
+            StationMarkerView(station: station, zoneID: layout.zoneID, isNearby: station.id == nearbyStationID)
                 .position(station.position)
         }
     }
@@ -122,6 +143,14 @@ struct OverworldView: View {
         // is ever tuned later, rather than needing a separately-tuned hardcoded speed.
         let speed = layout.canvasSize.height / 4.0
         playerPosition = PlayerMovementSystem.move(from: playerPosition, direction: joystickDirection, speed: speed, deltaTime: deltaTime, canvasSize: layout.canvasSize)
+
+        // Only flip on a meaningful horizontal push, so tiny joystick jitter near the
+        // deadzone boundary doesn't make the sprite flicker between facings.
+        if joystickDirection.dx > 0.15 {
+            facingRight = true
+        } else if joystickDirection.dx < -0.15 {
+            facingRight = false
+        }
 
         if let nearest = PlayerMovementSystem.nearestStation(to: playerPosition, among: layout.stations), PlayerMovementSystem.isInRange(playerPosition, of: nearest) {
             nearbyStationID = nearest.id
@@ -254,16 +283,49 @@ private struct ZoneGateAlertModifier: ViewModifier {
 
 private struct StationMarkerView: View {
     let station: WorldStationDefinition
+    let zoneID: String
     let isNearby: Bool
+
+    /// Two neutral (gray/white) sprites get recolored per station kind via .colorMultiply
+    /// below, rather than hand-drawing a unique sprite for every kind — buildings for
+    /// mundane stations, a ring portal for magical/transit ones.
+    private var spriteName: String {
+        switch station.kind {
+        case .rebirthAltar, .runeShrine, .zoneTransition: return "PortalSprite"
+        case .generator, .upgradeWorkshop, .minionDen: return "BuildingSprite"
+        }
+    }
+
+    private var tint: Color {
+        switch station.kind {
+        case .generator: return worldTint(for: zoneID)
+        case .upgradeWorkshop: return .cyan
+        case .minionDen: return .green
+        case .rebirthAltar: return .pink
+        case .runeShrine: return .mint
+        case .zoneTransition(let targetZoneID): return worldTint(for: targetZoneID)
+        }
+    }
 
     var body: some View {
         VStack(spacing: 2) {
-            Image(systemName: station.icon)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(.white)
-                .frame(width: 44, height: 44)
-                .background(isNearby ? Theme.oofGradient : LinearGradient(colors: [.white.opacity(0.25)], startPoint: .top, endPoint: .bottom), in: Circle())
-                .overlay(Circle().strokeBorder(Color.white.opacity(0.5), lineWidth: 1.5))
+            ZStack(alignment: .topTrailing) {
+                Image(spriteName)
+                    .resizable()
+                    .interpolation(.none)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 48, height: 48)
+                    .colorMultiply(tint)
+                    .brightness(isNearby ? 0.2 : 0)
+                    .shadow(color: isNearby ? tint.opacity(0.9) : .clear, radius: isNearby ? 8 : 0)
+
+                Image(systemName: station.icon)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(3)
+                    .background(Color.black.opacity(0.65), in: Circle())
+                    .offset(x: 6, y: -6)
+            }
             Text(station.name)
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.white)

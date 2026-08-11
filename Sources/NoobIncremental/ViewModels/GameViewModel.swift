@@ -449,16 +449,6 @@ final class GameViewModel: ObservableObject {
         checkForAchievements()
     }
 
-    func buyRuneMax(id: String) {
-        guard let definition = RuneCatalog.definition(for: id) else { return }
-        let before = RuneStore.level(definition, state: state)
-        state = RuneStore.buyMax(definition, state: state)
-        if RuneStore.level(definition, state: state) > before {
-            fireBuyFeedback()
-        }
-        checkForAchievements()
-    }
-
     func claimDailyReward() {
         guard let (newState, _) = DailyStreakSystem.claim(state: state) else { return }
         state = newState

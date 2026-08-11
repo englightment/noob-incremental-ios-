@@ -490,6 +490,18 @@ enum WorldThemeKind {
             return [Color(red: 0.04, green: 0.0, blue: 0.09), Color(red: 0.14, green: 0.02, blue: 0.22), Color(red: 0.02, green: 0.0, blue: 0.06)]
         }
     }
+
+    /// A generated, tileable pixel-art ground texture (see Assets.xcassets) drawn under the
+    /// gradient/motifs below, so the overworld reads as an actual pixel-art ground plane
+    /// instead of a flat gradient.
+    var groundTileImageName: String {
+        switch self {
+        case .jungle: return "GrassTile"
+        case .space: return "SpaceTile"
+        case .desert: return "SandTile"
+        case .abyss: return "VoidTile"
+        }
+    }
 }
 
 func worldTint(for zoneID: String) -> Color {
@@ -504,7 +516,11 @@ struct WorldBackdrop: View {
 
     var body: some View {
         ZStack {
+            Image(kind.groundTileImageName)
+                .resizable(resizingMode: .tile)
+                .interpolation(.none)
             LinearGradient(colors: kind.gradientColors, startPoint: .top, endPoint: .bottom)
+                .opacity(0.55)
             motifs
         }
         .allowsHitTesting(false)
@@ -799,43 +815,6 @@ struct RebirthTab: View {
 }
 
 // MARK: - Runes tab
-
-struct RunesTab: View {
-    let runeShardsText: String
-    let runes: [UpgradeRowViewData]
-    let onBuy: (String) -> Void
-    let onBuyMax: (String) -> Void
-    @ScaledMetric(relativeTo: .largeTitle) private var currencyFontSize: CGFloat = 40
-
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                VStack(spacing: 4) {
-                    Text(runeShardsText)
-                        .font(.system(size: currencyFontSize, weight: .heavy, design: .rounded))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.4)
-                        .foregroundStyle(Theme.runeGradient)
-                    Text("Rune Shards")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
-                }
-                .padding(.top, 4)
-
-                Text("Earned from Lucky Surges and net-worth milestones \u{2014} spend them on permanent Runes.")
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.white.opacity(0.6))
-
-                ForEach(runes) { rune in
-                    UpgradeRowView(data: rune, borderColor: .mint, onBuy: { onBuy(rune.id) }, onBuyMax: { onBuyMax(rune.id) })
-                }
-            }
-            .padding(.vertical, 4)
-        }
-        .scrollIndicators(.hidden)
-    }
-}
 
 // MARK: - Offline earnings banner
 
