@@ -549,7 +549,7 @@ private struct AchievementToastView: View {
 
 // MARK: - Noobs tab
 
-private enum WorldThemeKind {
+enum WorldThemeKind {
     case jungle, space, desert, abyss
 
     static func kind(for zoneID: String) -> WorldThemeKind {
@@ -585,11 +585,11 @@ private enum WorldThemeKind {
     }
 }
 
-private func worldTint(for zoneID: String) -> Color {
+func worldTint(for zoneID: String) -> Color {
     WorldThemeKind.kind(for: zoneID).tint
 }
 
-private struct WorldBackdrop: View {
+struct WorldBackdrop: View {
     let zoneID: String
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
