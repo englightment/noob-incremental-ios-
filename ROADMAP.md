@@ -13,7 +13,7 @@ player's progress with no warning. Fix: give `GameState` a custom `init(from:)` 
 each field with `decodeIfPresent(...) ?? default` instead of an all-or-nothing decode, so
 adding fields going forward never nukes an existing save.
 
-## 2. [ ] Bug: achievements list renders eagerly instead of lazily
+## 2. [x] Bug: achievements list renders eagerly instead of lazily
 
 `MoreSheet.achievementsSection` builds all ~30 achievement rows inside a plain `VStack` +
 `ForEach` every time the sheet is opened, instead of a `LazyVStack`. Harmless today, but it'll

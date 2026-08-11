@@ -1254,19 +1254,25 @@ private struct MoreSheet: View {
                 Text("Achievements (\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount))")
                     .font(.headline)
                     .foregroundStyle(.white)
-                ForEach(viewModel.achievementRows) { row in
-                    HStack(spacing: 8) {
-                        Image(systemName: row.isUnlocked ? "trophy.fill" : "lock.fill")
-                            .foregroundStyle(row.isUnlocked ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.3)))
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(row.name)
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(row.isUnlocked ? .white : .white.opacity(0.4))
-                            Text(row.description)
-                                .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.4))
+                // LazyVStack rather than a plain ForEach — this list has grown to 30+ rows
+                // and only gets longer, so eagerly building every row on each sheet open
+                // wastes work for whatever's off-screen. Still lazily loaded correctly here
+                // since it sits inside MoreSheet's enclosing ScrollView.
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(viewModel.achievementRows) { row in
+                        HStack(spacing: 8) {
+                            Image(systemName: row.isUnlocked ? "trophy.fill" : "lock.fill")
+                                .foregroundStyle(row.isUnlocked ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.3)))
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(row.name)
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(row.isUnlocked ? .white : .white.opacity(0.4))
+                                Text(row.description)
+                                    .font(.caption2)
+                                    .foregroundStyle(.white.opacity(0.4))
+                            }
+                            Spacer()
                         }
-                        Spacer()
                     }
                 }
             }
