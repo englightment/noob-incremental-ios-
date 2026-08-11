@@ -121,9 +121,25 @@ controls to keep that change reviewable. Finish the sweep: add accessibilityLabe
 to the "Watch Ad" buttons, the Supporter Pack / Rune Shard pack buttons, Restore Purchases,
 Copy/Restore backup code, Redeem, and the Sound/Haptics/Offline Reminder toggles.
 
-## 16. [ ] Polish: unlock moments have no VoiceOver announcement
+## 16. [x] Polish: unlock moments have no VoiceOver announcement
 
 Achievement toasts, the daily-reward banner, and milestone confetti are all purely visual —
 a VoiceOver user gets no signal that something just happened, unlike a sighted player who
 sees the toast animate in. Post a `UIAccessibility.post(notification: .announcement, ...)`
 alongside each of these so the moment doesn't just silently pass by.
+
+## 17. [ ] Feature: no App Store review prompt
+
+Standard practice for this genre — asking at a well-earned moment (after a rebirth, a
+handful of achievements) rather than on cold launch. Missing entirely right now. Add a pure
+"should we ask" function (mirroring OnboardingSystem's shape) gating a call to StoreKit's
+`AppStore.requestReview(in:)`, with a one-shot guard so it only ever fires once per
+reasonable window (Apple also rate-limits this itself, but the app shouldn't rely solely on
+that).
+
+## 18. [ ] Feature: no way to share progress
+
+Every comparable incremental game has some kind of "brag" mechanic. Add a native `ShareLink`
+somewhere reachable (Stats section of the More sheet is the natural spot) that shares a short
+plain-text summary — lifetime Oof earned, rebirth count, achievements unlocked. The summary
+string itself should be a pure, testable function.

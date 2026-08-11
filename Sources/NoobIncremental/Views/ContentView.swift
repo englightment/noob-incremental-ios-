@@ -334,6 +334,16 @@ struct ContentView: View {
         .onChange(of: viewModel.showMilestoneCelebration) { _, isShowing in
             if isShowing {
                 confettiPieces = ConfettiView.randomBurst()
+                UIAccessibility.post(notification: .announcement, argument: "New net-worth milestone reached!")
+            }
+        }
+        .onChange(of: viewModel.achievementToast?.id) { _, newValue in
+            guard newValue != nil, let achievement = viewModel.achievementToast else { return }
+            UIAccessibility.post(notification: .announcement, argument: "Achievement unlocked: \(achievement.name)")
+        }
+        .onChange(of: viewModel.canClaimDailyReward) { _, canClaim in
+            if canClaim {
+                UIAccessibility.post(notification: .announcement, argument: "Daily reward available")
             }
         }
         .sheet(isPresented: $showMore) {
