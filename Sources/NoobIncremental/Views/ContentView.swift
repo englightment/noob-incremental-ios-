@@ -320,7 +320,7 @@ struct ContentView: View {
                     viewModel.dismissOnboarding()
                 }
                 .transition(.opacity)
-                .animation(.easeOut(duration: 0.3), value: viewModel.showOnboarding)
+                .animation(reduceMotion ? .linear(duration: 0.15) : .easeOut(duration: 0.3), value: viewModel.showOnboarding)
             }
         }
         .preferredColorScheme(.dark)
@@ -486,6 +486,7 @@ private struct FloatingTextItemView: View {
     let item: FloatingText
     let gradient: LinearGradient
     @State private var risen = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Text(item.text)
@@ -494,6 +495,11 @@ private struct FloatingTextItemView: View {
             .offset(x: item.xOffset, y: risen ? -70 : -10)
             .opacity(risen ? 0 : 1)
             .onAppear {
+                // Under Reduce Motion, skip the rise/fade entirely rather than shortening it -
+                // GameViewModel already removes this item from floatingTexts on its own timer
+                // (1.1s), independent of this view's animation state, so there's nothing left
+                // to drive here.
+                guard !reduceMotion else { return }
                 withAnimation(.easeOut(duration: 1.1)) {
                     risen = true
                 }
@@ -1258,21 +1264,28 @@ private struct MoreSheet: View {
                 statRow("Login Streak", "\(viewModel.currentStreak) days")
                 statRow("Achievements", "\(viewModel.unlockedAchievementCount)/\(viewModel.totalAchievementCount)")
                 statRow("Time Played", viewModel.totalPlayTimeText)
-
-                ShareLink(item: viewModel.shareSummaryText) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "square.and.arrow.up")
-                        Text("Share Progress")
-                    }
-                    .font(.subheadline.weight(.bold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .foregroundStyle(.black)
-                }
-                .padding(.top, 2)
+                shareProgressButton
             }
         }
+    }
+
+    // Split out from statsSection - adding this ShareLink inline pushed that VStack's
+    // ViewBuilder past Swift's type-checking time budget ("unable to type-check this
+    // expression in reasonable time"). Giving it its own `some View` boundary keeps each
+    // individual expression small enough to infer quickly.
+    private var shareProgressButton: some View {
+        ShareLink(item: viewModel.shareSummaryText) {
+            HStack(spacing: 6) {
+                Image(systemName: "square.and.arrow.up")
+                Text("Share Progress")
+            }
+            .font(.subheadline.weight(.bold))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(Theme.oofGradient, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .foregroundStyle(.black)
+        }
+        .padding(.top, 2)
     }
 
     private func statRow(_ label: String, _ value: String) -> some View {

@@ -144,7 +144,7 @@ somewhere reachable (Stats section of the More sheet is the natural spot) that s
 plain-text summary — lifetime Oof earned, rebirth count, achievements unlocked. The summary
 string itself should be a pure, testable function.
 
-## 19. [ ] Bug: two views still ignore Reduce Motion despite #5's sweep
+## 19. [x] Bug: two views still ignore Reduce Motion despite #5's sweep
 
 Found while working on #18: `FloatingTextItemView` (the "+X" VFX text that plays on every
 single buy/rebirth — likely the single most frequent animation in the whole app) and
