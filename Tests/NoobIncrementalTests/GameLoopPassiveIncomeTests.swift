@@ -86,6 +86,36 @@ final class GameLoopPassiveIncomeTests: XCTestCase {
         XCTAssertEqual(NSDecimalNumber(decimal: multiplier).doubleValue, 2.0, accuracy: 0.001)
     }
 
+    func testTickSpeedReductionsFromAllShopsCombineAdditivelyNotMultiplicatively() {
+        // Maxing every tick-speed source (faster_noobs: 5*0.1=0.5s, rebirth_speed: 8*0.08=0.64s,
+        // rune_haste: 10*0.05=0.5s) sums to 1.64s of reduction against a 1.0s base tick, which
+        // floors at GameBalance.minimumNoobTickSeconds (0.1s) -> a single 10x multiplier.
+        // Treating each shop as an independent source and multiplying their individual
+        // tickSpeedMultiplier()s together instead would give a different (and wrong) ~11.11x.
+        guard let fasterNoobs = UpgradeCatalog.definition(for: "faster_noobs"),
+              let rebirthSpeed = RebirthUpgradeCatalog.definition(for: "rebirth_speed"),
+              let runeHaste = RuneCatalog.definition(for: "rune_haste"),
+              let noob = GeneratorCatalog.definition(for: "starter_noob") else {
+            return XCTFail("expected catalog entries missing")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000_000
+        state.rebirthCurrency = 1_000_000_000
+        state.runeShards = 1_000_000_000
+        state = GeneratorStore.buy(noob, state: state)
+        state = UpgradeStore.buyMax(fasterNoobs, state: state)
+        state = RebirthUpgradeStore.buyMax(rebirthSpeed, state: state)
+        state = RuneStore.buyMax(runeHaste, state: state)
+
+        XCTAssertTrue(UpgradeStore.isMaxed(fasterNoobs, state: state))
+        XCTAssertTrue(RebirthUpgradeStore.isMaxed(rebirthSpeed, state: state))
+        XCTAssertTrue(RuneStore.isMaxed(runeHaste, state: state))
+
+        let actual = GameLoop.passiveIncomePerSecond(state)
+        let expected = noob.baseOutput * 10
+        XCTAssertEqual(NSDecimalNumber(decimal: actual).doubleValue, NSDecimalNumber(decimal: expected).doubleValue, accuracy: 0.001)
+    }
+
     func testAchievementBonusAppliesToPassiveIncome() {
         guard let noob = GeneratorCatalog.definition(for: "starter_noob") else {
             return XCTFail("starter_noob missing from catalog")
