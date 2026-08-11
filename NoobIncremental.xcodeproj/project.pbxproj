@@ -55,6 +55,7 @@
 		90FF55CC043EAB85B5D77752 /* RebirthUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A5334149B8528D7DC2A4AD /* RebirthUpgradeStoreTests.swift */; };
 		93399FAF8EDF0D0AFC9DF65C /* BoostSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4CD89245D4F148580E586A7 /* BoostSystem.swift */; };
 		9402A07A6ED2AD9A72B59BD2 /* RebirthUpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F01DD25682182DD9350069 /* RebirthUpgradeStore.swift */; };
+		9C04859A9F9AD0F15151F2B7 /* VirtualJoystickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD43E97D103ACDCAB7FE1E7A /* VirtualJoystickView.swift */; };
 		9FA032C71DB52C65A9502BC7 /* OfflineReminderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA46166D56613029AA9D816C /* OfflineReminderManager.swift */; };
 		A0358655451A09E05D261A45 /* GameStateDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90B32F6D8F465672160259B /* GameStateDecodingTests.swift */; };
 		A347901CD1A41D6547EC7987 /* MinionSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1617C25BBC17994990ACA /* MinionSystem.swift */; };
@@ -81,6 +82,7 @@
 		E3E9256A44C551AB7F857E07 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E37B9372F19D47069C143984 /* PrivacyInfo.xcprivacy */; };
 		E7F3F6218BC45A35902F2903 /* GeneratorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D29D4C7990FC411B26A687 /* GeneratorState.swift */; };
 		E9D6ED46465E8BDBD22428A3 /* RuneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267A418F4C2AFE77927BB3C8 /* RuneStore.swift */; };
+		EB8C3B95DC20BB51D34ABE17 /* PlayerAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D063BE011E055297A3341C4 /* PlayerAvatarView.swift */; };
 		F0805055EBC86388F39E0EA6 /* GameCenterSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E26BA92B8CC0DF2B59BBB27 /* GameCenterSystemTests.swift */; };
 		F5951C5C5FD4FC62E555164A /* MilestoneSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46AAC80EE22DFD9DF50568A /* MilestoneSystem.swift */; };
 		F5BC4086C34469E49AC93F43 /* IAPSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3997B6A86BAD5B359F2393EC /* IAPSystem.swift */; };
@@ -140,6 +142,7 @@
 		7D2E29CB1B6E4CC9B3A8C317 /* MinionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinionState.swift; sourceTree = "<group>"; };
 		87C17984A246BD80DD460E38 /* ShareSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSummaryTests.swift; sourceTree = "<group>"; };
 		8C2D34A644C9CB7DD4AE7B08 /* IAPSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPSystemTests.swift; sourceTree = "<group>"; };
+		8D063BE011E055297A3341C4 /* PlayerAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerAvatarView.swift; sourceTree = "<group>"; };
 		9102C53B66EE95A238CE1C0D /* FormulasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulasTests.swift; sourceTree = "<group>"; };
 		9146A6B1A231FA3371299827 /* OnboardingSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSystem.swift; sourceTree = "<group>"; };
 		96EFC80C3F6D91160B7C4AC2 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
@@ -168,6 +171,7 @@
 		CCDF48CF0CC309DFEE2DF0C3 /* AdBoostSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdBoostSystemTests.swift; sourceTree = "<group>"; };
 		CD4A7CB0ECD22071F278E647 /* RebirthSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RebirthSystem.swift; sourceTree = "<group>"; };
 		D51AF8145913BC8374F6B4D8 /* GeneratorMilestoneSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorMilestoneSystem.swift; sourceTree = "<group>"; };
+		DD43E97D103ACDCAB7FE1E7A /* VirtualJoystickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualJoystickView.swift; sourceTree = "<group>"; };
 		E164BB617C986177AA688455 /* NoobIncrementalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoobIncrementalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E18A0896ECC21EC4833B7340 /* UpgradeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeStoreTests.swift; sourceTree = "<group>"; };
 		E351B575024F8F9F55D18F37 /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
@@ -375,7 +379,9 @@
 				96EFC80C3F6D91160B7C4AC2 /* ConfettiView.swift */,
 				9A10F64BBF3AE4F3B20A3C4B /* ContentView.swift */,
 				C2D9ED406DD0557491410368 /* NoobFaceView.swift */,
+				8D063BE011E055297A3341C4 /* PlayerAvatarView.swift */,
 				4DA66A8B7A6C1B79E57F7F6E /* SharedRowComponents.swift */,
+				DD43E97D103ACDCAB7FE1E7A /* VirtualJoystickView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -505,6 +511,7 @@
 				5EA32FE7047CE1A8F4BA55AD /* OfflineProgress.swift in Sources */,
 				9FA032C71DB52C65A9502BC7 /* OfflineReminderManager.swift in Sources */,
 				15986A20704065875F45FE11 /* OnboardingSystem.swift in Sources */,
+				EB8C3B95DC20BB51D34ABE17 /* PlayerAvatarView.swift in Sources */,
 				E0375D2ECAD7F70B8503FEB9 /* PlayerMovementSystem.swift in Sources */,
 				31A4DF71B0C2E51502CC4CD9 /* RebirthSystem.swift in Sources */,
 				9402A07A6ED2AD9A72B59BD2 /* RebirthUpgradeStore.swift in Sources */,
@@ -520,6 +527,7 @@
 				385640CAC69744E5DA3DF486 /* SoundManager.swift in Sources */,
 				BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */,
 				F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */,
+				9C04859A9F9AD0F15151F2B7 /* VirtualJoystickView.swift in Sources */,
 				58C363AA5A0BD8B957A19B95 /* WorldDefinition.swift in Sources */,
 				D10ED26E35C36833B71BC778 /* WorldStation.swift in Sources */,
 				26C421148AA2FF174AB5910A /* WorldSystem.swift in Sources */,
