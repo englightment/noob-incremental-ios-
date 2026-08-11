@@ -12,6 +12,7 @@
 		0EF915C8504FB351EBC648EE /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A799D55A49241D21CCEA52F3 /* GameViewModel.swift */; };
 		154ED22B5797F1111B2ED85E /* DailyStreakSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B575B677372D934D11F4C8 /* DailyStreakSystem.swift */; };
 		15802D9B60936424AF17B301 /* RuneStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E18250F274BCEC89B02EF11 /* RuneStoreTests.swift */; };
+		15986A20704065875F45FE11 /* OnboardingSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9146A6B1A231FA3371299827 /* OnboardingSystem.swift */; };
 		183790EAA80841FFDF999C9B /* NumberFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */; };
 		18482F9CD0921CC1840609F4 /* RedeemCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2B014BBA193687A6084D9F /* RedeemCode.swift */; };
 		1DFBA7D68BB4AF4E34EA195F /* RuneDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160DF0198DD0ABB320B2B8B9 /* RuneDefinition.swift */; };
@@ -67,6 +68,7 @@
 		E7F3F6218BC45A35902F2903 /* GeneratorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D29D4C7990FC411B26A687 /* GeneratorState.swift */; };
 		E9D6ED46465E8BDBD22428A3 /* RuneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267A418F4C2AFE77927BB3C8 /* RuneStore.swift */; };
 		F5951C5C5FD4FC62E555164A /* MilestoneSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46AAC80EE22DFD9DF50568A /* MilestoneSystem.swift */; };
+		F5EA6DDF21E0C4C2DEFDE3E6 /* OnboardingSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D76D06754DBFE22CD1B15E /* OnboardingSystemTests.swift */; };
 		F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC12A83B89E0907154AB583 /* UpgradeStore.swift */; };
 /* End PBXBuildFile section */
 
@@ -109,6 +111,7 @@
 		70E4B7D9C6FD4E0A7258A4C6 /* MilestoneSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneSystemTests.swift; sourceTree = "<group>"; };
 		7D2E29CB1B6E4CC9B3A8C317 /* MinionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinionState.swift; sourceTree = "<group>"; };
 		9102C53B66EE95A238CE1C0D /* FormulasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulasTests.swift; sourceTree = "<group>"; };
+		9146A6B1A231FA3371299827 /* OnboardingSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSystem.swift; sourceTree = "<group>"; };
 		96EFC80C3F6D91160B7C4AC2 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		98BBD9F8D7888AF0AEF95417 /* WorldSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldSystemTests.swift; sourceTree = "<group>"; };
 		98E303E868D2D07673027F91 /* GeneratorDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorDefinition.swift; sourceTree = "<group>"; };
@@ -123,6 +126,7 @@
 		B0B2EB3C206472485AE9F1A8 /* AdBoostSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdBoostSystem.swift; sourceTree = "<group>"; };
 		B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormattingTests.swift; sourceTree = "<group>"; };
 		B46AAC80EE22DFD9DF50568A /* MilestoneSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneSystem.swift; sourceTree = "<group>"; };
+		B8D76D06754DBFE22CD1B15E /* OnboardingSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSystemTests.swift; sourceTree = "<group>"; };
 		BA2D00D4BA8BDA1B40A72EB7 /* Formulas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formulas.swift; sourceTree = "<group>"; };
 		BFC12A83B89E0907154AB583 /* UpgradeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeStore.swift; sourceTree = "<group>"; };
 		C2D9ED406DD0557491410368 /* NoobFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoobFaceView.swift; sourceTree = "<group>"; };
@@ -268,6 +272,7 @@
 				9F90E01719EB5431EA35B938 /* MinionSystemTests.swift */,
 				B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */,
 				17A6DF5E50215E9B2048DADC /* OfflineProgressTests.swift */,
+				B8D76D06754DBFE22CD1B15E /* OnboardingSystemTests.swift */,
 				F5B3C57A6C63ED8BFA9AE459 /* RebirthSystemTests.swift */,
 				A1A5334149B8528D7DC2A4AD /* RebirthUpgradeStoreTests.swift */,
 				A25ACC1DF21B323B8DEBD00F /* RedeemCodeStoreTests.swift */,
@@ -293,6 +298,7 @@
 				16F1617C25BBC17994990ACA /* MinionSystem.swift */,
 				1616AA4F5E49D1A089625AC1 /* NumberFormatting.swift */,
 				C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */,
+				9146A6B1A231FA3371299827 /* OnboardingSystem.swift */,
 				CD4A7CB0ECD22071F278E647 /* RebirthSystem.swift */,
 				63F01DD25682182DD9350069 /* RebirthUpgradeStore.swift */,
 				339213DC8553D38B91E3553A /* RedeemCodeStore.swift */,
@@ -441,6 +447,7 @@
 				3B0F4D3F6CF32BEAF4CAB058 /* NoobIncrementalApp.swift in Sources */,
 				BE90EC6D4AB8EFF30652BEFD /* NumberFormatting.swift in Sources */,
 				5EA32FE7047CE1A8F4BA55AD /* OfflineProgress.swift in Sources */,
+				15986A20704065875F45FE11 /* OnboardingSystem.swift in Sources */,
 				31A4DF71B0C2E51502CC4CD9 /* RebirthSystem.swift in Sources */,
 				9402A07A6ED2AD9A72B59BD2 /* RebirthUpgradeStore.swift in Sources */,
 				18482F9CD0921CC1840609F4 /* RedeemCode.swift in Sources */,
@@ -474,6 +481,7 @@
 				5D1E78C87504AC80DA6510CD /* MinionSystemTests.swift in Sources */,
 				183790EAA80841FFDF999C9B /* NumberFormattingTests.swift in Sources */,
 				6FC7BF5BDF1502E276274D14 /* OfflineProgressTests.swift in Sources */,
+				F5EA6DDF21E0C4C2DEFDE3E6 /* OnboardingSystemTests.swift in Sources */,
 				4C53C3DF992E92B2B73B6666 /* RebirthSystemTests.swift in Sources */,
 				90FF55CC043EAB85B5D77752 /* RebirthUpgradeStoreTests.swift in Sources */,
 				83C213142E2E00B2B1D706C5 /* RedeemCodeStoreTests.swift in Sources */,
