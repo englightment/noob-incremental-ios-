@@ -31,7 +31,7 @@ Brand-new players are dropped straight into the game with zero explanation of th
 (buy Noobs, watch Oof grow, eventually Rebirth). Add a lightweight one-time first-launch
 overlay/tip that explains this in a few seconds, then never shows again.
 
-## 5. [ ] Polish: no Reduce Motion support
+## 5. [x] Polish: no Reduce Motion support
 
 The app leans heavily on decorative animation (ambient background blobs, glow pulses, spring
 transitions on tab/world switches) with no way to tone it down. Respect

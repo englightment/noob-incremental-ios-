@@ -21,6 +21,7 @@ private enum Theme {
 /// fill — gives the whole app a sense of depth for the glass cards to sit on top of.
 private struct AppBackground: View {
     @State private var drift = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -39,6 +40,10 @@ private struct AppBackground: View {
         }
         .ignoresSafeArea()
         .onAppear {
+            // Reduce Motion: skip the continuous drift entirely rather than just shortening
+            // it — this is exactly the kind of ambient, purely-decorative looping motion the
+            // setting exists to suppress.
+            guard !reduceMotion else { return }
             withAnimation(.easeInOut(duration: 11).repeatForever(autoreverses: true)) {
                 drift = true
             }
@@ -146,12 +151,13 @@ private enum AppTab: Hashable, CaseIterable, Identifiable {
 private struct PillTabBar: View {
     @Binding var selection: AppTab
     @Namespace private var namespace
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 4) {
             ForEach(AppTab.allCases) { tab in
                 Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                    withAnimation(reduceMotion ? .linear(duration: 0.1) : .spring(response: 0.35, dampingFraction: 0.82)) {
                         selection = tab
                     }
                 } label: {
@@ -190,6 +196,7 @@ struct ContentView: View {
     @State private var showMore = false
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var selectedTab: AppTab = .noobs
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -290,11 +297,14 @@ struct ContentView: View {
                         .padding(.top, 8)
                     Spacer()
                 }
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.achievementToast?.id)
+                .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+                .animation(reduceMotion ? .linear(duration: 0.15) : .spring(response: 0.4, dampingFraction: 0.8), value: viewModel.achievementToast?.id)
             }
 
-            if viewModel.showMilestoneCelebration {
+            // Confetti is purely decorative celebration motion — skip it entirely under
+            // Reduce Motion rather than just toning it down; the achievement/milestone
+            // itself is still granted either way.
+            if viewModel.showMilestoneCelebration && !reduceMotion {
                 ConfettiView(pieces: confettiPieces)
             }
 
@@ -384,6 +394,7 @@ private struct CurrencyDisplay: View {
     let subtitleText: String
     let gradient: LinearGradient
     @State private var glowing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 2) {
@@ -394,6 +405,7 @@ private struct CurrencyDisplay: View {
                 .contentTransition(.numericText())
                 .animation(.snappy, value: valueText)
                 .onAppear {
+                    guard !reduceMotion else { return }
                     withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
                         glowing = true
                     }
@@ -450,6 +462,7 @@ private struct BoostBanner: View {
     let multiplierText: String
     let remainingText: String
     @State private var pulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack {
@@ -463,6 +476,7 @@ private struct BoostBanner: View {
         .padding(10)
         .background(Theme.rebirthGradient.opacity(pulse ? 0.9 : 0.6), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .onAppear {
+            guard !reduceMotion else { return }
             withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
                 pulse = true
             }
@@ -581,6 +595,7 @@ private func worldTint(for zoneID: String) -> Color {
 
 private struct WorldBackdrop: View {
     let zoneID: String
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var kind: WorldThemeKind { WorldThemeKind.kind(for: zoneID) }
 
@@ -590,7 +605,7 @@ private struct WorldBackdrop: View {
             motifs
         }
         .allowsHitTesting(false)
-        .animation(.easeInOut(duration: 0.5), value: zoneID)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: zoneID)
     }
 
     @ViewBuilder
@@ -777,6 +792,7 @@ private struct WorldSelector: View {
     let worlds: [WorldRowViewData]
     @Binding var selectedZoneID: String
     @Namespace private var namespace
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 8) {
@@ -786,7 +802,7 @@ private struct WorldSelector: View {
 
                 Button {
                     guard world.isUnlocked else { return }
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                    withAnimation(reduceMotion ? .linear(duration: 0.1) : .spring(response: 0.35, dampingFraction: 0.82)) {
                         selectedZoneID = world.id
                     }
                 } label: {
