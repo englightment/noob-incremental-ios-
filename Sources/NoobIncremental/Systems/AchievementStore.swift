@@ -74,6 +74,28 @@ enum AchievementStore {
         }
     }
 
+    /// 0...1 reading of how close a condition is to being met — 0 for conditions with no
+    /// fractional progress (see `progress(_:state:)`).
+    static func progressFraction(_ definition: AchievementDefinition, state: GameState) -> Double {
+        guard let (current, target) = progress(definition, state: state), target > 0 else { return 0 }
+        return NSDecimalNumber(decimal: min(current, target) / target).doubleValue
+    }
+
+    /// Display order: unlocked achievements first (a stable "trophy wall" — their relative
+    /// order never changes once earned), then locked ones sorted closest-to-completion first,
+    /// so the list reads as "here's what to chase next" rather than a fixed catalog order.
+    static func sortedForDisplay(state: GameState) -> [AchievementDefinition] {
+        AchievementCatalog.all.sorted { lhs, rhs in
+            let lhsUnlocked = isUnlocked(lhs, state: state)
+            let rhsUnlocked = isUnlocked(rhs, state: state)
+            if lhsUnlocked != rhsUnlocked { return lhsUnlocked }
+            if !lhsUnlocked {
+                return progressFraction(lhs, state: state) > progressFraction(rhs, state: state)
+            }
+            return false
+        }
+    }
+
     private static func ownedCount<T>(_ items: [T], isOwned: (T) -> Bool) -> Int {
         items.filter(isOwned).count
     }

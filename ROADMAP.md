@@ -65,7 +65,7 @@ local notification (no server needed) for when the cap will be hit, cancel it on
 foreground/dismiss, and request notification permission the first time it's relevant rather
 than on cold launch.
 
-## 9. [ ] Feature: achievement list has no sense of priority
+## 9. [x] Feature: achievement list has no sense of priority
 
 Now that locked achievements show progress (#6), the list itself still renders in raw catalog
 order — a 90%-done achievement can sit below a 2%-done one with no way to tell at a glance

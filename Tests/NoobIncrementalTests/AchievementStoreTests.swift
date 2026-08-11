@@ -242,4 +242,57 @@ final class AchievementStoreTests: XCTestCase {
         let definition = AchievementDefinition(id: "test_progress_code", name: "Test", description: "", condition: .codeRedeemed)
         XCTAssertNil(AchievementStore.progress(definition, state: .newGame))
     }
+
+    func testProgressFractionIsZeroWhenNoProgress() {
+        XCTAssertEqual(AchievementStore.progressFraction(earnedAchievement, state: .newGame), 0)
+    }
+
+    func testProgressFractionReflectsHalfway() {
+        var state = GameState.newGame
+        state.lifetimeEarned = 500
+
+        XCTAssertEqual(AchievementStore.progressFraction(earnedAchievement, state: state), 0.5, accuracy: 0.0001)
+    }
+
+    func testProgressFractionNeverExceedsOne() {
+        var state = GameState.newGame
+        state.lifetimeEarned = 50_000 // way past the 1,000 target
+
+        XCTAssertEqual(AchievementStore.progressFraction(earnedAchievement, state: state), 1.0, accuracy: 0.0001)
+    }
+
+    func testProgressFractionIsZeroForCodeRedeemed() {
+        let definition = AchievementDefinition(id: "test_fraction_code", name: "Test", description: "", condition: .codeRedeemed)
+        XCTAssertEqual(AchievementStore.progressFraction(definition, state: .newGame), 0)
+    }
+
+    func testSortedForDisplayPutsUnlockedAchievementsFirst() {
+        var state = GameState.newGame
+        state.unlockedAchievements = ["first_noob"]
+
+        let sorted = AchievementStore.sortedForDisplay(state: state)
+
+        XCTAssertEqual(sorted.first?.id, "first_noob")
+    }
+
+    func testSortedForDisplayOrdersLockedAchievementsByProximityToCompletion() {
+        var state = GameState.newGame
+        state.lifetimeEarned = 999_000 // very close to first_quadrillion? no — close to first_million (1,000,000)
+
+        let sorted = AchievementStore.sortedForDisplay(state: state)
+        let lockedOnly = sorted.filter { !AchievementStore.isUnlocked($0, state: state) }
+        let indexOfMillionaire = lockedOnly.firstIndex { $0.id == "first_million" }
+        let indexOfQuadrillionaire = lockedOnly.firstIndex { $0.id == "first_quadrillion" }
+
+        guard let millionaireIndex = indexOfMillionaire, let quadrillionaireIndex = indexOfQuadrillionaire else {
+            return XCTFail("expected achievements missing from catalog")
+        }
+        XCTAssertLessThan(millionaireIndex, quadrillionaireIndex, "being 99.9% of the way to Millionaire should sort before a barely-started Quadrillionaire")
+    }
+
+    func testSortedForDisplayIncludesEveryAchievementExactlyOnce() {
+        let sorted = AchievementStore.sortedForDisplay(state: .newGame)
+        XCTAssertEqual(Set(sorted.map(\.id)).count, AchievementCatalog.all.count)
+        XCTAssertEqual(sorted.count, AchievementCatalog.all.count)
+    }
 }

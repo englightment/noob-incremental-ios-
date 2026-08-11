@@ -203,7 +203,7 @@ final class GameViewModel: ObservableObject {
     var totalAchievementCount: Int { AchievementCatalog.all.count }
 
     var achievementRows: [AchievementRowViewData] {
-        AchievementCatalog.all.map { definition in
+        AchievementStore.sortedForDisplay(state: state).map { definition in
             let isUnlocked = AchievementStore.isUnlocked(definition, state: state)
             return AchievementRowViewData(
                 id: definition.id,
