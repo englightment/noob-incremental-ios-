@@ -158,7 +158,7 @@ Tapping "Redeem" with an empty code field just round-trips to "Invalid code." in
 being disabled outright — inconsistent with the backup "Restore" button a few sections down,
 which already disables on `importCodeText.isEmpty`.
 
-## 21. [ ] Feature: Zone 4, a new endgame frontier
+## 21. [x] Feature: Zone 4, a new endgame frontier
 
 Zones 2 (Overworks) and 3 (Ascension Spire) each shipped 3-5 new Noob tiers plus matching
 achievements, and both have been fully built out for a while now — meanwhile #17/#18 added
@@ -166,3 +166,10 @@ IAP and sharing, which only matter if there's fresh content to earn/brag about. 
 zone following the same pattern: new `GeneratorDefinition`s in the new zone, a `WorldCatalog`
 entry, zone-completion achievements (mirroring `allZoneNoobsOwned`), and balance numbers that
 continue the existing cost/output curve rather than restarting it.
+
+## 22. [ ] Feature: a Zone 4-themed Minion
+
+Zone 3's launch included two matching Minions (#58) to keep that reward system's pacing
+consistent with new content. Zone 4 (#21) shipped without one — add at least one
+Void-Expanse-themed Minion, unlocked via a Zone 4 achievement (e.g. `voidbound` or
+`void_master`), following the existing MinionCatalog/MinionSystem pattern.

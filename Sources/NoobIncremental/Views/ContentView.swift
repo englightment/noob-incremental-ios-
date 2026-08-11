@@ -609,13 +609,14 @@ private struct GlowCard<Content: View>: View {
 // MARK: - Noobs tab
 
 private enum WorldThemeKind {
-    case jungle, space, desert
+    case jungle, space, desert, abyss
 
     static func kind(for zoneID: String) -> WorldThemeKind {
         switch zoneID {
         case WorldCatalog.zone1ID: return .jungle
         case WorldCatalog.zone2ID: return .space
         case WorldCatalog.zone3ID: return .desert
+        case WorldCatalog.zone4ID: return .abyss
         default: return .jungle
         }
     }
@@ -625,6 +626,7 @@ private enum WorldThemeKind {
         case .jungle: return .green
         case .space: return .purple
         case .desert: return .orange
+        case .abyss: return .indigo
         }
     }
 
@@ -636,6 +638,8 @@ private enum WorldThemeKind {
             return [Color(red: 0.02, green: 0.02, blue: 0.10), Color(red: 0.10, green: 0.04, blue: 0.24), Color(red: 0.02, green: 0.02, blue: 0.12)]
         case .desert:
             return [Color(red: 0.18, green: 0.07, blue: 0.02), Color(red: 0.35, green: 0.16, blue: 0.04), Color(red: 0.12, green: 0.04, blue: 0.06)]
+        case .abyss:
+            return [Color(red: 0.04, green: 0.0, blue: 0.09), Color(red: 0.14, green: 0.02, blue: 0.22), Color(red: 0.02, green: 0.0, blue: 0.06)]
         }
     }
 }
@@ -665,6 +669,7 @@ private struct WorldBackdrop: View {
         case .jungle: JungleMotifs()
         case .space: SpaceMotifs()
         case .desert: DesertMotifs()
+        case .abyss: VoidMotifs()
         }
     }
 }
@@ -762,6 +767,43 @@ private struct DesertMotifs: View {
             path.addLine(to: CGPoint(x: 220, y: 200))
             path.addLine(to: CGPoint(x: -220, y: 200))
             path.closeSubpath()
+        }
+    }
+}
+
+private struct VoidMotifs: View {
+    private let shardOffsets: [(CGFloat, CGFloat, Double, Double)] = [
+        (-150, -240, 20, 0.20), (160, -200, -35, 0.16), (-180, 160, 15, 0.14),
+        (140, 260, -20, 0.18), (0, -320, 40, 0.13), (-80, 40, -15, 0.15)
+    ]
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .strokeBorder(Color.purple.opacity(0.4), lineWidth: 4)
+                .frame(width: 220, height: 220)
+                .offset(x: -100, y: -260)
+            Circle()
+                .strokeBorder(Color(red: 0.6, green: 0.1, blue: 0.9).opacity(0.22), lineWidth: 10)
+                .frame(width: 320, height: 320)
+                .offset(x: -100, y: -260)
+            Circle()
+                .fill(RadialGradient(colors: [Color(red: 0.5, green: 0.0, blue: 0.7).opacity(0.5), .clear], center: .center, startRadius: 0, endRadius: 160))
+                .frame(width: 260, height: 260)
+                .offset(x: -100, y: -260)
+                .blur(radius: 30)
+            Circle()
+                .fill(RadialGradient(colors: [Color.indigo.opacity(0.35), .clear], center: .center, startRadius: 0, endRadius: 220))
+                .frame(width: 380, height: 380)
+                .offset(x: 140, y: 280)
+                .blur(radius: 50)
+            ForEach(Array(shardOffsets.enumerated()), id: \.offset) { _, shard in
+                Image(systemName: "diamond.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color.purple.opacity(shard.3))
+                    .rotationEffect(.degrees(shard.2))
+                    .offset(x: shard.0, y: shard.1)
+            }
         }
     }
 }

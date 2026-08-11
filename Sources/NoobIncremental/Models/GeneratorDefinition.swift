@@ -39,7 +39,12 @@ enum GeneratorCatalog {
         GeneratorDefinition(id: "ethereal_noob", name: "Ethereal Noob", zoneID: WorldCatalog.zone3ID, baseCost: 80_000_000_000, baseOutput: 350_000_000, unlockThreshold: 10_000_000),
         GeneratorDefinition(id: "divine_noob", name: "Divine Noob", zoneID: WorldCatalog.zone3ID, baseCost: 1_200_000_000_000, baseOutput: 5_000_000_000, unlockThreshold: 100_000_000),
         GeneratorDefinition(id: "phoenix_noob", name: "Phoenix Noob", zoneID: WorldCatalog.zone3ID, baseCost: 18_000_000_000_000, baseOutput: 70_000_000_000, unlockThreshold: 800_000_000),
-        GeneratorDefinition(id: "sovereign_noob", name: "Sovereign Noob", zoneID: WorldCatalog.zone3ID, baseCost: 280_000_000_000_000, baseOutput: 1_000_000_000_000, unlockThreshold: 8_000_000_000)
+        GeneratorDefinition(id: "sovereign_noob", name: "Sovereign Noob", zoneID: WorldCatalog.zone3ID, baseCost: 280_000_000_000_000, baseOutput: 1_000_000_000_000, unlockThreshold: 8_000_000_000),
+
+        // Zone 4 — The Void Expanse (unlocks after 15 Rebirths)
+        GeneratorDefinition(id: "voidwalker_noob", name: "Voidwalker Noob", zoneID: WorldCatalog.zone4ID, baseCost: 4_200_000_000_000_000, baseOutput: 14_000_000_000_000, unlockThreshold: 0),
+        GeneratorDefinition(id: "eclipse_noob", name: "Eclipse Noob", zoneID: WorldCatalog.zone4ID, baseCost: 63_000_000_000_000_000, baseOutput: 197_000_000_000_000, unlockThreshold: 1_200_000_000_000),
+        GeneratorDefinition(id: "omega_noob", name: "Omega Noob", zoneID: WorldCatalog.zone4ID, baseCost: 945_000_000_000_000_000, baseOutput: 2_780_000_000_000_000, unlockThreshold: 12_000_000_000_000)
     ]
 
     static func definition(for id: String) -> GeneratorDefinition? {

@@ -56,10 +56,11 @@ final class AchievementStoreTests: XCTestCase {
         state.currency = 10_000_000
         XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
 
-        // Must cover the priciest Zone 3 Noob (currently up to hundreds of trillions), not
-        // just Zone 1/2 — this budget is intentionally generous rather than tightly pinned to
-        // today's catalog costs, so it doesn't need touching every time balance changes.
-        state.currency = 1_000_000_000_000_000
+        // Must cover the priciest Zone 4 Noob (currently up to ~945 quadrillion) — this
+        // budget is intentionally generous (a full quintillion headroom) rather than tightly
+        // pinned to today's catalog costs, so it doesn't need touching every time balance
+        // changes. It has already had to move once (from 1 quadrillion) when Zone 4 shipped.
+        state.currency = 1_000_000_000_000_000_000_000
         for generator in GeneratorCatalog.all {
             state = GeneratorStore.buy(generator, state: state)
         }
@@ -149,6 +150,26 @@ final class AchievementStoreTests: XCTestCase {
 
         state = GeneratorStore.buy(zone2Generators.last!, state: state)
         XCTAssertTrue(AchievementStore.conditionMet(definition, state: state))
+    }
+
+    func testVoidSovereignRequiresEveryZone4NoobOwned() {
+        guard let voidSovereign = AchievementCatalog.definition(for: "void_sovereign") else {
+            return XCTFail("void_sovereign missing from catalog")
+        }
+        let zone4Generators = GeneratorCatalog.all(inZone: WorldCatalog.zone4ID)
+        guard zone4Generators.count > 1 else {
+            return XCTFail("expected multiple Zone 4 generators")
+        }
+        var state = GameState.newGame
+        state.currency = 1_000_000_000_000_000_000_000
+
+        for generator in zone4Generators.dropLast() {
+            state = GeneratorStore.buy(generator, state: state)
+        }
+        XCTAssertFalse(AchievementStore.conditionMet(voidSovereign, state: state))
+
+        state = GeneratorStore.buy(zone4Generators.last!, state: state)
+        XCTAssertTrue(AchievementStore.conditionMet(voidSovereign, state: state))
     }
 
     func testAllRunesOwnedConditionRequiresEveryRune() {

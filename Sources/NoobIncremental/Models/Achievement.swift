@@ -59,7 +59,10 @@ enum AchievementCatalog {
         AchievementDefinition(id: "overworks_tycoon", name: "Overworks Tycoon", description: "Own every Overworks Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone2ID)),
         AchievementDefinition(id: "spire_sovereign", name: "Spire Sovereign", description: "Own every Ascension Spire Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone3ID)),
         AchievementDefinition(id: "well_rested", name: "Well Rested", description: "Max the Extended Rest upgrade", condition: .upgradeMaxed("rebirth_extended_rest")),
-        AchievementDefinition(id: "patron", name: "Patron", description: "Buy the Supporter Pack", condition: .productOwned(IAPProduct.supporterPack.rawValue))
+        AchievementDefinition(id: "patron", name: "Patron", description: "Buy the Supporter Pack", condition: .productOwned(IAPProduct.supporterPack.rawValue)),
+        AchievementDefinition(id: "voidbound", name: "Voidbound", description: "Reach Zone 4, The Void Expanse", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone4ID, total: 1)),
+        AchievementDefinition(id: "void_master", name: "Void Master", description: "Reach 20 total Zone 4 Noob levels", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone4ID, total: 20)),
+        AchievementDefinition(id: "void_sovereign", name: "Void Sovereign", description: "Own every Void Expanse Noob", condition: .allZoneNoobsOwned(zoneID: WorldCatalog.zone4ID))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {

@@ -60,4 +60,22 @@ final class WorldSystemTests: XCTestCase {
         state.rebirthCount = 5
         XCTAssertTrue(WorldSystem.isUnlocked(zone3, state: state))
     }
+
+    func testZone4IsLockedBeforeFifteenRebirths() {
+        guard let zone4 = WorldCatalog.definition(for: WorldCatalog.zone4ID) else {
+            return XCTFail("zone_4 missing from catalog")
+        }
+        var state = GameState.newGame
+        state.rebirthCount = 14
+        XCTAssertFalse(WorldSystem.isUnlocked(zone4, state: state))
+    }
+
+    func testZone4UnlocksAtFifteenRebirths() {
+        guard let zone4 = WorldCatalog.definition(for: WorldCatalog.zone4ID) else {
+            return XCTFail("zone_4 missing from catalog")
+        }
+        var state = GameState.newGame
+        state.rebirthCount = 15
+        XCTAssertTrue(WorldSystem.isUnlocked(zone4, state: state))
+    }
 }
