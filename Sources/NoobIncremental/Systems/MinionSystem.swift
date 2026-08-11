@@ -7,9 +7,10 @@ enum MinionSystem {
 
     private static let baseMaxEquipped = 3
 
-    /// Base slot count plus whatever the "Extra Minion Slots" rebirth upgrade has granted.
+    /// Base slot count plus whatever the "Extra Minion Slots" rebirth upgrade and the
+    /// "Rune of Kinship" have granted.
     static func maxEquipped(state: GameState) -> Int {
-        baseMaxEquipped + RebirthUpgradeStore.minionSlotBonus(state: state)
+        baseMaxEquipped + RebirthUpgradeStore.minionSlotBonus(state: state) + RuneStore.minionSlotBonus(state: state)
     }
 
     static func isOwned(_ definition: MinionDefinition, state: GameState) -> Bool {

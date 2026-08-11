@@ -127,4 +127,17 @@ final class RuneStoreTests: XCTestCase {
 
         XCTAssertEqual(RuneStore.flatOutputBonus(state: state), 50 * 2)
     }
+
+    func testRuneOfKinshipAddsMinionSlotBonus() {
+        guard let runeKinship = RuneCatalog.definition(for: "rune_kinship") else {
+            return XCTFail("rune_kinship missing from catalog")
+        }
+        XCTAssertEqual(RuneStore.minionSlotBonus(state: .newGame), 0)
+
+        var state = GameState.newGame
+        state.runeShards = 1_000_000
+        state = RuneStore.buyOne(runeKinship, state: state)
+
+        XCTAssertEqual(RuneStore.minionSlotBonus(state: state), 1)
+    }
 }

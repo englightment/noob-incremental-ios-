@@ -74,4 +74,11 @@ enum RuneStore {
             return total + UpgradeEffect.flatOutputBonusValue(level: level(definition, state: state), perLevel: perLevel)
         }
     }
+
+    static func minionSlotBonus(state: GameState) -> Int {
+        RuneCatalog.all.reduce(0) { total, definition in
+            guard case .minionSlotBonus(let perLevel) = definition.effect else { return total }
+            return total + UpgradeEffect.minionSlotBonusValue(level: level(definition, state: state), perLevel: perLevel)
+        }
+    }
 }
