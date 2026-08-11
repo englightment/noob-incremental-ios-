@@ -130,6 +130,7 @@ struct ContentView: View {
     @StateObject private var iapManager = IAPManager()
     @StateObject private var gameCenterManager = GameCenterManager()
     @State private var showMore = false
+    @State private var showGamePasses = false
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var selectedTab: AppTab = .noobs
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -146,6 +147,16 @@ struct ContentView: View {
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.white.opacity(0.7))
                     Spacer()
+                    Button(action: { showGamePasses = true }) {
+                        Image(systemName: "ticket.fill")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.85))
+                            .frame(width: 34, height: 34)
+                            .background(.ultraThinMaterial, in: Circle())
+                            .overlay(Circle().strokeBorder(Color.white.opacity(0.15), lineWidth: 1))
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                    .accessibilityLabel("Game Passes Shop")
                     Button(action: { showMore = true }) {
                         Image(systemName: "gearshape.fill")
                             .font(.subheadline.weight(.bold))
@@ -195,11 +206,12 @@ struct ContentView: View {
                 Group {
                     switch selectedTab {
                     case .noobs:
-                        NoobsTab(
-                            worlds: viewModel.worldRows,
+                        OverworldView(
+                            layout: ZoneLayoutCatalog.zone1,
                             generators: viewModel.generatorRows,
-                            onUpgrade: viewModel.buyGenerator,
-                            onUpgradeMax: viewModel.buyGeneratorMax
+                            isZone2Unlocked: viewModel.worldRows.first(where: { $0.id == WorldCatalog.zone2ID })?.isUnlocked ?? false,
+                            onBuyGenerator: viewModel.buyGenerator,
+                            onBuyGeneratorMax: viewModel.buyGeneratorMax
                         )
                     case .upgrades:
                         UpgradesTab(upgrades: viewModel.visibleUpgrades, onBuy: viewModel.buyUpgrade, onBuyMax: viewModel.buyUpgradeMax)
@@ -297,7 +309,10 @@ struct ContentView: View {
         }
         .onChange(of: viewModel.unlockedAchievementCount) { _, _ in checkForReviewPrompt() }
         .sheet(isPresented: $showMore) {
-            MoreSheet(viewModel: viewModel, adManager: adManager, iapManager: iapManager, gameCenterManager: gameCenterManager)
+            MoreSheet(viewModel: viewModel, adManager: adManager, gameCenterManager: gameCenterManager)
+        }
+        .sheet(isPresented: $showGamePasses) {
+            GamePassesSheet(viewModel: viewModel, iapManager: iapManager)
         }
     }
 
@@ -749,135 +764,6 @@ private struct VoidMotifs: View {
     }
 }
 
-private struct NoobsTab: View {
-    let worlds: [WorldRowViewData]
-    let generators: [GeneratorRowViewData]
-    let onUpgrade: (String, Int) -> Void
-    let onUpgradeMax: (String) -> Void
-    @State private var quantity: BuyQuantity = .one
-    @State private var selectedZoneID: String = WorldCatalog.zone1ID
-
-    private var selectedWorld: WorldRowViewData? {
-        worlds.first { $0.id == selectedZoneID }
-    }
-
-    private var rowsForSelectedZone: [GeneratorRowViewData] {
-        generators.filter { $0.zoneID == selectedZoneID }
-    }
-
-    var body: some View {
-        ZStack {
-            WorldBackdrop(zoneID: selectedZoneID)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-
-            VStack(spacing: 8) {
-                Picker("Quantity", selection: $quantity) {
-                    ForEach(BuyQuantity.allCases) { q in
-                        Text(q.rawValue).tag(q)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                if let world = selectedWorld, !world.isUnlocked {
-                    GlowCard(borderColor: .gray) {
-                        VStack(spacing: 6) {
-                            Image(systemName: "lock.fill")
-                                .font(.largeTitle)
-                                .foregroundStyle(.white.opacity(0.4))
-                            Text(world.name)
-                                .font(.headline)
-                                .foregroundStyle(.white.opacity(0.6))
-                            Text(world.lockedDescription)
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.4))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 24)
-                    }
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 10) {
-                            ForEach(rowsForSelectedZone) { generator in
-                                GeneratorRowView(data: generator, quantity: quantity) {
-                                    switch quantity {
-                                    case .one: onUpgrade(generator.id, 1)
-                                    case .ten: onUpgrade(generator.id, 10)
-                                    case .hundred: onUpgrade(generator.id, 100)
-                                    case .max: onUpgradeMax(generator.id)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .scrollIndicators(.hidden)
-                }
-
-                if worlds.count > 1 {
-                    WorldSelector(worlds: worlds, selectedZoneID: $selectedZoneID)
-                }
-            }
-            .padding(10)
-        }
-    }
-}
-
-private struct WorldSelector: View {
-    let worlds: [WorldRowViewData]
-    @Binding var selectedZoneID: String
-    @Namespace private var namespace
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        HStack(spacing: 8) {
-            ForEach(worlds) { world in
-                let tint = worldTint(for: world.id)
-                let isSelected = world.id == selectedZoneID
-
-                Button {
-                    guard world.isUnlocked else { return }
-                    withAnimation(reduceMotion ? .linear(duration: 0.1) : .spring(response: 0.35, dampingFraction: 0.82)) {
-                        selectedZoneID = world.id
-                    }
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: world.isUnlocked ? world.icon : "lock.fill")
-                            .font(.system(size: 18, weight: .bold))
-                        Text(world.name)
-                            .font(.caption2.weight(.bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                    }
-                    .foregroundStyle(isSelected ? .white : .white.opacity(world.isUnlocked ? 0.65 : 0.35))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background {
-                        if isSelected {
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [tint, tint.opacity(0.6)],
-                                        startPoint: .top, endPoint: .bottom
-                                    )
-                                )
-                                .matchedGeometryEffect(id: "selectedWorld", in: namespace)
-                                .shadow(color: tint.opacity(0.5), radius: 8, y: 3)
-                        }
-                    }
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .strokeBorder(tint.opacity(isSelected ? 0 : (world.isUnlocked ? 0.5 : 0.15)), lineWidth: 1.2)
-                    )
-                }
-                .buttonStyle(.plain)
-                .opacity(world.isUnlocked ? 1 : 0.6)
-            }
-        }
-        .padding(6)
-        .glassPanel(tint: .white, cornerRadius: 20)
-    }
-}
-
 // MARK: - Upgrades tab (shared row style for both Oof and Rebirth shops)
 
 private struct UpgradesTab: View {
@@ -1085,7 +971,6 @@ private struct OfflineEarningsBanner: View {
 private struct MoreSheet: View {
     @ObservedObject var viewModel: GameViewModel
     @ObservedObject var adManager: RewardedAdManager
-    @ObservedObject var iapManager: IAPManager
     @ObservedObject var gameCenterManager: GameCenterManager
     @Environment(\.dismiss) private var dismiss
     @State private var codeText = ""
@@ -1093,7 +978,6 @@ private struct MoreSheet: View {
     @State private var importCodeText = ""
     @State private var backupMessage: String?
     @State private var showImportConfirm = false
-    @State private var restoreMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -1106,7 +990,6 @@ private struct MoreSheet: View {
                         adBoostsSection
                         codesSection
                         backupSection
-                        supportSection
                         achievementsSection
                         settingsSection
                     }
@@ -1385,78 +1268,6 @@ private struct MoreSheet: View {
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.7))
                 }
-            }
-        }
-    }
-
-    private var supportSection: some View {
-        GlowCard(borderColor: .green) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Support the Game").font(.headline).foregroundStyle(.white)
-                ForEach(IAPProduct.allCases) { product in
-                    supportRow(product)
-                }
-
-                Button("Restore Purchases") {
-                    Task {
-                        await iapManager.restorePurchases()
-                        restoreMessage = "Restore complete."
-                    }
-                }
-                .buttonStyle(PressableButtonStyle())
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.6))
-                .accessibilityHint("Reapplies any purchases already made with this Apple ID")
-
-                if let restoreMessage {
-                    Text(restoreMessage)
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
-                }
-            }
-        }
-    }
-
-    private func supportRow(_ product: IAPProduct) -> some View {
-        let isOwned = product.kind == .nonConsumable && viewModel.isProductOwned(product)
-        let storeProduct = iapManager.products[product]
-        let isPurchasing = iapManager.purchasing == product
-
-        return HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(product.displayName)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.white)
-                Text(product.displayDescription)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
-            }
-            Spacer()
-            if isOwned {
-                Image(systemName: "checkmark.seal.fill")
-                    .foregroundStyle(.green)
-                    .accessibilityLabel("Owned")
-            } else {
-                Button {
-                    Task { await iapManager.purchase(product) }
-                } label: {
-                    if isPurchasing {
-                        ProgressView().tint(.white)
-                    } else {
-                        Text(storeProduct?.displayPrice ?? "\u{2014}")
-                    }
-                }
-                .buttonStyle(PressableButtonStyle())
-                .font(.caption.weight(.bold))
-                .padding(.horizontal, 12).padding(.vertical, 8)
-                .background(
-                    storeProduct != nil ? AnyShapeStyle(Theme.oofGradient) : AnyShapeStyle(Color.white.opacity(0.15)),
-                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-                )
-                .foregroundStyle(.white)
-                .disabled(storeProduct == nil || isPurchasing)
-                .accessibilityLabel("Buy \(product.displayName)")
-                .accessibilityValue(storeProduct?.displayPrice ?? "Unavailable")
             }
         }
     }
