@@ -31,11 +31,15 @@ enum GeneratorCatalog {
         GeneratorDefinition(id: "portal_noob", name: "Portal Noob", zoneID: WorldCatalog.zone2ID, baseCost: 1_500_000, baseOutput: 12_000, unlockThreshold: 0),
         GeneratorDefinition(id: "cosmic_noob", name: "Cosmic Noob", zoneID: WorldCatalog.zone2ID, baseCost: 20_000_000, baseOutput: 150_000, unlockThreshold: 500_000),
         GeneratorDefinition(id: "void_noob", name: "Void Noob", zoneID: WorldCatalog.zone2ID, baseCost: 300_000_000, baseOutput: 2_000_000, unlockThreshold: 5_000_000),
+        GeneratorDefinition(id: "nebula_noob", name: "Nebula Noob", zoneID: WorldCatalog.zone2ID, baseCost: 900_000_000, baseOutput: 5_000_000, unlockThreshold: 50_000_000),
+        GeneratorDefinition(id: "singularity_noob", name: "Singularity Noob", zoneID: WorldCatalog.zone2ID, baseCost: 2_500_000_000, baseOutput: 13_000_000, unlockThreshold: 300_000_000),
 
         // Zone 3 — The Ascension Spire (unlocks after 5 Rebirths)
         GeneratorDefinition(id: "ascended_noob", name: "Ascended Noob", zoneID: WorldCatalog.zone3ID, baseCost: 5_000_000_000, baseOutput: 25_000_000, unlockThreshold: 0),
         GeneratorDefinition(id: "ethereal_noob", name: "Ethereal Noob", zoneID: WorldCatalog.zone3ID, baseCost: 80_000_000_000, baseOutput: 350_000_000, unlockThreshold: 10_000_000),
-        GeneratorDefinition(id: "divine_noob", name: "Divine Noob", zoneID: WorldCatalog.zone3ID, baseCost: 1_200_000_000_000, baseOutput: 5_000_000_000, unlockThreshold: 100_000_000)
+        GeneratorDefinition(id: "divine_noob", name: "Divine Noob", zoneID: WorldCatalog.zone3ID, baseCost: 1_200_000_000_000, baseOutput: 5_000_000_000, unlockThreshold: 100_000_000),
+        GeneratorDefinition(id: "phoenix_noob", name: "Phoenix Noob", zoneID: WorldCatalog.zone3ID, baseCost: 18_000_000_000_000, baseOutput: 70_000_000_000, unlockThreshold: 800_000_000),
+        GeneratorDefinition(id: "sovereign_noob", name: "Sovereign Noob", zoneID: WorldCatalog.zone3ID, baseCost: 280_000_000_000_000, baseOutput: 1_000_000_000_000, unlockThreshold: 8_000_000_000)
     ]
 
     static func definition(for id: String) -> GeneratorDefinition? {

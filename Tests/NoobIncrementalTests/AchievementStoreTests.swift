@@ -56,10 +56,10 @@ final class AchievementStoreTests: XCTestCase {
         state.currency = 10_000_000
         XCTAssertFalse(AchievementStore.conditionMet(definition, state: state))
 
-        // Must cover the priciest Zone 3 Noob (currently up to low trillions), not just
-        // Zone 1/2 — this budget is intentionally generous rather than tightly pinned to
+        // Must cover the priciest Zone 3 Noob (currently up to hundreds of trillions), not
+        // just Zone 1/2 — this budget is intentionally generous rather than tightly pinned to
         // today's catalog costs, so it doesn't need touching every time balance changes.
-        state.currency = 10_000_000_000_000
+        state.currency = 1_000_000_000_000_000
         for generator in GeneratorCatalog.all {
             state = GeneratorStore.buy(generator, state: state)
         }
