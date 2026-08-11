@@ -47,6 +47,7 @@ struct AchievementRowViewData: Identifiable {
     let name: String
     let description: String
     let isUnlocked: Bool
+    let progressText: String?
 }
 
 struct MinionRowViewData: Identifiable {
@@ -203,13 +204,24 @@ final class GameViewModel: ObservableObject {
 
     var achievementRows: [AchievementRowViewData] {
         AchievementCatalog.all.map { definition in
-            AchievementRowViewData(
+            let isUnlocked = AchievementStore.isUnlocked(definition, state: state)
+            return AchievementRowViewData(
                 id: definition.id,
                 name: definition.name,
                 description: definition.description,
-                isUnlocked: AchievementStore.isUnlocked(definition, state: state)
+                isUnlocked: isUnlocked,
+                progressText: isUnlocked ? nil : achievementProgressText(definition)
             )
         }
+    }
+
+    private func achievementProgressText(_ definition: AchievementDefinition) -> String? {
+        guard let (current, target) = AchievementStore.progress(definition, state: state) else { return nil }
+        let clampedCurrent = min(current, target)
+        if case .lifetimeEarned = definition.condition {
+            return "\(NumberFormatting.format(clampedCurrent)) / \(NumberFormatting.format(target))"
+        }
+        return "\(NumberFormatting.format(clampedCurrent, fractionDigits: 0)) / \(NumberFormatting.format(target, fractionDigits: 0))"
     }
 
     // MARK: - Minions

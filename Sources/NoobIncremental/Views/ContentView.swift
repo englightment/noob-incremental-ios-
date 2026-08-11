@@ -1350,6 +1350,11 @@ private struct MoreSheet: View {
                                     .foregroundStyle(.white.opacity(0.4))
                             }
                             Spacer()
+                            if let progressText = row.progressText {
+                                Text(progressText)
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
                         }
                     }
                 }

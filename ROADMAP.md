@@ -39,7 +39,7 @@ transitions on tab/world switches) with no way to tone it down. Respect
 disable or shorten the purely-decorative animations for players who want/need it — also an
 App Store accessibility best practice.
 
-## 6. [ ] Feature: locked achievements show no progress
+## 6. [x] Feature: locked achievements show no progress
 
 Every locked achievement row shows the same generic lock icon regardless of how close it is —
 a player at 999,900/1,000,000 lifetime Oof looks identical to one at 10. Showing numeric

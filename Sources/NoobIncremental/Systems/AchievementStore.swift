@@ -40,6 +40,44 @@ enum AchievementStore {
         }
     }
 
+    /// (current, target) toward a condition, for showing "how close am I" on locked
+    /// achievements — nil for conditions with no meaningful fractional reading (codeRedeemed
+    /// is binary: either a code has been redeemed or it hasn't).
+    static func progress(_ definition: AchievementDefinition, state: GameState) -> (current: Decimal, target: Decimal)? {
+        switch definition.condition {
+        case .lifetimeEarned(let amount):
+            return (state.lifetimeEarned, amount)
+        case .rebirths(let count):
+            return (Decimal(state.rebirthCount), Decimal(count))
+        case .totalNoobLevels(let total):
+            return (Decimal(totalNoobLevels(state: state)), Decimal(total))
+        case .streakDays(let days):
+            return (Decimal(state.longestStreak), Decimal(days))
+        case .zoneNoobLevels(let zoneID, let total):
+            return (Decimal(totalNoobLevels(state: state, zoneID: zoneID)), Decimal(total))
+        case .allNoobsOwned:
+            return (Decimal(ownedCount(GeneratorCatalog.all, isOwned: { GeneratorStore.level($0, state: state) > 0 })), Decimal(GeneratorCatalog.all.count))
+        case .allZoneNoobsOwned(let zoneID):
+            let zoneGenerators = GeneratorCatalog.all(inZone: zoneID)
+            return (Decimal(ownedCount(zoneGenerators, isOwned: { GeneratorStore.level($0, state: state) > 0 })), Decimal(zoneGenerators.count))
+        case .allRunesOwned:
+            return (Decimal(ownedCount(RuneCatalog.all, isOwned: { RuneStore.level($0, state: state) > 0 })), Decimal(RuneCatalog.all.count))
+        case .allMinionsOwned:
+            return (Decimal(ownedCount(MinionCatalog.all, isOwned: { MinionSystem.isOwned($0, state: state) })), Decimal(MinionCatalog.all.count))
+        case .upgradeMaxed(let id):
+            if let def = UpgradeCatalog.definition(for: id) { return (Decimal(UpgradeStore.level(def, state: state)), Decimal(def.maxLevel)) }
+            if let def = RebirthUpgradeCatalog.definition(for: id) { return (Decimal(RebirthUpgradeStore.level(def, state: state)), Decimal(def.maxLevel)) }
+            if let def = RuneCatalog.definition(for: id) { return (Decimal(RuneStore.level(def, state: state)), Decimal(def.maxLevel)) }
+            return nil
+        case .codeRedeemed:
+            return nil
+        }
+    }
+
+    private static func ownedCount<T>(_ items: [T], isOwned: (T) -> Bool) -> Int {
+        items.filter(isOwned).count
+    }
+
     private static func totalNoobLevels(state: GameState) -> Int {
         GeneratorCatalog.all.reduce(0) { $0 + GeneratorStore.level($1, state: state) }
     }

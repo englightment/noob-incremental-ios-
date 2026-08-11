@@ -185,4 +185,61 @@ final class AchievementStoreTests: XCTestCase {
             XCTAssertTrue(existsSomewhere, "\(achievement.id) references unknown upgrade \(id)")
         }
     }
+
+    func testProgressForLifetimeEarned() {
+        var state = GameState.newGame
+        state.lifetimeEarned = 400
+
+        let progress = AchievementStore.progress(earnedAchievement, state: state)
+
+        XCTAssertEqual(progress?.current, 400)
+        XCTAssertEqual(progress?.target, 1_000)
+    }
+
+    func testProgressForRebirths() {
+        var state = GameState.newGame
+        state.rebirthCount = 1
+
+        let progress = AchievementStore.progress(rebirthAchievement, state: state)
+
+        XCTAssertEqual(progress?.current, 1)
+        XCTAssertEqual(progress?.target, 2)
+    }
+
+    func testProgressForAllNoobsOwnedCountsOwnedTiers() {
+        guard let starter = GeneratorCatalog.definition(for: "starter_noob") else {
+            return XCTFail("starter_noob missing from catalog")
+        }
+        let definition = AchievementDefinition(id: "test_progress_all_noobs", name: "Test", description: "", condition: .allNoobsOwned)
+        var state = GameState.newGame
+        state.currency = 1_000_000
+
+        let before = AchievementStore.progress(definition, state: state)
+        XCTAssertEqual(before?.current, 0)
+        XCTAssertEqual(before?.target, Decimal(GeneratorCatalog.all.count))
+
+        state = GeneratorStore.buy(starter, state: state)
+        let after = AchievementStore.progress(definition, state: state)
+        XCTAssertEqual(after?.current, 1)
+    }
+
+    func testProgressForUpgradeMaxedReadsCurrentLevel() {
+        guard let moreOof = UpgradeCatalog.definition(for: "more_oof") else {
+            return XCTFail("more_oof missing from catalog")
+        }
+        let definition = AchievementDefinition(id: "test_progress_upgrade", name: "Test", description: "", condition: .upgradeMaxed("more_oof"))
+        var state = GameState.newGame
+        state.currency = 1_000_000
+        state = UpgradeStore.buyOne(moreOof, state: state)
+
+        let progress = AchievementStore.progress(definition, state: state)
+
+        XCTAssertEqual(progress?.current, 1)
+        XCTAssertEqual(progress?.target, Decimal(moreOof.maxLevel))
+    }
+
+    func testProgressIsNilForCodeRedeemed() {
+        let definition = AchievementDefinition(id: "test_progress_code", name: "Test", description: "", condition: .codeRedeemed)
+        XCTAssertNil(AchievementStore.progress(definition, state: .newGame))
+    }
 }
