@@ -45,6 +45,7 @@
 		780C15320F83BD4132C3BDE5 /* GeneratorStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFCA9BD2719FCF5AA254E72 /* GeneratorStoreTests.swift */; };
 		7A975D28117F65FC7C9A5AB4 /* MilestoneSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70E4B7D9C6FD4E0A7258A4C6 /* MilestoneSystemTests.swift */; };
 		81E1B483C93537F0DD5EBE50 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EFC80C3F6D91160B7C4AC2 /* ConfettiView.swift */; };
+		83319F619FF6000DF15DFE58 /* ShareSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C17984A246BD80DD460E38 /* ShareSummaryTests.swift */; };
 		83C213142E2E00B2B1D706C5 /* RedeemCodeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25ACC1DF21B323B8DEBD00F /* RedeemCodeStoreTests.swift */; };
 		84A93CE002F19753FBA371D3 /* RedeemCodeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339213DC8553D38B91E3553A /* RedeemCodeStore.swift */; };
 		8D2803565938F31C79A21CB4 /* GeneratorMilestoneSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6917D32E5994E8ECB31EB358 /* GeneratorMilestoneSystemTests.swift */; };
@@ -78,6 +79,7 @@
 		F5BC4086C34469E49AC93F43 /* IAPSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3997B6A86BAD5B359F2393EC /* IAPSystem.swift */; };
 		F5EA6DDF21E0C4C2DEFDE3E6 /* OnboardingSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D76D06754DBFE22CD1B15E /* OnboardingSystemTests.swift */; };
 		F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC12A83B89E0907154AB583 /* UpgradeStore.swift */; };
+		FD3CDA6A01EB499A0BABA45F /* ShareSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A17F1B059184772E5BE9F20 /* ShareSummary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,10 +121,12 @@
 		54B575B677372D934D11F4C8 /* DailyStreakSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyStreakSystem.swift; sourceTree = "<group>"; };
 		63F01DD25682182DD9350069 /* RebirthUpgradeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RebirthUpgradeStore.swift; sourceTree = "<group>"; };
 		6917D32E5994E8ECB31EB358 /* GeneratorMilestoneSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorMilestoneSystemTests.swift; sourceTree = "<group>"; };
+		6A17F1B059184772E5BE9F20 /* ShareSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSummary.swift; sourceTree = "<group>"; };
 		6A2B014BBA193687A6084D9F /* RedeemCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedeemCode.swift; sourceTree = "<group>"; };
 		7081E2503F71D0B4790301A7 /* DailyReward.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReward.swift; sourceTree = "<group>"; };
 		70E4B7D9C6FD4E0A7258A4C6 /* MilestoneSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneSystemTests.swift; sourceTree = "<group>"; };
 		7D2E29CB1B6E4CC9B3A8C317 /* MinionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinionState.swift; sourceTree = "<group>"; };
+		87C17984A246BD80DD460E38 /* ShareSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSummaryTests.swift; sourceTree = "<group>"; };
 		8C2D34A644C9CB7DD4AE7B08 /* IAPSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPSystemTests.swift; sourceTree = "<group>"; };
 		9102C53B66EE95A238CE1C0D /* FormulasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulasTests.swift; sourceTree = "<group>"; };
 		9146A6B1A231FA3371299827 /* OnboardingSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSystem.swift; sourceTree = "<group>"; };
@@ -297,6 +301,7 @@
 				2E9E3B505C8C4AB150229CA1 /* ReviewPromptSystemTests.swift */,
 				4E18250F274BCEC89B02EF11 /* RuneStoreTests.swift */,
 				08042ADBAD173FBB5AF65CC6 /* SaveManagerBackupTests.swift */,
+				87C17984A246BD80DD460E38 /* ShareSummaryTests.swift */,
 				E18A0896ECC21EC4833B7340 /* UpgradeStoreTests.swift */,
 				98BBD9F8D7888AF0AEF95417 /* WorldSystemTests.swift */,
 			);
@@ -328,6 +333,7 @@
 				03463F5BE5D9791339E9A914 /* ReviewPromptSystem.swift */,
 				F530D937662570E1B748BD95 /* RewardedAdManager.swift */,
 				267A418F4C2AFE77927BB3C8 /* RuneStore.swift */,
+				6A17F1B059184772E5BE9F20 /* ShareSummary.swift */,
 				4F1D3AE977C368F1B7F475C6 /* SoundManager.swift */,
 				BFC12A83B89E0907154AB583 /* UpgradeStore.swift */,
 				00E444AB830DAFFF59CE5480 /* WorldSystem.swift */,
@@ -485,6 +491,7 @@
 				1DFBA7D68BB4AF4E34EA195F /* RuneDefinition.swift in Sources */,
 				E9D6ED46465E8BDBD22428A3 /* RuneStore.swift in Sources */,
 				00E29878A6480C69338B2CB4 /* SaveManager.swift in Sources */,
+				FD3CDA6A01EB499A0BABA45F /* ShareSummary.swift in Sources */,
 				385640CAC69744E5DA3DF486 /* SoundManager.swift in Sources */,
 				BBBCD93773FE41F97D4AEF53 /* UpgradeDefinition.swift in Sources */,
 				F870BCFCBB605353EEA02EFD /* UpgradeStore.swift in Sources */,
@@ -518,6 +525,7 @@
 				AE7AD251B20277C9746FA5EC /* ReviewPromptSystemTests.swift in Sources */,
 				15802D9B60936424AF17B301 /* RuneStoreTests.swift in Sources */,
 				4DA6776A7B55D0607D887BC0 /* SaveManagerBackupTests.swift in Sources */,
+				83319F619FF6000DF15DFE58 /* ShareSummaryTests.swift in Sources */,
 				283E0ABD92263388403A364B /* UpgradeStoreTests.swift in Sources */,
 				D61F7A43E3CC1FDE17D3CC5A /* WorldSystemTests.swift in Sources */,
 			);
