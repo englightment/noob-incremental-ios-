@@ -78,4 +78,17 @@ final class WorldSystemTests: XCTestCase {
         state.rebirthCount = 15
         XCTAssertTrue(WorldSystem.isUnlocked(zone4, state: state))
     }
+
+    /// Guards against ZoneLayoutCatalog silently drifting out of sync with GeneratorCatalog
+    /// — e.g. a new Zone 1 generator added without a matching overworld station, which would
+    /// make it permanently unreachable in the walkable world despite still existing in the shop.
+    func testZone1LayoutHasExactlyOneStationForEveryZone1Generator() {
+        let zone1GeneratorIDs = Set(GeneratorCatalog.all(inZone: WorldCatalog.zone1ID).map(\.id))
+        let stationGeneratorIDs = ZoneLayoutCatalog.zone1.stations.compactMap { station -> String? in
+            guard case .generator(let generatorID) = station.kind else { return nil }
+            return generatorID
+        }
+        XCTAssertEqual(Set(stationGeneratorIDs), zone1GeneratorIDs)
+        XCTAssertEqual(stationGeneratorIDs.count, zone1GeneratorIDs.count, "expected no duplicate generator stations")
+    }
 }
