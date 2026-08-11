@@ -56,7 +56,7 @@ expires every 7 days, and reinstalling to re-sign can wipe local app data — th
 no way to protect progress against that. Add an export-to-clipboard/share-sheet "backup code"
 (base64 of the save JSON, or similar) and a matching import flow in Settings.
 
-## 8. [ ] Feature: no reminder when offline-progress caps out
+## 8. [x] Feature: no reminder when offline-progress caps out
 
 Idle games live and die on getting players to come back at the right moment. Right now there's
 no nudge — a player who closes the app has no signal that their offline-earnings cap (8h, or

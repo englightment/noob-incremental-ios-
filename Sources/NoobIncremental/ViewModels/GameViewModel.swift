@@ -335,6 +335,7 @@ final class GameViewModel: ObservableObject {
     }
 
     func start() {
+        OfflineReminderManager.cancelReminder()
         lastTickDate = Date()
         refreshTimer?.invalidate()
         refreshTimer = Timer.scheduledTimer(withTimeInterval: GameBalance.uiRefreshInterval, repeats: true) { [weak self] _ in
@@ -352,6 +353,8 @@ final class GameViewModel: ObservableObject {
         autosaveTimer?.invalidate()
         autosaveTimer = nil
         save()
+        let offlineCap = GameBalance.maxOfflineProgressDuration + RebirthUpgradeStore.offlineCapBonus(state: state)
+        OfflineReminderManager.scheduleReminder(after: offlineCap)
     }
 
     func dismissOfflineEarningsBanner() {
