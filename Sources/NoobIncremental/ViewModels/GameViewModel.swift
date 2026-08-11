@@ -142,9 +142,11 @@ final class GameViewModel: ObservableObject {
 
     var pendingDailyRewardText: String {
         let reward = DailyRewardCatalog.reward(forStreak: pendingStreakDay)
-        return reward.rebirthCurrency > 0
-            ? "+\(NumberFormatting.format(reward.rebirthCurrency)) Rebirth"
-            : "+\(NumberFormatting.format(reward.oof)) Oof"
+        var parts: [String] = []
+        if reward.oof > 0 { parts.append("+\(NumberFormatting.format(reward.oof)) Oof") }
+        if reward.rebirthCurrency > 0 { parts.append("+\(NumberFormatting.format(reward.rebirthCurrency)) Rebirth") }
+        if reward.runeShards > 0 { parts.append("+\(NumberFormatting.format(reward.runeShards)) Rune Shards") }
+        return parts.joined(separator: ", ")
     }
 
     // MARK: - Rebirth

@@ -42,6 +42,7 @@ enum AchievementCatalog {
         AchievementDefinition(id: "redeem_code", name: "Code Breaker", description: "Redeem a code", condition: .codeRedeemed),
         AchievementDefinition(id: "streak_7", name: "Week One", description: "Reach a 7-day login streak", condition: .streakDays(7)),
         AchievementDefinition(id: "streak_30", name: "Dedicated", description: "Reach a 30-day login streak", condition: .streakDays(30)),
+        AchievementDefinition(id: "streak_100", name: "Unshakeable", description: "Reach a 100-day login streak", condition: .streakDays(100)),
         AchievementDefinition(id: "explorer", name: "Explorer", description: "Reach Zone 2, The Overworks", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone2ID, total: 1)),
         AchievementDefinition(id: "overworks_master", name: "Overworks Master", description: "Reach 20 total Zone 2 Noob levels", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone2ID, total: 20)),
         AchievementDefinition(id: "ascendant", name: "Ascendant", description: "Reach Zone 3, The Ascension Spire", condition: .zoneNoobLevels(zoneID: WorldCatalog.zone3ID, total: 1)),

@@ -31,6 +31,7 @@ enum DailyStreakSystem {
         next.lastStreakClaimDate = now
         next.currency += reward.oof
         next.rebirthCurrency += reward.rebirthCurrency
+        next.runeShards += reward.runeShards
         return (next, reward)
     }
 }
