@@ -71,6 +71,7 @@
 		C6D6C157D44844E41E80FF30 /* AdBoostTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5D15538058B1DA10C4A6D5 /* AdBoostTier.swift */; };
 		C8120884DA12BDB85C870E3E /* GameCenterSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C56DBD0419B46ADE94106C9 /* GameCenterSystem.swift */; };
 		CA34CD22AA380AF9298E7589 /* NoobFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D9ED406DD0557491410368 /* NoobFaceView.swift */; };
+		CBD820B836C661E02BCAE38C /* ZoneLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3D5CEEBB33E0BF29D549C1 /* ZoneLayout.swift */; };
 		CBFAF698C1DC698E3DD8AE30 /* IAPSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2D34A644C9CB7DD4AE7B08 /* IAPSystemTests.swift */; };
 		CDFA142A60E72F35B51D6303 /* GeneratorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0428B2EB50771DBE1BA4CC4A /* GeneratorStore.swift */; };
 		CE54B7F076646DD58CDE2503 /* GameLoopPassiveIncomeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1131683B10CC5CB75CA716 /* GameLoopPassiveIncomeTests.swift */; };
@@ -120,6 +121,7 @@
 		182014D5CB08333C8F91B968 /* IAPProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPProduct.swift; sourceTree = "<group>"; };
 		21BDCEE547CA924FD376D2E5 /* WorldStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldStation.swift; sourceTree = "<group>"; };
 		267A418F4C2AFE77927BB3C8 /* RuneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneStore.swift; sourceTree = "<group>"; };
+		2C3D5CEEBB33E0BF29D549C1 /* ZoneLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneLayout.swift; sourceTree = "<group>"; };
 		2CA0BADD1BD076C3421A7642 /* SaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveManager.swift; sourceTree = "<group>"; };
 		2E26BA92B8CC0DF2B59BBB27 /* GameCenterSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterSystemTests.swift; sourceTree = "<group>"; };
 		2E9E3B505C8C4AB150229CA1 /* ReviewPromptSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptSystemTests.swift; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 				F13E6847D2D71E92B21BF9C2 /* UpgradeDefinition.swift */,
 				EDFC94A3B23BFF987BB69B3C /* WorldDefinition.swift */,
 				21BDCEE547CA924FD376D2E5 /* WorldStation.swift */,
+				2C3D5CEEBB33E0BF29D549C1 /* ZoneLayout.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -531,6 +534,7 @@
 				58C363AA5A0BD8B957A19B95 /* WorldDefinition.swift in Sources */,
 				D10ED26E35C36833B71BC778 /* WorldStation.swift in Sources */,
 				26C421148AA2FF174AB5910A /* WorldSystem.swift in Sources */,
+				CBD820B836C661E02BCAE38C /* ZoneLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
