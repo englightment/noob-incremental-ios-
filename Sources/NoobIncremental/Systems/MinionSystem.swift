@@ -5,7 +5,12 @@ import Foundation
 /// real choice.
 enum MinionSystem {
 
-    static let maxEquipped = 3
+    private static let baseMaxEquipped = 3
+
+    /// Base slot count plus whatever the "Extra Minion Slots" rebirth upgrade has granted.
+    static func maxEquipped(state: GameState) -> Int {
+        baseMaxEquipped + RebirthUpgradeStore.minionSlotBonus(state: state)
+    }
 
     static func isOwned(_ definition: MinionDefinition, state: GameState) -> Bool {
         state.ownedMinions[definition.id]?.isUnlocked ?? false
@@ -20,7 +25,7 @@ enum MinionSystem {
     }
 
     static func canEquipMore(state: GameState) -> Bool {
-        equippedCount(state: state) < maxEquipped
+        equippedCount(state: state) < maxEquipped(state: state)
     }
 
     /// Marks any minion whose unlock achievement is already recorded as owned but not yet

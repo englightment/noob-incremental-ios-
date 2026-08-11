@@ -210,7 +210,7 @@ final class GameViewModel: ObservableObject {
     // MARK: - Minions
 
     var equippedMinionCount: Int { MinionSystem.equippedCount(state: state) }
-    var maxEquippedMinions: Int { MinionSystem.maxEquipped }
+    var maxEquippedMinions: Int { MinionSystem.maxEquipped(state: state) }
 
     var minionRows: [MinionRowViewData] {
         MinionCatalog.all.map { definition in

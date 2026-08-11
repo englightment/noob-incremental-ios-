@@ -61,8 +61,22 @@ final class MinionSystemTests: XCTestCase {
             state = MinionSystem.toggleEquip(definition, state: state)
         }
 
-        XCTAssertEqual(MinionSystem.equippedCount(state: state), MinionSystem.maxEquipped)
-        XCTAssertLessThan(MinionSystem.maxEquipped, MinionCatalog.all.count)
+        XCTAssertEqual(MinionSystem.equippedCount(state: state), MinionSystem.maxEquipped(state: state))
+        XCTAssertLessThan(MinionSystem.maxEquipped(state: state), MinionCatalog.all.count)
+    }
+
+    func testExtraMinionSlotsUpgradeRaisesMaxEquipped() {
+        guard let extraSlots = RebirthUpgradeCatalog.definition(for: "rebirth_minion_slots") else {
+            return XCTFail("rebirth_minion_slots missing from catalog")
+        }
+        var state = GameState.newGame
+        let baseline = MinionSystem.maxEquipped(state: state)
+
+        state.rebirthCurrency = 1_000_000
+        state = RebirthUpgradeStore.buyMax(extraSlots, state: state)
+
+        XCTAssertTrue(RebirthUpgradeStore.isMaxed(extraSlots, state: state))
+        XCTAssertEqual(MinionSystem.maxEquipped(state: state), baseline + 2)
     }
 
     func testOutputMultiplierOnlyCountsEquippedMinions() {

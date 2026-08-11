@@ -1,7 +1,7 @@
 import Foundation
 
 /// A minion is unlocked automatically by hitting a specific achievement (no separate currency
-/// sink) and grants a flat production bonus while equipped. Only `MinionSystem.maxEquipped`
+/// sink) and grants a flat production bonus while equipped. Only `MinionSystem.maxEquipped(state:)`
 /// can be active at once, so which ones to run is a real choice, not just a checklist.
 struct MinionDefinition: Identifiable, Equatable {
     let id: String

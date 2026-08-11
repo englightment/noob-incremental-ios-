@@ -107,4 +107,17 @@ final class RebirthUpgradeStoreTests: XCTestCase {
 
         XCTAssertEqual(RebirthUpgradeStore.flatOutputBonus(state: state), 500 * 2)
     }
+
+    func testExtraMinionSlotsAddsOnePerLevel() {
+        guard let def = RebirthUpgradeCatalog.definition(for: "rebirth_minion_slots") else {
+            return XCTFail("rebirth_minion_slots missing from catalog")
+        }
+        XCTAssertEqual(RebirthUpgradeStore.minionSlotBonus(state: .newGame), 0)
+
+        var state = GameState.newGame
+        state.rebirthCurrency = 1_000_000
+        state = RebirthUpgradeStore.buyOne(def, state: state)
+
+        XCTAssertEqual(RebirthUpgradeStore.minionSlotBonus(state: state), 1)
+    }
 }
