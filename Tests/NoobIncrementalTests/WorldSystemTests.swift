@@ -83,12 +83,20 @@ final class WorldSystemTests: XCTestCase {
     /// — e.g. a new Zone 1 generator added without a matching overworld station, which would
     /// make it permanently unreachable in the walkable world despite still existing in the shop.
     func testZone1LayoutHasExactlyOneStationForEveryZone1Generator() {
-        let zone1GeneratorIDs = Set(GeneratorCatalog.all(inZone: WorldCatalog.zone1ID).map(\.id))
-        let stationGeneratorIDs = ZoneLayoutCatalog.zone1.stations.compactMap { station -> String? in
+        assertLayoutHasExactlyOneStationPerGenerator(ZoneLayoutCatalog.zone1, zoneID: WorldCatalog.zone1ID)
+    }
+
+    func testZone2LayoutHasExactlyOneStationForEveryZone2Generator() {
+        assertLayoutHasExactlyOneStationPerGenerator(ZoneLayoutCatalog.zone2, zoneID: WorldCatalog.zone2ID)
+    }
+
+    private func assertLayoutHasExactlyOneStationPerGenerator(_ layout: ZoneLayout, zoneID: String, file: StaticString = #filePath, line: UInt = #line) {
+        let generatorIDs = Set(GeneratorCatalog.all(inZone: zoneID).map(\.id))
+        let stationGeneratorIDs = layout.stations.compactMap { station -> String? in
             guard case .generator(let generatorID) = station.kind else { return nil }
             return generatorID
         }
-        XCTAssertEqual(Set(stationGeneratorIDs), zone1GeneratorIDs)
-        XCTAssertEqual(stationGeneratorIDs.count, zone1GeneratorIDs.count, "expected no duplicate generator stations")
+        XCTAssertEqual(Set(stationGeneratorIDs), generatorIDs, file: file, line: line)
+        XCTAssertEqual(stationGeneratorIDs.count, generatorIDs.count, "expected no duplicate generator stations", file: file, line: line)
     }
 }

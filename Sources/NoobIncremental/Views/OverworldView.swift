@@ -1,16 +1,24 @@
 import SwiftUI
 
 /// The walkable 2D scene for a zone — replaces the old NoobsTab. A joystick-driven player
-/// walks around a fixed-size canvas; nearby stations (Noob generators, a zone-transition
-/// gate) surface an interact prompt.
+/// walks around a fixed-size canvas; nearby stations (Noob generators, the Rebirth Altar,
+/// Upgrade Workshop, Rune Shrine, Minion Den, zone-transition gates) surface an interact
+/// prompt.
 ///
-/// Body is split into small @ViewBuilder properties from the start rather than one large
-/// ZStack — this project hit a real Swift type-checker timeout CI failure earlier this
-/// session from exactly that pattern (see MoreSheet.statsSection's own split into
-/// statsRows/shareProgressButton for the same reason).
+/// `body` is kept to a handful of `.modifier(SomeType(...))` calls, each type-checked
+/// independently, rather than one big chain of `.sheet`/`.alert` — this project hit a real
+/// Swift type-checker timeout CI failure from exactly that pattern (first in
+/// MoreSheet.statsSection, then again here once this view grew past two sheets). Splitting
+/// into small `@ViewBuilder` properties wasn't sufficient on its own the second time; each
+/// popup now lives in its own dedicated `ViewModifier` type instead.
 struct OverworldView: View {
     @ObservedObject var viewModel: GameViewModel
     let layout: ZoneLayout
+    /// Called when the player interacts with an unlocked zone-transition station. The
+    /// caller is expected to apply `.id(zoneID)` to this view at the call site so SwiftUI
+    /// tears down and recreates it (resetting playerPosition to the new zone's spawn point,
+    /// clearing any open popups) rather than reusing this instance's @State across zones.
+    let onTravel: (String) -> Void
 
     @State private var playerPosition: CGPoint
     @State private var joystickDirection: CGVector = .zero
@@ -22,10 +30,12 @@ struct OverworldView: View {
     @State private var showRebirthAltar = false
     @State private var showUpgradeWorkshop = false
     @State private var showRuneShrine = false
+    @State private var showMinionDen = false
 
-    init(viewModel: GameViewModel, layout: ZoneLayout) {
+    init(viewModel: GameViewModel, layout: ZoneLayout, onTravel: @escaping (String) -> Void) {
         self.viewModel = viewModel
         self.layout = layout
+        self.onTravel = onTravel
         _playerPosition = State(initialValue: layout.spawnPoint)
     }
 
@@ -40,6 +50,14 @@ struct OverworldView: View {
     }
 
     var body: some View {
+        sceneContent
+            .modifier(GeneratorPopupModifier(viewModel: viewModel, generators: generators, activePopupGeneratorID: $activePopupGeneratorID))
+            .modifier(RebirthAndUpgradeSheetsModifier(viewModel: viewModel, showRebirthAltar: $showRebirthAltar, showUpgradeWorkshop: $showUpgradeWorkshop))
+            .modifier(RuneAndMinionSheetsModifier(viewModel: viewModel, showRuneShrine: $showRuneShrine, showMinionDen: $showMinionDen))
+            .modifier(ZoneGateAlertModifier(zoneGateMessage: $zoneGateMessage))
+    }
+
+    private var sceneContent: some View {
         GeometryReader { geo in
             ZStack(alignment: .topLeading) {
                 worldLayer(viewportSize: geo.size)
@@ -48,29 +66,6 @@ struct OverworldView: View {
             .frame(width: geo.size.width, height: geo.size.height)
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .overlay(alignment: .bottom) { controlsOverlay }
-        }
-        .sheet(isPresented: activePopupPresentedBinding) {
-            if let generatorID = activePopupGeneratorID, let data = generators.first(where: { $0.id == generatorID }) {
-                GeneratorStationPopupView(
-                    generator: data,
-                    onBuy: { viewModel.buyGenerator(generatorID, $0) },
-                    onBuyMax: { viewModel.buyGeneratorMax(generatorID) }
-                )
-            }
-        }
-        .sheet(isPresented: $showRebirthAltar) {
-            RebirthAltarSheet(viewModel: viewModel)
-        }
-        .sheet(isPresented: $showUpgradeWorkshop) {
-            UpgradeWorkshopSheet(viewModel: viewModel)
-        }
-        .sheet(isPresented: $showRuneShrine) {
-            RuneShrineSheet(viewModel: viewModel)
-        }
-        .alert("Locked", isPresented: zoneGateAlertBinding, presenting: zoneGateMessage) { _ in
-            Button("OK", role: .cancel) {}
-        } message: { message in
-            Text(message)
         }
     }
 
@@ -176,26 +171,84 @@ struct OverworldView: View {
         case .generator(let generatorID):
             activePopupGeneratorID = generatorID
         case .zoneTransition(let targetZoneID):
-            zoneGateMessage = isTargetZoneUnlocked(targetZoneID)
-                ? "\(station.name) is unlocked! It isn't walkable yet — for now, keep growing this zone."
-                : "Rebirth to unlock \(station.name)."
+            if isTargetZoneUnlocked(targetZoneID) {
+                onTravel(targetZoneID)
+            } else {
+                zoneGateMessage = "Rebirth to unlock \(station.name)."
+            }
         case .rebirthAltar:
             showRebirthAltar = true
         case .upgradeWorkshop:
             showUpgradeWorkshop = true
         case .runeShrine:
             showRuneShrine = true
+        case .minionDen:
+            showMinionDen = true
         }
     }
+}
 
-    // MARK: - Sheet/alert bindings
+// MARK: - Popup modifiers (see the type-level doc comment for why these are split out)
 
-    private var activePopupPresentedBinding: Binding<Bool> {
+private struct GeneratorPopupModifier: ViewModifier {
+    let viewModel: GameViewModel
+    let generators: [GeneratorRowViewData]
+    @Binding var activePopupGeneratorID: String?
+
+    private var isPresented: Binding<Bool> {
         Binding(get: { activePopupGeneratorID != nil }, set: { if !$0 { activePopupGeneratorID = nil } })
     }
 
-    private var zoneGateAlertBinding: Binding<Bool> {
+    func body(content: Content) -> some View {
+        content.sheet(isPresented: isPresented) {
+            if let generatorID = activePopupGeneratorID, let data = generators.first(where: { $0.id == generatorID }) {
+                GeneratorStationPopupView(
+                    generator: data,
+                    onBuy: { viewModel.buyGenerator(generatorID, $0) },
+                    onBuyMax: { viewModel.buyGeneratorMax(generatorID) }
+                )
+            }
+        }
+    }
+}
+
+private struct RebirthAndUpgradeSheetsModifier: ViewModifier {
+    let viewModel: GameViewModel
+    @Binding var showRebirthAltar: Bool
+    @Binding var showUpgradeWorkshop: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $showRebirthAltar) { RebirthAltarSheet(viewModel: viewModel) }
+            .sheet(isPresented: $showUpgradeWorkshop) { UpgradeWorkshopSheet(viewModel: viewModel) }
+    }
+}
+
+private struct RuneAndMinionSheetsModifier: ViewModifier {
+    let viewModel: GameViewModel
+    @Binding var showRuneShrine: Bool
+    @Binding var showMinionDen: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $showRuneShrine) { RuneShrineSheet(viewModel: viewModel) }
+            .sheet(isPresented: $showMinionDen) { MinionDenSheet(viewModel: viewModel) }
+    }
+}
+
+private struct ZoneGateAlertModifier: ViewModifier {
+    @Binding var zoneGateMessage: String?
+
+    private var isPresented: Binding<Bool> {
         Binding(get: { zoneGateMessage != nil }, set: { if !$0 { zoneGateMessage = nil } })
+    }
+
+    func body(content: Content) -> some View {
+        content.alert("Locked", isPresented: isPresented, presenting: zoneGateMessage) { _ in
+            Button("OK", role: .cancel) {}
+        } message: { message in
+            Text(message)
+        }
     }
 }
 

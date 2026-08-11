@@ -7,8 +7,7 @@ enum WorldStationKind: Equatable {
     case rebirthAltar
     case upgradeWorkshop
     case runeShrine
-    // .minionDen intentionally not added yet — bundled with removing Minions from
-    // Settings in a later phase, never before that station exists.
+    case minionDen
 }
 
 /// A fixed, interactive point of interest placed in a zone's walkable world (see
