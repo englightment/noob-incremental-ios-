@@ -100,7 +100,7 @@ though StoreKit itself still knows they own it. Add a "Restore Purchases" action
 reconciles `GameState` against `Transaction.currentEntitlements` and reapplies any owned
 non-consumables via `IAPSystem.applyPurchase`.
 
-## 13. [ ] Polish: primary controls have no VoiceOver labels
+## 13. [x] Polish: primary controls have no VoiceOver labels
 
 The UI relies entirely on visual layout (icons, color, position) with no `accessibilityLabel`/
 `accessibilityValue` on the highest-traffic controls (currency display, generator buy buttons,

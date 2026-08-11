@@ -181,6 +181,8 @@ private struct PillTabBar: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(tab.title)
+                .accessibilityAddTraits(selection == tab ? .isSelected : [])
             }
         }
         .padding(4)
@@ -221,6 +223,7 @@ struct ContentView: View {
                             .overlay(Circle().strokeBorder(Color.white.opacity(0.15), lineWidth: 1))
                     }
                     .buttonStyle(PressableButtonStyle())
+                    .accessibilityLabel("Menu")
                 }
 
                 if viewModel.canClaimDailyReward {
@@ -427,6 +430,9 @@ private struct CurrencyDisplay: View {
             }
             .font(.subheadline.weight(.bold))
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(subtitleText.isEmpty ? valueText : "\(valueText), \(subtitleText)")
     }
 }
 
@@ -932,10 +938,35 @@ private struct GeneratorRowView: View {
                     }
                     .buttonStyle(PressableButtonStyle())
                     .disabled(!canAfford)
+                    .accessibilityLabel(quantity == .max ? "Buy max \(data.name)" : "Upgrade \(data.name)")
+                    .accessibilityValue(costText)
+                    .accessibilityHint(canAfford ? "" : "Not enough Oof")
                 }
             }
         }
         .opacity(data.isLocked ? 0.55 : 1.0)
+        .modifier(LockedAccessibilitySummary(isLocked: data.isLocked, name: data.name, unlockText: data.unlockText))
+    }
+}
+
+/// Locked generator/upgrade rows have no interactive button for VoiceOver to land on, so
+/// without this the whole row reads as a jumble of static text with no indication of why
+/// it's greyed out. Collapses to a single "name, locked — unlockText" element only when
+/// locked; unlocked rows keep their normal per-child navigation (name, level, Upgrade button).
+private struct LockedAccessibilitySummary: ViewModifier {
+    let isLocked: Bool
+    let name: String
+    let unlockText: String
+
+    func body(content: Content) -> some View {
+        if isLocked {
+            content
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(name), locked")
+                .accessibilityHint(unlockText)
+        } else {
+            content
+        }
     }
 }
 
@@ -989,6 +1020,8 @@ private struct UpgradeRowView: View {
                         .background(borderColor.opacity(data.isMaxed || !data.canAfford ? 0.18 : 0.85), in: Capsule())
                         .foregroundStyle(.white)
                         .disabled(data.isMaxed || !data.canAfford)
+                        .accessibilityLabel("Buy \(data.name)")
+                        .accessibilityValue(data.costText)
                     Button("Max", action: onBuyMax)
                         .buttonStyle(PressableButtonStyle())
                         .padding(.horizontal, 14).padding(.vertical, 7)
@@ -996,6 +1029,7 @@ private struct UpgradeRowView: View {
                         .overlay(Capsule().strokeBorder(borderColor.opacity(data.isMaxed || !data.canAfford ? 0.15 : 0.7), lineWidth: 1))
                         .foregroundStyle(.white)
                         .disabled(data.isMaxed || !data.canAfford)
+                        .accessibilityLabel("Buy max \(data.name)")
                 }
             }
         }
@@ -1056,6 +1090,7 @@ private struct RebirthTab: View {
                         }
                         .buttonStyle(PressableButtonStyle())
                         .disabled(!canRebirth)
+                        .accessibilityHint(canRebirth ? "" : requirementText)
                     }
                 }
 
