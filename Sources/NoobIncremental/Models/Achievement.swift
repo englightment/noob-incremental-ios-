@@ -50,7 +50,9 @@ enum AchievementCatalog {
         AchievementDefinition(id: "rune_collector", name: "Rune Collector", description: "Own every Rune", condition: .allRunesOwned),
         AchievementDefinition(id: "max_rune_oof", name: "Runed Up", description: "Max the Rune of Oof", condition: .upgradeMaxed("rune_oof")),
         AchievementDefinition(id: "menagerie", name: "Menagerie", description: "Unlock every Minion", condition: .allMinionsOwned),
-        AchievementDefinition(id: "minion_master", name: "Minion Master", description: "Max the Extra Minion Slots upgrade", condition: .upgradeMaxed("rebirth_minion_slots"))
+        AchievementDefinition(id: "minion_master", name: "Minion Master", description: "Max the Extra Minion Slots upgrade", condition: .upgradeMaxed("rebirth_minion_slots")),
+        AchievementDefinition(id: "insightful", name: "Insightful", description: "Max the Prestige Insight upgrade", condition: .upgradeMaxed("prestige_insight")),
+        AchievementDefinition(id: "true_kinship", name: "True Kinship", description: "Max the Rune of Kinship", condition: .upgradeMaxed("rune_kinship"))
     ]
 
     static func definition(for id: String) -> AchievementDefinition? {
