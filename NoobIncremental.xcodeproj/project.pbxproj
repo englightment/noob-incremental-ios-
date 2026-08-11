@@ -50,6 +50,7 @@
 		90FF55CC043EAB85B5D77752 /* RebirthUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A5334149B8528D7DC2A4AD /* RebirthUpgradeStoreTests.swift */; };
 		93399FAF8EDF0D0AFC9DF65C /* BoostSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4CD89245D4F148580E586A7 /* BoostSystem.swift */; };
 		9402A07A6ED2AD9A72B59BD2 /* RebirthUpgradeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F01DD25682182DD9350069 /* RebirthUpgradeStore.swift */; };
+		9FA032C71DB52C65A9502BC7 /* OfflineReminderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA46166D56613029AA9D816C /* OfflineReminderManager.swift */; };
 		A0358655451A09E05D261A45 /* GameStateDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90B32F6D8F465672160259B /* GameStateDecodingTests.swift */; };
 		A347901CD1A41D6547EC7987 /* MinionSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1617C25BBC17994990ACA /* MinionSystem.swift */; };
 		A65D3A7E310E9FDE9C920EE4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4B7BB345AAB314803A868CE /* Assets.xcassets */; };
@@ -124,6 +125,7 @@
 		A25ACC1DF21B323B8DEBD00F /* RedeemCodeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedeemCodeStoreTests.swift; sourceTree = "<group>"; };
 		A799D55A49241D21CCEA52F3 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		A7BE3D0708186C31FD1439E0 /* Achievement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Achievement.swift; sourceTree = "<group>"; };
+		AA46166D56613029AA9D816C /* OfflineReminderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineReminderManager.swift; sourceTree = "<group>"; };
 		AF13B3804E62DA65AE06A1F4 /* GameLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLoop.swift; sourceTree = "<group>"; };
 		B0B2EB3C206472485AE9F1A8 /* AdBoostSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdBoostSystem.swift; sourceTree = "<group>"; };
 		B1B9EE3BC00533F6016F46E1 /* NumberFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormattingTests.swift; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 				16F1617C25BBC17994990ACA /* MinionSystem.swift */,
 				1616AA4F5E49D1A089625AC1 /* NumberFormatting.swift */,
 				C5AB028C6D45BB3EE0AA1ABE /* OfflineProgress.swift */,
+				AA46166D56613029AA9D816C /* OfflineReminderManager.swift */,
 				9146A6B1A231FA3371299827 /* OnboardingSystem.swift */,
 				CD4A7CB0ECD22071F278E647 /* RebirthSystem.swift */,
 				63F01DD25682182DD9350069 /* RebirthUpgradeStore.swift */,
@@ -450,6 +453,7 @@
 				3B0F4D3F6CF32BEAF4CAB058 /* NoobIncrementalApp.swift in Sources */,
 				BE90EC6D4AB8EFF30652BEFD /* NumberFormatting.swift in Sources */,
 				5EA32FE7047CE1A8F4BA55AD /* OfflineProgress.swift in Sources */,
+				9FA032C71DB52C65A9502BC7 /* OfflineReminderManager.swift in Sources */,
 				15986A20704065875F45FE11 /* OnboardingSystem.swift in Sources */,
 				31A4DF71B0C2E51502CC4CD9 /* RebirthSystem.swift in Sources */,
 				9402A07A6ED2AD9A72B59BD2 /* RebirthUpgradeStore.swift in Sources */,
